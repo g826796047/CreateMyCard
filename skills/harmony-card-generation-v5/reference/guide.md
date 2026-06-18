@@ -108,7 +108,7 @@
 ## 媒体规则
 
 - `Image.src` 和 `styles.backgroundImage` 只使用本地/资源路径。
-- 不要使用网络图片 URL、`https://example.com`、占位图片 URL、SVG 或 base64 SVG。
+- 不要使用网络图片 URL、占位图片 URL、SVG 或 base64 SVG。
 - 如果没有真实本地资源，用 `linearGradient`、半透明块、文本字形、`Progress` 和 `Divider` 创造视觉丰富度。
 
 ## 输出质量清单

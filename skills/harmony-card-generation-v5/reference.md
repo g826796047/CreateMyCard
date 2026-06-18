@@ -1,12 +1,12 @@
-# Harmony 卡片生成 V5 参考索引
+# Harmony 卡片生成参考索引
 
 此文件只用于导航。只有在 `SKILL.md` 的参考路由不够明确、或当前任务横跨多个问题域时读取它；读取后只加载相关文件。
 
 ## 核心原则
 
-V5 由 Form 协议和规则共同驱动：
+卡片生成由 Form 协议和规则共同驱动：
 
-- 协议事实源是仓库根目录的 `harmonyos-a2ui-form-protocol.md`。
+- 协议依据收敛在 [`reference/protocol.md`](reference/protocol.md)。
 - 生成时先读 [`reference/protocol.md`](reference/protocol.md) 取得 Form 硬约束。
 - 不要选择或改造内置 DSL 模板。
 - 除非用户明确提供已有 DSL 产物要求编辑，否则不要模仿历史输出或示例卡片。
@@ -65,13 +65,11 @@ V5 由 Form 协议和规则共同驱动：
 - 脚本已通过但仍要判断视觉、交互、数据语义质量：读 [`reference/design-review.md`](reference/design-review.md)。
 - 最终交付前：读 [`reference/review-validation.md`](reference/review-validation.md)，并由它调度最终评审。
 
-## 来源依据
+## 内部依据
 
-本 skill 基于本仓库中的 Form 协议裁剪文档：
+本 skill 目录内的 [`reference/protocol.md`](reference/protocol.md)、[`reference/component-catalog.md`](reference/component-catalog.md) 和 [`reference/data-binding.md`](reference/data-binding.md) 构成协议与 DSL 依据。
 
-- `harmonyos-a2ui-form-protocol.md`
-
-不要把历史示例产物作为卡片布局来源。协议原文是权威依据；本 skill 的协议参考只是生成用摘要。
+不要把示例产物作为卡片布局来源。卡片布局只从语义角色、尺寸预算和构图规则推导。
 
 ## 校验
 
