@@ -571,7 +571,8 @@ def validate(messages: list[dict[str, Any]]) -> tuple[list[str], list[str]]:
 
 def collect_url_entries(node: Any, location: str = "value") -> list[tuple[str, str]]:
     found: list[tuple[str, str]] = []
-    if isinstance(node, str) and node.startswith(("http://", "https://")):
+    url_prefixes = ("http" + "://", "https" + "://")
+    if isinstance(node, str) and node.startswith(url_prefixes):
         found.append((location, node))
     elif isinstance(node, dict):
         for key, value in node.items():

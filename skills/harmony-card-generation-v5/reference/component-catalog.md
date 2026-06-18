@@ -1,6 +1,6 @@
 # Form 组件目录
 
-这是 `harmonyos-a2ui-form-protocol.md` 的卡片生成子集。协议原文冲突时，以协议原文为准。
+这是卡片生成使用的 Form 组件子集。组件与属性规则以本文档和 [`protocol.md`](protocol.md) 为准。
 
 ## 必需 Catalog
 

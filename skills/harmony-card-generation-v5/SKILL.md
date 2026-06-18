@@ -1,37 +1,36 @@
 ---
 name: harmony-card-generation-v5
-description: "根据 harmonyos-a2ui-form-protocol 生成 HarmonyOS A2UI Form 服务卡片完整结果：一个 genui 代码块中的 DSL JSONL + 一个 cardspec 代码块中的 CardSpec JSON。使用 extended catalog 下的 Form 子集、10 个 Form 支持组件、onClick 行为链、表达式/DataModel、2x2 或横版 2x4 卡片构造规则，以及端侧 dataBindings/refreshPlan 契约。适用于创建、优化、校验或输出 HarmonyOS/A2UI/Form/服务卡片/widget 卡片/DSL/JSONL/CardSpec 组合结果，目标场景为 160x160vp 或 320x160vp。"
+description: "生成 HarmonyOS A2UI Form 服务卡片完整结果：一个 genui 代码块中的 DSL JSONL + 一个 cardspec 代码块中的 CardSpec JSON。使用 extended catalog 下的 Form 子集、10 个 Form 支持组件、onClick 行为链、表达式/DataModel、2x2 或横版 2x4 卡片构造规则，以及端侧 dataBindings/refreshPlan 契约。适用于创建、优化、校验或输出 HarmonyOS/A2UI/Form/服务卡片/widget 卡片/DSL/JSONL/CardSpec 组合结果，目标场景为 160x160vp 或 320x160vp。"
 ---
 
-# Harmony 卡片生成 V5
+# Harmony 卡片生成
 
 ## 这个 Skill 做什么
 
 - 根据一句话生成 HarmonyOS A2UI Form 服务卡片完整结果。
-- 每个卡片结果都包含同一张卡片的 `genui` DSL JSONL 代码块与 `cardspec` JSON 代码块；CardSpec 是 V5 结果的一部分，不是额外外挂。
+- 每个卡片结果都包含同一张卡片的 `genui` DSL JSONL 代码块与 `cardspec` JSON 代码块；CardSpec 是卡片结果的一部分，不是额外外挂。
 - 使用可泛化的构图规则构造卡片：
   - `2x2`：`160 x 160vp`
   - `2x4`：`320 x 160vp` 横版
 - 遵循自包含工作流：模式识别、按需读取参考、先说明布局理由再写 JSON、显式改进、优先落盘迭代、脚本校验和最终验收。
-- 使用 `harmonyos-a2ui-form-protocol.md` 的 Form 裁剪协议。协议冲突时，以该协议为准。
+- 使用本 skill 内置的 Form 裁剪协议摘要。协议冲突时，以 [`reference/protocol.md`](reference/protocol.md) 为准。
 
 ## 执行边界
 
-- 默认不要联网。使用本地 `harmonyos-a2ui-form-protocol.md` 和本 skill 自带参考。
-- 除非用户明确提供已有 DSL 文件用于优化，否则不要主动读取、复制、改造或模仿历史卡片模板、示例卡片、旧产物、截图或已生成 JSON。
+- 默认不要联网。只使用本 skill 目录内的参考和脚本。
+- 除非用户明确提供已有 DSL 文件用于优化，否则不要主动读取、复制、改造或模仿其它卡片模板、示例卡片、产物、截图或已生成 JSON。
 - 不要把“选择模板”作为生成步骤。布局决策只来自可泛化的构造规则。
 - 除非用户明确改变任务，否则不要把桌面卡片扩展成页面、文章、长列表或仪表盘。
 - 不要发明组件、样式键或预定义函数。只有在用户/宿主提供或明确声明为宿主自定义函数假设时，才允许使用应用特定函数。
-- CardSpec 是 V5 卡片结果的一部分，负责端侧数据能力、刷新和持久化契约；不要把旧项目中的旧 catalog、旧组件清单或旧 DSL 示例合并进 V5 DSL 规则。
+- CardSpec 是卡片结果的一部分，负责端侧数据能力、刷新和持久化契约；DSL 规则只来自本 skill 的协议、组件目录和数据绑定参考。
 
 ## 协议优先级
 
 按以下顺序解决冲突：
 
-1. 仓库根目录的 `harmonyos-a2ui-form-protocol.md`
-2. [`reference/protocol.md`](reference/protocol.md)
-3. [`reference/component-catalog.md`](reference/component-catalog.md) 和 [`reference/data-binding.md`](reference/data-binding.md)
-4. 设计、构图和评审文档
+1. [`reference/protocol.md`](reference/protocol.md)
+2. [`reference/component-catalog.md`](reference/component-catalog.md) 和 [`reference/data-binding.md`](reference/data-binding.md)
+3. 设计、构图和评审文档
 
 设计文档只负责卡片质量，不得放宽 Form 协议约束。
 
@@ -161,7 +160,7 @@ description: "根据 harmonyos-a2ui-form-protocol 生成 HarmonyOS A2UI Form 服
 - 直接输出 `genui` 块和 `cardspec` 块；前后不要加解释、标题、路径或总结。
 - `genui` 块只输出 A2UI JSONL，每行是一条完整 JSON 消息。
 - `cardspec` 块只输出一个完整 JSON 对象。
-- `genui` 和 `cardspec` 是同一个 V5 卡片结果的两个部分，不要把 CardSpec 当外挂、附件或另一个项目产物。
+- `genui` 和 `cardspec` 是同一个卡片结果的两个部分，不要把 CardSpec 当外挂、附件或另一个项目产物。
 - 静态卡片也输出 `cardspec`；可以只包含 `suggestSize`，不要虚构 `dataBindings`。
 - 动态卡片必须在 `cardspec.dataBindings` 中声明端侧能力调用。
 
@@ -235,7 +234,7 @@ description: "根据 harmonyos-a2ui-form-protocol 生成 HarmonyOS A2UI Form 服
 - 任何手动/设计修改后，都要重新运行校验器。
 - CardSpec 的 `suggestSize` 必须与 DSL 选择的尺寸一致。
 - CardSpec 的 `dataBindings[].writeResultTo` 必须位于 `/data` 下，且 UI 绑定路径必须能由 `writeResultTo + outputSchema` 推导。
-- CardSpec 优先使用旧 cardspec 项目的简洁契约：`suggestSize`、`dataBindings[].capabilityId`、`arguments`、`writeResultTo`；只有端侧明确需要时才加入 `bindingId`、`capabilityVersion` 或 `refreshPlan`。
+- CardSpec 优先使用简洁契约：`suggestSize`、`dataBindings[].capabilityId`、`arguments`、`writeResultTo`；只有端侧明确需要时才加入 `bindingId`、`capabilityVersion` 或 `refreshPlan`。
 - 不虚构 CardSpec 能力、参数、权限、端侧函数或刷新策略；未声明能力只能降级为静态卡片或说明需要补充 capability manifest。
 
 ## 资源

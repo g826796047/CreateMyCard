@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a V5 CardSpec JSON file."""
+"""Validate a CardSpec JSON file."""
 
 from __future__ import annotations
 
