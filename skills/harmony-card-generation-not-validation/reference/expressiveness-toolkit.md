@@ -35,7 +35,7 @@
 当不需要图标素材时，用 `Text` 承载紧凑字形/图标。
 
 ```json
-{"id":"weatherIcon","component":"Text","content":"{{ $__dataModel.weather.icon }}","styles":{"fontSize":38,"maxLines":1,"textAlign":"center"}}
+{"id":"weatherIcon","component":"Text","content":{"path":"/weather/icon"},"styles":{"fontSize":38,"maxLines":1,"textAlign":"center"}}
 ```
 
 字形图标用于简单符号标记。当字形承载语义时，添加 `accessibility.label`。
@@ -45,7 +45,7 @@
 睡眠、习惯、电量、完成度、训练和目标卡使用 `Progress`。
 
 ```json
-{"id":"goalProgress","component":"Progress","value":"{{ $__dataModel.goal.value }}","total":"{{ $__dataModel.goal.total }}","styles":{"type":"ring","color":"#A77DFF","width":72,"height":72}}
+{"id":"goalProgress","component":"Progress","value":{"path":"/goal/value"},"total":{"path":"/goal/total"},"styles":{"type":"ring","color":"#A77DFF","width":72,"height":72}}
 ```
 
 进度组件应是主要焦点之一，不要成为很小的附带元素。
@@ -66,7 +66,7 @@
 
 ```json
 {"id":"root","component":"Stack","children":["productImage","contentLayer"],"styles":{"width":160,"height":160,"clip":true}}
-{"id":"productImage","component":"Image","src":"{{ $__dataModel.asset.productImage }}","styles":{"width":"100%","height":"100%","objectFit":"cover"}}
+{"id":"productImage","component":"Image","src":{"path":"/asset/productImage"},"styles":{"width":"100%","height":"100%","objectFit":"cover"}}
 ```
 
 规则：

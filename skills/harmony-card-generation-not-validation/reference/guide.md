@@ -6,7 +6,7 @@
 
 ```jsonl
 {"version":"v0.9","createSurface":{"surfaceId":"sample-card","catalogId":"ohos.a2ui.extended.catalog"}}
-{"version":"v0.9","updateComponents":{"surfaceId":"sample-card","components":[{"id":"root","component":"Column","children":["title"],"styles":{"width":160,"height":160,"borderRadius":22,"clip":true}},{"id":"title","component":"Text","content":"{{ $__dataModel.title }}","styles":{"fontSize":16,"fontWeight":700}}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"sample-card","components":[{"id":"root","component":"Column","children":["title"],"styles":{"width":160,"height":160,"borderRadius":22,"clip":true}},{"id":"title","component":"Text","content":{"path":"/title"},"styles":{"fontSize":16,"fontWeight":700}}]}}
 {"version":"v0.9","updateDataModel":{"surfaceId":"sample-card","path":"/","value":{"title":"Sample"}}}
 ```
 
@@ -39,7 +39,7 @@
 
 ```json
 {"id":"root","component":"Column","children":["title","cta"]}
-{"id":"title","component":"Text","content":"{{ $__dataModel.title }}"}
+{"id":"title","component":"Text","content":{"path":"/title"}}
 ```
 
 不要内联 child component object：
@@ -73,19 +73,19 @@
 
 ## 数据模型规则
 
-- 用表达式绑定动态可见数据：`"{{ $__dataModel.meeting.time }}"`。
+- 动态可见数据优先用原生 path 绑定：`{"path":"/meeting/time"}`。
 - 只有结构性装饰值才保持字面量，例如空 spacer 文本。
 - 表达式引用的数据应存在于 `updateDataModel.value`。
 - `updateDataModel.path` 使用 `/` JSON Pointer。
 - 宿主动作参数尽量绑定到数据：
 
 ```json
-"onClick":[{"call":"openTrainingPlan","args":{"planId":"{{ $__dataModel.plan.id }}"}}]
+"onClick":[{"call":"openTrainingPlan","args":{"planId":{"path":"/plan/id"}}}]
 ```
 
-## 表达式规则
+## 表达式规则（兜底）
 
-表达式只在 Form 扩展组件中可用，并且只用于 `updateComponents` 的 value 位置：
+表达式是原生 path 绑定和 `formatString` 无法表达时的兜底方式，只在 Form 扩展组件中可用，并且只用于 `updateComponents` 的 value 位置：
 
 ```json
 {"content":"{{ '剩余 ' + $__dataModel.countdown.days + ' 天' }}"}

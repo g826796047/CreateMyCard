@@ -24,7 +24,7 @@
 示例：
 
 ```json
-{"id":"focusAction","component":"Stack","children":["focusLabel"],"onClick":[{"call":"enterFocusMode","args":{"meetingId":"{{ $__dataModel.meeting.id }}"}}]}
+{"id":"focusAction","component":"Stack","children":["focusLabel"],"onClick":[{"call":"enterFocusMode","args":{"meetingId":{"path":"/meeting/id"}}}]}
 ```
 
 ## 按钮安全
