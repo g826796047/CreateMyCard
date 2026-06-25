@@ -1,5 +1,5 @@
 ---
-name: harmony-card-generation-not-validation
+name: harmony-card-generation
 description: "生成 HarmonyOS A2UI Form 服务卡片完整结果：一个 genui 代码块中的 DSL JSONL + 一个 cardspec 代码块中的 CardSpec JSON。使用 extended catalog 下的 Form 子集、10 个 Form 支持组件、onClick 行为链、原生 `{path}` 绑定/`formatString` 拼接/表达式、DataModel、2x2 或横版 2x4 卡片构造规则，以及端侧 dataBindings/refreshPlan 契约。适用于创建、优化、评审或输出 HarmonyOS/A2UI/Form/服务卡片/widget 卡片/DSL/JSONL/CardSpec 组合结果，目标场景为 160x160vp 或 320x160vp。"
 ---
 
