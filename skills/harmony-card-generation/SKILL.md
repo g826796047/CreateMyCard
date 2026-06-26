@@ -1,6 +1,6 @@
 ---
 name: harmony-card-generation
-description: "生成 HarmonyOS A2UI Form 服务卡片完整结果：一个 genui 代码块中的 DSL JSONL + 一个 cardspec 代码块中的 CardSpec JSON。使用 extended catalog 下的 Form 子集、10 个 Form 支持组件、onClick 行为链、原生 `{path}` 绑定/`formatString` 拼接/表达式、DataModel、2x2 或横版 2x4 卡片构造规则，以及端侧 dataBindings/refreshPlan 契约。适用于创建、优化、评审或输出 HarmonyOS/A2UI/Form/服务卡片/widget 卡片/DSL/JSONL/CardSpec 组合结果，目标场景为 160x160vp 或 320x160vp。"
+description: "生成 HarmonyOS A2UI Form 服务卡片完整结果：一个 genui 代码块中的 DSL JSONL + 一个 cardspec 代码块中的 CardSpec JSON。使用 extended catalog 下的 Form 子集、10 个 Form 支持组件、onClick 行为链、原生 `{path}` 绑定/`formatString` 拼接/表达式、DataModel、2x2 或横版 2x4 卡片构造规则，以及端侧 dataBindings 契约。适用于创建、优化、评审或输出 HarmonyOS/A2UI/Form/服务卡片/widget 卡片/DSL/JSONL/CardSpec 组合结果，目标场景为 160x160vp 或 320x160vp。"
 ---
 
 # Harmony 卡片生成
@@ -194,7 +194,7 @@ description: "生成 HarmonyOS A2UI Form 服务卡片完整结果：一个 genui
    - 必须完整显示的关键信息
    - 每个拥挤 Row 的组件内部宽度预算
    - 交互、点击能力来源和 DataModel 形状
-   - CardSpec 的 `suggestSize`、静态/动态形态、能力选择、参数、`writeResultTo` 和刷新计划
+   - CardSpec 的 `suggestSize`、静态/动态形态、能力选择、参数和 `writeResultTo`
 10. 正式输出前至少做一次显式改进：
    - 指出第一个内部版本缺少什么
    - 改进层级、紧凑度、场景视觉特征，或关键信息完整显示的安全性
@@ -240,7 +240,7 @@ description: "生成 HarmonyOS A2UI Form 服务卡片完整结果：一个 genui
 - CardSpec 的 `suggestSize` 必须与 DSL 选择的尺寸一致。
 - CardSpec 的 `dataBindings[].writeResultTo` 必须位于 `/data` 下，且 UI 绑定路径必须能由 `writeResultTo + outputSchema` 推导。
 - `dataBindings[].capabilityId` 必须来自 [`reference/data-capability/`](reference/data-capability/) 中选定能力的 `id`，`arguments` 只能使用该能力 `inputSchema.properties` 声明的字段。
-- CardSpec 优先使用简洁契约：`suggestSize`、`dataBindings[].capabilityId`、`arguments`、`writeResultTo`；只有端侧明确需要时才加入 `bindingId`、`capabilityVersion` 或 `refreshPlan`。
+- CardSpec 优先使用简洁契约：`suggestSize`、`dataBindings[].capabilityId`、`arguments`、`writeResultTo`；只有端侧明确需要时才加入 `bindingId` 或 `capabilityVersion`。
 - 不虚构 CardSpec 能力、参数、权限、端侧函数或刷新策略；未声明能力只能降级为静态卡片或说明需要补充 capability manifest。
 
 ## 资源
