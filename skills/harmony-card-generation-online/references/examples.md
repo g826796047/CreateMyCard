@@ -82,12 +82,12 @@ invoke(functionName:"RequestDataPermission", arguments:{
 ```json
 {
   "result": {
-    "stateOfPermission": "true"
+    "stateOfPermission": true
   }
 }
 ```
 
-返回 `"false"` 时立即终止，不调用生成工具，并回复“当前生成卡片所需的数据权限不可用，已停止生成。”
+返回 Boolean `false` 时立即终止，不调用生成工具，并回复“当前生成卡片所需的数据权限不可用，已停止生成。”
 
 4. `generateWidgetCard`
 
@@ -155,7 +155,7 @@ invoke(functionName:"RequestDataPermission", arguments:{
 },"skillName":"harmony-card-generation-online")
 ```
 
-仅在权限返回 `"true"` 后调用：
+仅在权限返回 Boolean `true` 后调用：
 
 ```text
 invoke(functionName:"generateWidgetCard", arguments:{
@@ -343,7 +343,7 @@ failed：
 卡片创建过程遇到问题了，请稍后再试
 ```
 
-权限不可用（`RequestDataPermission` 返回 `"false"`）：
+权限不可用（`RequestDataPermission` 返回 Boolean `false`）：
 
 ```text
 当前生成卡片所需的数据权限不可用，已停止生成。
@@ -382,7 +382,7 @@ failed：
 invoke(functionName:"RequestDataPermission", arguments:{bundleName:"com.omega_w_0823.hmservice", dataCapabilityIds:["ViewWeather", "calendar.events.search"]},"skillName":"harmony-card-generation-online")
 ```
 
-权限返回 `"true"` 后调用：
+权限返回 Boolean `true` 后调用：
 
 ```text
 invoke(functionName:"generateWidgetCard", arguments:{bundleName:"com.omega_w_0823.hmservice", userQuery:"背景改成蓝色，信息排紧凑一点", sourceArtifactUrl:"https://obs.example/widget/v1.json"},"skillName":"harmony-card-generation-online")
@@ -394,7 +394,7 @@ invoke(functionName:"generateWidgetCard", arguments:{bundleName:"com.omega_w_082
 
 用户：“标题改成每日通勤，再改成 2x4。”
 
-同样先对 `effectiveCapabilities.data` 调用 `RequestDataPermission`，权限返回 `"true"` 后调用：
+同样先对 `effectiveCapabilities.data` 调用 `RequestDataPermission`，权限返回 Boolean `true` 后调用：
 
 ```text
 invoke(functionName:"generateWidgetCard", arguments:{bundleName:"com.omega_w_0823.hmservice", userQuery:"标题改成每日通勤，再改成 2x4", sourceArtifactUrl:"https://obs.example/widget/v1.json", title:"每日通勤", size:"2x4"},"skillName":"harmony-card-generation-online")
@@ -412,7 +412,7 @@ invoke(functionName:"generateWidgetCard", arguments:{bundleName:"com.omega_w_082
 invoke(functionName:"RequestDataPermission", arguments:{bundleName:"com.omega_w_0823.hmservice", dataCapabilityIds:["ViewWeather"]},"skillName":"harmony-card-generation-online")
 ```
 
-权限返回 `"true"` 后传编辑后的完整集合：
+权限返回 Boolean `true` 后传编辑后的完整集合：
 
 ```text
 invoke(functionName:"generateWidgetCard", arguments:{bundleName:"com.omega_w_0823.hmservice", userQuery:"去掉日历，只保留天气", sourceArtifactUrl:"https://obs.example/widget/v1.json", candidateDataBindings:[{capabilityId:"ViewWeather", arguments:{districtName:"上海", forecastDays:1}, writeResultTo:"/data/weather", candidateOutputFields:["/location/name", "/current/temperatureText", "/current/weatherText"]}]},"skillName":"harmony-card-generation-online")
@@ -424,7 +424,7 @@ invoke(functionName:"generateWidgetCard", arguments:{bundleName:"com.omega_w_082
 
 用户：“把上海天气改成北京天气。”
 
-重新获取 overview 和天气 schema，将完整数据候选中的天气参数改为北京，保留其它 binding；先对编辑后的完整数据能力 ID 调用 `RequestDataPermission`，权限返回 `"true"` 后再调用 `generateWidgetCard`。如果上一轮编辑成功并返回：
+重新获取 overview 和天气 schema，将完整数据候选中的天气参数改为北京，保留其它 binding；先对编辑后的完整数据能力 ID 调用 `RequestDataPermission`，权限返回 Boolean `true` 后再调用 `generateWidgetCard`。如果上一轮编辑成功并返回：
 
 ```json
 {

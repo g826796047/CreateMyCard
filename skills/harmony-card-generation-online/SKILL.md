@@ -33,7 +33,7 @@ metadata:
 - edit 未指定目标时使用当前会话最近一次成功或降级结果；明确目标无法对应时才追问。来源只能取目标卡片工具业务 payload 的真实 `artifactUrl`；没有可用来源时要求先创建，不得改走 create。
 - 每次调用工具前检查是否缺少会改变核心意图、候选选择、目标对象、地点、时间范围、动作目标或业务入参的用户信息；有则集中追问并等待回答。设备能力、能力 ID、schema 等内部信息不向用户确认。
 - 每次调用前读取当前运行时 `tools` schema，并执行下方“调用前硬校验”。参考资料、示例、历史字段和内部类结构不能覆盖运行时 schema。
-- 在每次 `generateWidgetCard` 前确定本轮最终数据能力 ID 集合；非空时必须调用 `RequestDataPermission` 并等待结果。只有 `result.stateOfPermission` 明确为 `"true"` 才能生成；为 `"false"` 时终止并告知权限不可用，缺失或非法时按工具异常终止。数据集合变化后必须重新检查；空集合表示无动态数据权限需要检查。
+- 在每次 `generateWidgetCard` 前确定本轮最终数据能力 ID 集合；非空时必须调用 `RequestDataPermission` 并等待结果。只有 Boolean `result.stateOfPermission` 明确为 `true` 才能生成；为 `false` 时终止并告知权限不可用，缺失、非 Boolean 或其它非法结果按工具异常终止。数据集合变化后必须重新检查；空集合表示无动态数据权限需要检查。
 
 ## 职责边界
 

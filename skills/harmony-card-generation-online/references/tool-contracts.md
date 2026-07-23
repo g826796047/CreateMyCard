@@ -138,7 +138,7 @@ invoke(functionName:"RequestDataPermission", arguments:{bundleName:"com.omega_w_
 - 无法从会话中的有效结果或完整候选链可靠恢复 edit 的数据能力集合时停止编辑，不读取来源 artifact 猜测。
 - `dataCapabilityIds` 为空时不调用；这表示本轮卡片不使用动态数据。
 - 调用后必须等待并解析权限结果；在得到明确结果前不得调用 `generateWidgetCard`，也不得继续修改待生成的数据能力集合。
-- 当前工具快照的输出为 `result.stateOfPermission: String`：精确值 `"true"` 才允许继续，精确值 `"false"` 表示权限不可用并立即终止。缺少 `result`、字段缺失、类型错误、其它值、工具不可用或调用失败均按其它异常终止，不调用生成工具。
+- 当前工具快照的输出为 `result.stateOfPermission: Boolean`：`true` 才允许继续，`false` 表示权限不可用并立即终止。缺少 `result`、字段缺失、非 Boolean、工具不可用或调用失败均按其它异常终止，不调用生成工具。
 - 权限通过后只能继续执行已检查的同一组数据能力；集合或数据 binding 发生变化时必须重新调用。
 
 ## generateWidgetCard
