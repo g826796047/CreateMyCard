@@ -31,7 +31,7 @@
         "required": [],
         "properties": {
           "stateOfPermission": {
-            "type": "String",
+            "type": "Boolean",
             "description": "获取到的权限结果"
           }
         }
