@@ -79,7 +79,7 @@
       },
       "size": {
         "type": "String",
-        "description": "主 Agent 建议尺寸"
+        "description": "用户本轮明确指定受支持的卡片尺寸时必须优先传入；用户未指定时沿用现有尺寸选择规则，默认2*2"
       },
       "sourceArtifactUrl": {
         "type": "String",
