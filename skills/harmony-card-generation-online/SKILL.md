@@ -1,6 +1,6 @@
 ---
 name: harmony-card-generation-online
-description: "用户要创建或修改可添加到鸿蒙桌面的服务卡片时，使用本 Skill；泛称做张卡片等创建请求也进入并按需澄清。壁纸或桌面背景、会员卡等非桌面服务卡，以及仅导出、保存或发送已有卡片图片的请求不适用。"
+description: "用户指定使用“桌面卡片生成技能”或者要创建/修改可添加到鸿蒙桌面的服务卡片时使用本 Skill；泛称做张卡片等创建请求也进入并按需澄清。壁纸或桌面背景、会员卡等非桌面服务卡，以及仅导出、保存或发送已有卡片图片的请求不适用。"
 metadata:
   tools:
     - bundleName: "com.omega_w_0823.hmservice"
