@@ -81,9 +81,6 @@ model_appid: ""
 model_url: ""
 model_bid: ""
 model_flow_id: ""
-system.prompt: "@prompt:../data/protocol_profiles/design-compact-dsl-fusion/prompt_source#create"
-edit.system.prompt: "@prompt:../data/protocol_profiles/design-compact-dsl-fusion/prompt_source#edit"
-repair.system.prompt: "@prompt:../data/protocol_profiles/design-compact-dsl-fusion/prompt_source#repair"
 
 a2ui_form_model_backend: mep
 design_compact_model_backend: openai

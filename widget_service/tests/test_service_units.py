@@ -103,7 +103,6 @@ from custom.mep_model_transport import MepModelTransport, PredictEventDecoder
 from custom.model_transport import ModelTransportError
 from custom.model_runtime import ModelExecutionRuntime, _generate_with_llmclient
 from services.card_spec_builder import CardSpecBuilder
-from services.card_validator import validate_card
 from services.card_validation import validate_card as validate_card_api
 from services.card_validation.rule_registry import RuleRegistry
 from services.capability_registry import CapabilityRegistry
@@ -245,12 +244,6 @@ def test_anyio_thread_pool_uses_configured_capacity(monkeypatch):
         return configured_tokens, limiter_tokens
 
     assert asyncio.run(configure_and_read_tokens()) == (80, 80)
-
-
-def test_settings_keeps_inline_multiline_prompt_without_path_probe() -> None:
-    prompt = "第一行\n第二行"
-
-    assert Settings.load_prompt_file_alias(prompt) == prompt
 
 
 def test_prompt_log_summary_only_keeps_configured_system_prompt_prefix():
@@ -4983,46 +4976,48 @@ def _a2ui_genui_with_image(
     )
 
 
-def test_card_validator_uses_effective_asset_candidates_without_external_reads():
+def test_card_validation_api_uses_effective_asset_candidates_without_external_reads():
     source = "resources/base/media/air_fill.svg"
-    validator_source = (CLOUD_ROOT / "services" / "card_validator.py").read_text(encoding="utf-8")
+    validator_source = (CLOUD_ROOT / "services/card_validation/api.py").read_text(encoding="utf-8")
 
-    selected_report = validate_card(
-        _a2ui_genui_with_image(source),
-        {"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
-        allowed_asset_sources={source},
+    selected_report = validate_card_api(
+        dsl_text=_a2ui_genui_with_image(source),
+        cardspec={"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
+        effective_capabilities={"data": [], "event": [], "asset": [{"src": source}]},
     )
-    unselected_report = validate_card(
-        _a2ui_genui_with_image(source),
-        {"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
-        allowed_asset_sources=set(),
+    unselected_report = validate_card_api(
+        dsl_text=_a2ui_genui_with_image(source),
+        cardspec={"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
+        effective_capabilities={"data": [], "event": [], "asset": []},
     )
-    standalone_report = validate_card(
-        _a2ui_genui_with_image(source),
-        {"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
+    standalone_report = validate_card_api(
+        dsl_text=_a2ui_genui_with_image(source),
+        cardspec={"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
     )
 
-    assert not any("EFFECTIVE_ASSET_NOT_ALLOWED" in item for item in selected_report.errors)
-    assert any("EFFECTIVE_ASSET_NOT_ALLOWED" in item for item in unselected_report.errors)
-    assert not any("EFFECTIVE_ASSET_NOT_ALLOWED" in item for item in standalone_report.errors)
+    assert not selected_report.has_code("EFFECTIVE_ASSET_NOT_ALLOWED")
+    assert unselected_report.has_code("EFFECTIVE_ASSET_NOT_ALLOWED")
+    assert not standalone_report.has_code("EFFECTIVE_ASSET_NOT_ALLOWED")
     assert "skills" not in validator_source.lower()
     assert "subprocess" not in validator_source
 
 
-def test_card_validator_does_not_apply_legacy_color_quality_rule():
-    valid_report = validate_card(
-        _a2ui_genui_with_image("resources/base/media/air_fill.svg"),
-        {"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
-        allowed_asset_sources={"resources/base/media/air_fill.svg"},
+def test_card_validation_api_does_not_apply_legacy_color_quality_rule():
+    source = "resources/base/media/air_fill.svg"
+    effective = {"data": [], "event": [], "asset": [{"src": source}]}
+    valid_report = validate_card_api(
+        dsl_text=_a2ui_genui_with_image(source),
+        cardspec={"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
+        effective_capabilities=effective,
     )
-    invalid_report = validate_card(
-        _a2ui_genui_with_image(
-            "resources/base/media/air_fill.svg",
+    invalid_report = validate_card_api(
+        dsl_text=_a2ui_genui_with_image(
+            source,
             background_color="blue",
         ),
-        {"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
-        allowed_asset_sources={"resources/base/media/air_fill.svg"},
+        cardspec={"title": "天气", "description": "今日天气", "suggestSize": "2x2"},
+        effective_capabilities=effective,
     )
 
-    assert valid_report.errors == []
-    assert invalid_report.errors == []
+    assert not valid_report.has_error()
+    assert not invalid_report.has_error()

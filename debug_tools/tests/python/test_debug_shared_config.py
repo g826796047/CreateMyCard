@@ -21,7 +21,7 @@ class SharedSettings(BaseSettings):
     deepseek_official_http_api_key: str = ""
     model_max_concurrency: int = 1
     enable_model_failure_retry: bool = False
-    system_prompt: str = ""
+    model_bid: str = ""
 
 
 @pytest.mark.parametrize("local_exists", [True, False])
@@ -44,10 +44,10 @@ def test_agent_uses_shared_configuration(
             "widget_backend:\n  exposed:\n    openai_master_client: deepseek_official_http\n"
             "  defaults:\n    deepseek_official_http_api_key: test-only-key\n"
             "    model_max_concurrency: 11\n    enable_model_failure_retry: true\n"
-            "    system_prompt: '@file:prompt.txt'\n",
+            "    model_bid: '@file:model_bid.txt'\n",
             encoding="utf-8",
         )
-        (tmp_path / "prompt.txt").write_text("共享提示词", encoding="utf-8")
+        (tmp_path / "model_bid.txt").write_text("共享模型标识", encoding="utf-8")
     monkeypatch.setenv("WIDGET_SERVICE_OPENAI_MASTER_CLIENT", "deepseek_platform")
     configuration = read_configuration(project, debug_path=debug_path)
     expected = runtime_values(configuration)
@@ -65,4 +65,4 @@ def test_agent_uses_shared_configuration(
     )
     if local_exists:
         assert settings.deepseek_official_http_api_key == "test-only-key"
-        assert settings.system_prompt == "共享提示词"
+        assert settings.model_bid == "共享模型标识"

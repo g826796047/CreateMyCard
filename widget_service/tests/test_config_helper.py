@@ -56,28 +56,38 @@ def test_missing_spec_uses_default_config(
 
 
 @pytest.mark.parametrize(
-    ("config_key", "prompt_name"),
-    [
-        ("system.prompt", "create"),
-        ("edit.system.prompt", "edit"),
-        ("repair.system.prompt", "repair"),
-    ],
+    "prompt_name", ["create", "edit", "repair"],
 )
-def test_default_prompt_references_load_complete_source(
+def test_explicit_prompt_references_load_complete_source(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
-    config_key: str,
     prompt_name: str,
 ) -> None:
-    _force_default_config(monkeypatch, tmp_path)
-    helper = ConfigHelper("local")
     source_root = (
         Path(__file__).resolve().parents[1]
         / "cloud/data/protocol_profiles/design-compact-dsl-fusion/prompt_source"
     )
+    spec_file = tmp_path / "spec.yaml"
+    spec_file.write_text(
+        f"fixture_text: '@prompt:{source_root.as_posix()}#{prompt_name}'\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(ConfigHelper, "_get_spec_config_file", lambda _self: spec_file)
+    helper = ConfigHelper("local")
     expected = read_prompt(source_root, prompt_name)
     assert expected.strip()
-    assert helper.get(config_key) == expected
+    assert helper.get("fixture_text") == expected
+
+
+def test_config_keeps_inline_multiline_text_without_path_probe(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    spec_file = tmp_path / "spec.yaml"
+    spec_file.write_text("fixture_text: |\n  第一行\n  第二行\n", encoding="utf-8")
+    monkeypatch.setattr(ConfigHelper, "_get_spec_config_file", lambda _self: spec_file)
+
+    helper = ConfigHelper("local")
+
+    assert helper.get("fixture_text") == "第一行\n第二行\n"
 
 
 def test_existing_spec_is_used_without_default_merge(
@@ -204,19 +214,24 @@ def test_photo_switch_can_override_enabled_default(monkeypatch, tmp_path, key, e
     assert settings.enable_photo_background_theme is enabled
 
 
-def test_settings_reads_prompt_file_alias_from_env(
+@pytest.mark.parametrize("name", ["system_prompt", "edit_system_prompt", "repair_system_prompt"])
+def test_settings_ignore_removed_prompt_aliases_without_reading_files(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
+    name: str,
 ) -> None:
     prompt_file = tmp_path / "prompt.txt"
-    prompt_file.write_text("prompt from env file", encoding="utf-8")
+    prompt_file.write_bytes(b"\xff")
     env_file = tmp_path / ".env"
-    env_file.write_text(
-        f"WIDGET_SERVICE_SYSTEM_PROMPT_FILE={prompt_file}\n",
-        encoding="utf-8",
-    )
-    monkeypatch.delenv("WIDGET_SERVICE_SYSTEM_PROMPT_FILE", raising=False)
+    entries = []
+    for prefix in ("", "WIDGET_SERVICE_"):
+        key = f"{prefix}{name.upper()}"
+        monkeypatch.setenv(key, "unused legacy prompt")
+        monkeypatch.setenv(f"{key}_FILE", str(prompt_file))
+        entries.append(f"{key}=unused legacy prompt\n{key}_FILE={prompt_file}\n")
+    env_file.write_text("".join(entries), encoding="utf-8")
 
     settings = Settings(_env_file=env_file)
 
-    assert settings.system_prompt == "prompt from env file"
+    assert name not in Settings.model_fields
+    assert not hasattr(settings, name)

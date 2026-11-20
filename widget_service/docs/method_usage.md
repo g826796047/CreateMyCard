@@ -1091,14 +1091,16 @@ build(
 ) -> list[dict[str, str]]
 ```
 
-用途：构造 A2UI 模型输入。首次生成从 `system_prompt_file` 读取系统提示词；编辑模式从 `edit_system_prompt_file` 读取提示词，通过 `{{CREATE_SYSTEM_PROMPT}}` 组合通用生成规则，并额外把本轮指令、新 TaskSpec 和来源 genui 作为结构化用户数据传入，不传来源 URL。
+用途：构造 A2UI 模型输入。首次生成从协议注册表读取提示词；Fusion 源文件按
+`design-compact-dsl-fusion/prompt_source/manifest.yaml` 装配，模板读取模块内部资源。
+不再从 Settings 的独立创建、编辑、修复提示词字段或文件路径别名读取内容。
 
-第四、第五接口不使用上述标准 A2UI edit system prompt。两者保持对应 Profile 的 `PROMPT.md` 原文作为
-第一条 system 消息，并在第二条 user 消息中传入 `userQuery`、完整 TaskSpec 和
-`previousDesignToken:{format,content}`。`content` 来自来源 artifact 的 `designcompactdsl` 原文，禁止以
-标准 `genui` 兜底。
+本节保留的 `previous_genui` 和 `build_design_token(previous_design_token=...)` 是内部整卡重生成
+兼容方法：使用注册表读取的编辑提示词组合创建规则，并传入原卡数据，不传来源 URL。
+这条旧分支和 Fusion 的 `prompt_source/edit.md` 本次不变。公开编辑请求由 `WidgetEditService`
+提前接管，使用 `semantic-widget-edit/` 独立资源，不经过本节的兼容分支。
 
-`build_repair()` 在首次调用实际使用的 system prompt 后追加 `repair_system_prompt_file`，并把首次 user
+`build_repair()` 在首次调用实际使用的 system prompt 后追加注册表读取的修复约束，并把首次 user
 内容、当前最新源 DSL、`dslFormat` 和结构化 `qualityErrors` 编码成标准 JSON user 消息。转换错误至少包含
 `stage`、`code`、`message`；完整 artifact 校验错误还传递具体校验错误码、`validatorStage`、`fileKind`、
 `line`、`jsonPointer`、`actual`、`expected` 和校验器确定性生成的 `fixHint`，并用 `category` 保留通用错误
@@ -1333,9 +1335,6 @@ WIDGET_SERVICE_DEFAULT_DEVICE_ROM_VERSION
 WIDGET_SERVICE_DEFAULT_PRD_VERSION
 WIDGET_SERVICE_MOCK_IDS_RESPONSE_PATH
 WIDGET_SERVICE_IDS_QUERY_URL
-WIDGET_SERVICE_SYSTEM_PROMPT_FILE
-WIDGET_SERVICE_EDIT_SYSTEM_PROMPT_FILE
-WIDGET_SERVICE_REPAIR_SYSTEM_PROMPT_FILE
 WIDGET_SERVICE_A2UI_FORM_MODEL_BACKEND
 WIDGET_SERVICE_DESIGN_COMPACT_MODEL_BACKEND
 WIDGET_SERVICE_OPENAI_MASTER_CLIENT

@@ -7,7 +7,7 @@ import pytest
 from config.config import get_settings
 from services import post_layout_theme as themes
 from services import post_layout_theme_registry as registry
-from services.card_validator import validate_card
+from services.card_validation import validate_card
 from services.theme_style_roles import role
 
 
@@ -160,8 +160,12 @@ def test_photo_with_fallback_passes_protocol_validation(monkeypatch, rgb, size):
     result = themes.apply_theme(source(), theme, {"size": size},
                                 {"text": {"color": "#FF" + rgb}})
     card = {"title": "图片兜底", "description": "背景加载测试", "suggestSize": size}
-    report = validate_card(result, card, allowed_asset_sources={theme.get("src")})
-    assert not report.errors, report.errors
+    report = validate_card(
+        dsl_text=result,
+        cardspec=card,
+        effective_capabilities={"data": [], "event": [], "asset": [{"src": theme.get("src")}]},
+    )
+    assert not report.has_error(), report.render_text()
 
 
 def test_explicit_background_bypasses_photo_and_its_fallback(monkeypatch):

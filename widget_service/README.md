@@ -92,11 +92,11 @@ The service follows `docs/AGENTS.md`:
 - If MEP ends a Design request with `6241/Early stop due to aborted` after emitting a non-empty candidate, the
   candidate continues through the strict Design converter and validation flow. Empty output and non-Design requests
   remain model failures.
-- Standard create, edit, and repair prompts are loaded from `WIDGET_SERVICE_SYSTEM_PROMPT_FILE`,
-  `WIDGET_SERVICE_EDIT_SYSTEM_PROMPT_FILE`, and `WIDGET_SERVICE_REPAIR_SYSTEM_PROMPT_FILE`. The Design and Terse
-  routes keep their selected profile's `PROMPT.md` as the system message. Their edit user message contains the
-  current query, TaskSpec, and the previous raw model output read from the artifact `designcompactdsl` block.
-  Repair appends the same repair constraints when enabled. Prompt logs never write the full messages;
+- 创建与修复提示词由 `services/protocol_registry.py` 读取，Fusion 按
+  `data/protocol_profiles/design-compact-dsl-fusion/prompt_source/manifest.yaml` 装配；模板使用自身内部资源。
+  公开二次编辑使用 `semantic-widget-edit/` 的独立提示词。旧整卡重生成编辑分支仍保留，
+  其兼容提示词资源不随本次清理删除。旧独立提示词配置及文件路径别名不再生效，
+  `docs/` 下三个 TXT 副本已删除。提示词日志不输出完整消息；
   `WIDGET_SERVICE_MODEL_PROMPT_LOG_PREVIEW_CHARS=30` limits the logged system-prompt prefix, and `0` disables prompt
   text while retaining message and character counts.
 - `WIDGET_SERVICE_ENABLE_ARTIFACT_DOWNLOAD_MOCK=true` by default. Multi-round source artifacts are read only from `cloud/workspace/mock_obs`; missing mock files do not fall back to the network. Set it to `false` to download from the validated HTTPS artifact URL.

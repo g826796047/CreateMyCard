@@ -24,15 +24,9 @@ from ruamel.yaml import YAML
 
 ALIASES = {
     "asset.src.url.mapping": "asset_src_url_mapping",
-    "edit.system.prompt": "edit_system_prompt",
     "obs.expire.time": "obs_expire_time",
     "obs.use.edge": "obs_use_edge",
-    "repair.system.prompt": "repair_system_prompt",
     "sts_serverdomain": "sts_server",
-    "system.prompt": "system_prompt",
-    "system_prompt_file": "system_prompt",
-    "edit_system_prompt_file": "edit_system_prompt",
-    "repair_system_prompt_file": "repair_system_prompt",
 }
 PLATFORM_FIELDS = {"server_host", "server_port", "local_flag", "project_root", "config"}
 SECRET_FIELDS = {"hag_osms_ak", "ids_sign_secret", "ids_access_key", "deepseek_user"}
@@ -336,11 +330,6 @@ def runtime_values(config: Configuration) -> dict[str, Any]:
             value = prompts.get(prompt_name)
             if value is None:
                 raise ValueError(f"提示词名称不存在: {name}")
-        elif name.endswith("system_prompt") and isinstance(value, str):
-            if "\n" not in value:
-                path = directory / value
-                if path.is_file():
-                    value = path.read_text(encoding="utf-8")
         result[name] = value
     base_url = result.get("hag_slb_url")
     if isinstance(base_url, str):

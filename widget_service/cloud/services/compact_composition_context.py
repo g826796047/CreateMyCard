@@ -3,7 +3,6 @@
 import ast
 import copy
 import json
-import math
 import re
 from typing import Any
 
@@ -266,59 +265,6 @@ def _layout_geometry(size: str, action_count: int | None) -> dict[str, Any]:
             patterns.append(rules)
         output[name] = patterns
     return output
-
-
-def composition_group_minimum_height(size: str, group: dict[str, Any]) -> float | None:
-    """核算能够无歧义确定条数的文本组合；其它组件继续由完整合同核算。"""
-    name = group.get("component")
-    if name in {"SingleLineTitle", "PillButton", "CardButton", "CircleButton"}:
-        recipe = component_visual_recipe(name, size=size)
-        return float(recipe.get("parts", {}).get("root", {}).get("styles", {}).get("height"))
-    if size == "2x2" and name in {"EmphasizedData", "EmphasisText"}:
-        recipe = component_visual_recipe(name, size=size)
-        parts = recipe.get("parts", {})
-        main = "value" if name == "EmphasizedData" else "main"
-        height = parts.get(main, {}).get("styles", {}).get("height")
-        if not isinstance(height, (int, float)):
-            return None
-        if name == "EmphasisText" and "secondaryText" in group.get("placements", []):
-            secondary = parts.get("secondary", {}).get("styles", {}).get("height")
-            gap = parts.get("root", {}).get("styles", {}).get("itemMargin", 0)
-            if not isinstance(secondary, (int, float)):
-                return None
-            height += secondary + gap
-        return float(height)
-    if name not in {"SecondaryBody", "TableText"}:
-        return None
-    indexes: set[int] = set()
-    for placement in group.get("placements", []):
-        match = re.match(r"items\[(\d+)\]\.", placement)
-        if match is not None:
-            indexes.add(int(match.group(1)))
-    if not indexes or indexes != set(range(len(indexes))):
-        return None
-    count = len(indexes)
-    if name == "TableText":
-        if count not in (2, 3):
-            return None
-        recipe = component_visual_recipe(name, size=size, variant="compact" if count == 3 else None)
-        height = recipe.get("parts", {}).get("row", {}).get("styles", {}).get("height", 0)
-        gap_key = "threeRowGap" if count == 3 else "twoRowGap"
-        return float(count * height + (count - 1) * recipe.get("metrics", {}).get(gap_key, 0))
-    columns = group.get("columns", 2)
-    lines = group.get("lines", [1] * count)
-    variant = secondary_body_variant([{"maxLines": line} for line in lines], columns)
-    recipe = component_visual_recipe(name, size=size, variant=variant)
-    styles = recipe.get("parts", {}).get("text", {}).get("styles", {})
-    line_height = styles.get("height", 0) / styles.get("maxLines", 1)
-    if len(lines) != count:
-        return None
-    height = 0.0
-    for start in range(0, count, columns):
-        height += line_height * max(lines[start:start + columns])
-    rows = math.ceil(count / columns)
-    gap = recipe.get("parts", {}).get("root", {}).get("styles", {}).get("itemMargin", 0)
-    return height + (rows - 1) * gap
 
 
 def _padding_pair(value: Any, axis: str) -> float:

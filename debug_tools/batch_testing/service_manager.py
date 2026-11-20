@@ -234,8 +234,6 @@ class ManagedServiceController:
         for name, value in validated.items():
             if sensitive(name):
                 continue
-            if name.endswith("system_prompt"):
-                value = configuration.values.get(name)
             public_config[name] = value
         self.last_public_config = public_config
         _validate_nonnegative_fields(validated)
@@ -261,8 +259,6 @@ class ManagedServiceController:
                 del environment[key]
         for name, value in validated.items():
             environment[_environment_name(name)] = self._environment_value(value)
-            if name.endswith("system_prompt"):
-                environment[f"{_environment_name(name)}_FILE"] = self._environment_value(value)
         environment[f"{_ENV_PREFIX}SERVER_HOST"] = "127.0.0.1"
         environment[f"{_ENV_PREFIX}SERVER_PORT"] = str(port)
         command = [sys.executable, str(self.project_root / "cloud" / "start_websocket_server.py")]

@@ -125,33 +125,6 @@ class Settings(BaseSettings):
     model_flow_id: str = CONFIG.get("model_flow_id")
     model_temperature: float = 0.4
     model_top_k: int = 1
-    system_prompt: str = Field(
-        default=CONFIG.get("system.prompt"),
-        validation_alias=AliasChoices(
-            "WIDGET_SERVICE_SYSTEM_PROMPT_FILE",
-            "WIDGET_SERVICE_SYSTEM_PROMPT",
-            "SYSTEM_PROMPT_FILE",
-            "SYSTEM_PROMPT",
-        ),
-    )
-    edit_system_prompt: str = Field(
-        default=CONFIG.get("edit.system.prompt"),
-        validation_alias=AliasChoices(
-            "WIDGET_SERVICE_EDIT_SYSTEM_PROMPT_FILE",
-            "WIDGET_SERVICE_EDIT_SYSTEM_PROMPT",
-            "EDIT_SYSTEM_PROMPT_FILE",
-            "EDIT_SYSTEM_PROMPT",
-        ),
-    )
-    repair_system_prompt: str = Field(
-        default=CONFIG.get("repair.system.prompt"),
-        validation_alias=AliasChoices(
-            "WIDGET_SERVICE_REPAIR_SYSTEM_PROMPT_FILE",
-            "WIDGET_SERVICE_REPAIR_SYSTEM_PROMPT",
-            "REPAIR_SYSTEM_PROMPT_FILE",
-            "REPAIR_SYSTEM_PROMPT",
-        ),
-    )
     a2ui_form_model_backend: str = CONFIG.get("a2ui_form_model_backend")
     design_compact_model_backend: str = CONFIG.get("design_compact_model_backend")
     validation_failure_max_repair_attempts: int = CONFIG.get(
@@ -397,30 +370,6 @@ class Settings(BaseSettings):
         """允许配置文件中的整数字符串，不接受布尔值或浮点数。"""
         if isinstance(value, (bool, float)):
             raise ValueError("compact_dsl_interface_retry_count must be a non-negative integer")
-        return value
-
-    @field_validator("system_prompt", "edit_system_prompt", "repair_system_prompt", mode="before")
-    @classmethod
-    def load_prompt_file_alias(cls, value: object) -> object:
-        """兼容 .env.example 中的 prompt 文件路径配置。"""
-        if not isinstance(value, str):
-            return value
-        if "\n" in value:
-            return value
-        candidate = Path(value).expanduser()
-        roots = (
-            Path.cwd(),
-            Path(__file__).resolve().parents[2],
-            Path(__file__).resolve().parents[3],
-        )
-        candidates = (
-            [candidate]
-            if candidate.is_absolute()
-            else [root / candidate for root in roots]
-        )
-        for path in candidates:
-            if path.is_file():
-                return path.read_text(encoding="utf-8")
         return value
 
     @field_validator("openai_master_client", "openai_fallback_client")

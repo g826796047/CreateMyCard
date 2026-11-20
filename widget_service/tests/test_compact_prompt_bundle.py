@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from config.config import get_settings
 from models.generation import TaskSpec
+from services import prompt_builder
 from services.compact_layout_runtime import layout_ids_for_size
 from services.compact_prompt_loader import (
     FRAGMENT,
@@ -741,14 +741,13 @@ def test_unknown_fewshot_size_is_rejected() -> None:
         A2UIProtocolRegistry.read_design_few_shot(DESIGN_COMPACT_PROFILE_ID, "../PROMPT")
 
 
-def test_default_config_uses_same_source_prompts() -> None:
-    settings = get_settings()
-    for key, method in (
-        ("system.prompt", "read_design_prompt"),
-        ("edit.system.prompt", "read_design_edit_prompt"),
-        ("repair.system.prompt", "read_design_repair_prompt"),
+def test_runtime_uses_registered_source_prompts() -> None:
+    for constant, method in (
+        ("SYSTEM_PROMPT", "read_design_prompt"),
+        ("EDIT_SYSTEM_PROMPT", "read_design_edit_prompt"),
+        ("REPAIR_SYSTEM_PROMPT", "read_design_repair_prompt"),
     ):
-        assert settings.CONFIG.get(key) == getattr(A2UIProtocolRegistry, method)(
+        assert getattr(prompt_builder, constant) == getattr(A2UIProtocolRegistry, method)(
             DESIGN_COMPACT_PROFILE_ID
         )
 

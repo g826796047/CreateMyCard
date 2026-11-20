@@ -34,14 +34,14 @@ def project(tmp_path: Path) -> Path:
     (config_dir / "default_config.yaml").write_text(
         "model_max_concurrency: 8\n"
         "enable_model_failure_retry: false\n"
-        "system.prompt: '@file:prompt.txt'\n"
+        "model_bid: '@file:model_bid.txt'\n"
         "obs.expire.time: 100\n"
         "asset.src.url.mapping: {}\n"
         "server_port: 8855\n"
         "unknown_legacy: null\n",
         encoding="utf-8",
     )
-    (config_dir / "prompt.txt").write_text("测试提示词\n", encoding="utf-8")
+    (config_dir / "model_bid.txt").write_text("测试模型标识\n", encoding="utf-8")
     (root / ".env").write_text(
         "WIDGET_SERVICE_MODEL_MAX_CONCURRENCY=12\n"
         "WIDGET_SERVICE_DEEPSEEK_API_KEY=test-private-value\n"
@@ -111,20 +111,36 @@ def test_prefixed_alias_wins_and_boolean_spellings_work(project: Path) -> None:
         read_configuration(project)
 
 
-def test_prompt_modules_are_expanded_without_stale_cache(project: Path) -> None:
+def test_prompt_references_expand_for_declared_text_fields(project: Path) -> None:
     actual_root = (Path(__file__).resolve().parents[3] / "widget_service")
-    default = managed_config.yaml_document(actual_root / "cloud/config/default_config.yaml")
-    reference = default.get("system.prompt")
-    assert isinstance(reference, str)
-    assert reference.startswith("@prompt:")
     config = read_configuration(project)
-    config.values["system_prompt"] = reference
-    config.directories["system_prompt"] = actual_root / "cloud/config"
+    config.values["model_bid"] = (
+        "@prompt:../data/protocol_profiles/design-compact-dsl-fusion/prompt_source#create"
+    )
+    config.directories["model_bid"] = actual_root / "cloud/config"
     result = runtime_values(config)
-    prompt = result.get("system_prompt")
+    prompt = result.get("model_bid")
     assert isinstance(prompt, str)
     assert len(prompt) > 100
     assert not prompt.startswith("@prompt:")
+
+
+@pytest.mark.parametrize("name", ["system_prompt", "edit_system_prompt", "repair_system_prompt"])
+def test_removed_prompt_fields_cannot_be_applied_or_read(project: Path, name: str) -> None:
+    env_path = project / ".env"
+    with env_path.open("a", encoding="utf-8") as stream:
+        stream.write(f"WIDGET_SERVICE_{name.upper()}_FILE=missing.txt\n")
+    debug_path = project.parent / "debug_tools/debug_tool.yaml"
+    debug_path.write_text(
+        f"widget_backend:\n  defaults:\n    {name}: '@file:missing.txt'\n", encoding="utf-8"
+    )
+    config = read_configuration(project)
+    values = runtime_values(config)
+    assert name not in config.types
+    assert name not in values
+    assert f"{name}_file" not in values
+    with pytest.raises(ValueError, match="不允许修改"):
+        save_configuration(project, {name: "unused"}, config.version)
 
 
 @pytest.mark.parametrize("name", ["server_port", "deepseek_api_key", "unknown_legacy", "new_field"])
@@ -204,7 +220,7 @@ def test_failed_replace_preserves_original(project: Path, monkeypatch: pytest.Mo
 
 def test_references_and_json_preserve_runtime_types(project: Path) -> None:
     config = read_configuration(project)
-    assert runtime_values(config).get("system_prompt") == "测试提示词\n"
+    assert runtime_values(config).get("model_bid") == "测试模型标识\n"
     config.values.update(
         validate_changes(config, {"asset_src_url_mapping": {"a": "b"}}, exposed=False)
     )
@@ -212,7 +228,7 @@ def test_references_and_json_preserve_runtime_types(project: Path) -> None:
     path = project.parent / "debug_tools/debug_tool.yaml"
     before = path.read_bytes()
     with pytest.raises(OSError):
-        save_configuration(project, {"system_prompt": "@file:missing.txt"}, config.version)
+        save_configuration(project, {"model_bid": "@file:missing.txt"}, config.version)
     assert path.read_bytes() == before
 
 
@@ -279,13 +295,12 @@ def test_config_is_accepted_by_actual_settings() -> None:
     for name, value in values.items():
         key = f"WIDGET_SERVICE_{name.upper()}"
         environment[key] = ManagedServiceController._environment_value(value)
-        if name.endswith("system_prompt"):
-            environment[f"{key}_FILE"] = environment.get(key, "")
     script = (
         "from config.config import Settings; s=Settings(); "
         "assert s.model_max_concurrency == 23; "
         "assert isinstance(s.asset_src_url_mapping, dict); "
-        "assert not s.system_prompt.startswith('@'); print('settings-ok')"
+        "assert not hasattr(s, 'system_prompt'); "
+        "assert s.enable_semantic_widget_edit; print('settings-ok')"
     )
     completed = subprocess.run(
         [sys.executable, "-c", script],
@@ -336,7 +351,7 @@ def test_lifecycle_fingerprint_detects_file_changes(
         await controller.ensure({})
         await controller.ensure({})
         assert len(calls) == 1
-        (project / "cloud/config/prompt.txt").write_text("已改变提示词\n", encoding="utf-8")
+        (project / "cloud/config/model_bid.txt").write_text("已改变模型标识\n", encoding="utf-8")
         await controller.ensure({})
         assert len(calls) == 2
         config = read_configuration(project)
