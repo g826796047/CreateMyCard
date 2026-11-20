@@ -1,0 +1,202 @@
+"""CodeCheck 整改不改变异常降级、配色角色和图片边界判断。"""
+
+import ast
+import asyncio
+import inspect
+from types import SimpleNamespace
+from unittest.mock import AsyncMock, Mock
+
+import pytest
+from test_photo_asset_delivery import artifact as photo_artifact
+
+from config.config import get_settings
+from services import post_layout_theme as themes
+from services import post_layout_theme_registry as registry
+from services import theme_photo_eligibility, theme_texture_eligibility
+from services.compact_high_level_components import (
+    CompactDslConversionError,
+    _system_palette_color,
+)
+from services.template_generation.engine.cardplan import photo_facts
+from services.theme_style_roles import layout_phase, role
+
+
+def test_photo_main_scope_uses_one_typed_return_for_optional_pair():
+    tree = ast.parse(inspect.getsource(photo_facts._main_scope))
+    returns = [node for node in ast.walk(tree) if isinstance(node, ast.Return)]
+    assert len(returns) == 1, "G.CTL.01: 主区与方向应通过同一带类型的局部变量返回"
+    returned = returns[0].value
+    assert isinstance(returned, ast.Name)
+    declarations = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.AnnAssign) or not isinstance(node.target, ast.Name):
+            continue
+        if node.target.id == returned.id:
+            declarations.append(node)
+    assert len(declarations) == 1
+    assert ast.unparse(declarations[0].annotation) == "tuple[dict | None, str | None]"
+
+
+@pytest.mark.parametrize("kind,children,expected_direction", [
+    ("Row", ["main", "support"], "left"),
+    ("Row", ["support", "main"], "right"),
+    ("Column", ["main", "support"], "top"),
+    ("Column", ["support", "main"], "bottom"),
+    ("Stack", ["main", "support"], None),
+    ("Row", [], None),
+    ("Column", ["support", "other_support"], None),
+])
+def test_photo_main_scope_preserves_pair_and_node_identity(kind, children, expected_direction):
+    root = {"id": "root", "component": kind, "children": children}
+    main = {"id": "main", "component": "Column", "children": ["reading"]}
+    support_kind = "Column" if kind == "Row" else "Row"
+    nodes = [
+        root, main,
+        {"id": "reading", "component": "Text", "content": "主区"},
+        {"id": "support", "component": support_kind, "children": ["upper", "lower"]},
+        {"id": "other_support", "component": "Row", "children": ["upper", "lower"]},
+        {"id": "upper", "component": "Column", "styles": {"backgroundColor": "#33FFFFFF"}},
+        {"id": "lower", "component": "Column", "styles": {"backgroundColor": "#33FFFFFF"}},
+    ]
+    result = photo_facts._main_scope(root, {node.get("id"): node for node in nodes}, set())
+    assert isinstance(result, tuple) and len(result) == 2
+    if expected_direction is None:
+        assert result == (None, None)
+    else:
+        assert result[0] is main
+        assert result[1] == expected_direction
+
+
+@pytest.mark.parametrize("module", [registry, theme_photo_eligibility, theme_texture_eligibility])
+def test_theme_comprehension_clauses_stay_on_single_lines(module):
+    tree = ast.parse(inspect.getsource(module))
+    violations = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.comprehension):
+            continue
+        if node.target.lineno != node.iter.end_lineno:
+            violations.append(f"multiline for clause at line {node.target.lineno}")
+        for condition in node.ifs:
+            if condition.lineno != condition.end_lineno:
+                violations.append(f"multiline if clause at line {condition.lineno}")
+        if len(node.ifs) > 1:
+            violations.append(f"multiple if clauses at line {node.target.lineno}")
+    assert not violations, violations
+
+
+def test_registry_frame_schema_keeps_all_required_positive_dimensions():
+    assert registry._FRAME == {
+        "type": "object", "additionalProperties": False,
+        "required": ["slotWidth", "slotHeight", "imageWidth", "imageHeight", "align"],
+        "properties": {
+            "slotWidth": {"type": "number", "exclusiveMinimum": 0},
+            "slotHeight": {"type": "number", "exclusiveMinimum": 0},
+            "imageWidth": {"type": "number", "exclusiveMinimum": 0},
+            "imageHeight": {"type": "number", "exclusiveMinimum": 0},
+            "align": {"enum": ["topStart", "topEnd", "center", "bottomStart", "bottomEnd"]},
+        },
+    }
+
+
+def test_registry_fusion_schema_keeps_three_required_argb_colors():
+    background = registry._BACKGROUNDS.get("fusion")
+    assert background is not None
+    color = {"type": "string", "pattern": r"^#[0-9A-Fa-f]{8}$"}
+    assert background.get("properties", {}).get("ballColors") == {
+        "type": "object", "required": ["large", "medium", "small"],
+        "additionalProperties": False,
+        "properties": {"large": color, "medium": color, "small": color},
+    }
+
+
+def layout_source():
+    return themes.encode([{"updateComponents": {"components": [
+        {"id": "root", "component": "Column", "children": ["title"],
+         "styles": {"width": "matchParent", "height": "matchParent"}},
+        {"id": "title", "component": "Text", "content": "天气",
+         "styles": {"fontColor": role("primary")}},
+    ]}}])
+
+
+def test_selection_never_starts_a_measurement_process(monkeypatch):
+    monkeypatch.setattr(get_settings(), "enable_photo_background_theme", True)
+    process = AsyncMock(side_effect=AssertionError("不得启动渲染进程"))
+    monkeypatch.setattr(asyncio, "create_subprocess_exec", process)
+    client = SimpleNamespace(generate=AsyncMock(return_value='{"themeId":"gradient-blue"}'))
+    source = layout_source()
+    result, audit = asyncio.run(themes.select_theme(
+        source, {"size": "2x2", "userQuery": "天气"}, client,
+    ))
+    process.assert_not_called()
+    assert audit.get("layoutEvidence", {}).get("deviceGeometryKnown") is False
+    assert audit.get("themeId") == "gradient-blue"
+    assert themes.foreground_signature(result) == themes.foreground_signature(source)
+
+
+@pytest.mark.parametrize("error", ["ARTIFACT.INVALID", "ASSET.INVALID", "VISUAL.INVALID"])
+def test_final_validation_errors_reapply_gradient_from_original(monkeypatch, error):
+    source = layout_source()
+    photo = next(item for item in registry.registered_themes("photos")
+                 if item.get("size") == "2x2")
+    audit = {"theme": photo, "outputSize": "2x2"}
+    themed = themes.apply_theme(source, photo, {"size": "2x2"}, {})
+    monkeypatch.setattr(themes, "select_theme", AsyncMock(return_value=(themed, audit)))
+    monkeypatch.setattr(themes, "trace_record", Mock())
+    artifact = photo_artifact()
+    artifact.genui = source
+    artifact.taskSpec = {}
+    validator = SimpleNamespace(validate=Mock(side_effect=[[error], []]))
+    result = asyncio.run(themes.theme_artifact(
+        artifact, {"size": "2x2", "userQuery": "天气"}, Mock(), validator, {},
+    ))
+    assert audit.get("finalValidationErrors") == [error]
+    assert audit.get("themeId") == "gradient-blue"
+    assert audit.get("rejectedTheme") == photo
+    assert validator.validate.call_count == 2
+    assert "linearGradient" in result.genui
+    assert result.taskSpec == {}
+    assert themes.foreground_signature(result.genui) == themes.foreground_signature(source)
+
+
+def test_palette_role_keeps_layout_and_final_color_contracts():
+    with layout_phase():
+        assert _system_palette_color({"primary": role("primary")}, "primary") == role("primary")
+    assert _system_palette_color({"primary": "#FFFFFFFF"}, "primary") == "#FFFFFFFF"
+    with pytest.raises(CompactDslConversionError, match="System palette role primary"):
+        _system_palette_color({"primary": role("primary")}, "primary")
+
+
+@pytest.mark.parametrize("region,accepted", [
+    ([.25, .25, .5, .5], True),
+    ([.25, .25, .5 + 5e-10, .5], True),
+    ([.25, .25, .5, .5 + 5e-10], True),
+    ([.24, .25, .5, .5], False),
+    ([.25, .24, .5, .5], False),
+    ([.25, .25, .5 + 2e-9, .5], False),
+    ([.25, .25, .5, .5 + 2e-9], False),
+])
+def test_subject_regions_preserve_containment_tolerance(region, accepted):
+    photo = {"size": "2x2", "business": "weather", "subjectBounds": [.25, .25, .5, .5],
+             "subjectRegions": [region]}
+    evidence = {"complete": True, "occupied": [{"id": "title", "rect": [0, 0, .1, .1]}]}
+    reason = themes._photo_geometry_reason(photo, evidence)
+    assert reason == (None if accepted else "主体区域配置无效")
+
+
+@pytest.mark.parametrize("rect,overlaps", [
+    ([0, .25, .25, .25], False),
+    ([.75, .25, .25, .25], False),
+    ([.25, 0, .25, .25], False),
+    ([.25, .75, .25, .25], False),
+    ([.001, .25, .25, .25], True),
+    ([.749, .25, .25, .25], True),
+    ([.25, .001, .25, .25], True),
+    ([.25, .749, .25, .25], True),
+    ([.3, .3, .1, .1], True),
+    ([.1, .1, .8, .8], True),
+])
+def test_subject_overlap_preserves_touching_edges(rect, overlaps):
+    photo = {"size": "2x2", "business": "weather", "subjectBounds": [.25, .25, .5, .5]}
+    evidence = {"complete": True, "occupied": [{"id": "title", "rect": rect}]}
+    reason = themes._photo_geometry_reason(photo, evidence)
+    assert reason == ("主体区域与内容 title 冲突" if overlaps else None)

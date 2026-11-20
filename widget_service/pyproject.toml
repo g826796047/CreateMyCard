@@ -54,3 +54,12 @@ ignore = ["UP009"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["cloud", ".", ".."]
+addopts = "--strict-markers"
+markers = [
+    "l0: 确定性业务测试及组件合同测试，不调用真实模型或外部服务",
+    "l1: 使用固定模型响应的编排与链路回放测试",
+    "unit: 单个函数、类或模块范围的确定性单元测试",
+    "integration: 多个确定性业务组件之间的公开合同测试",
+    "manual: 依赖人工启动服务、真实设备或其它外部环境的测试",
+    "model_smoke: 启动主服务并调用真实模型的生成与校验冒烟测试",
+]

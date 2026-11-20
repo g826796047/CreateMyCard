@@ -22,7 +22,11 @@ HOST = "127.0.0.1"
 
 
 @pytest.fixture
-def service_url(tmp_path):
+def service_url(tmp_path, monkeypatch):
+    existing_no_proxy = os.environ.get("NO_PROXY", "")
+    local_bypass = ",".join(filter(None, (existing_no_proxy, HOST, "localhost")))
+    monkeypatch.setenv("NO_PROXY", local_bypass)
+    monkeypatch.setenv("no_proxy", local_bypass)
     with socket.socket() as probe:
         probe.bind((HOST, 0))
         port = probe.getsockname()[1]
@@ -38,6 +42,8 @@ def service_url(tmp_path):
         "WIDGET_SERVICE_ENABLE_DAILY_USAGE_LIMIT": "false",
         "PYTHONUTF8": "1",
     }
+    health_session = requests.Session()
+    health_session.trust_env = False
     with subprocess.Popen(
         [sys.executable, str(SERVICE / "cloud/start_websocket_server.py")],
         cwd=SERVICE,
@@ -49,7 +55,7 @@ def service_url(tmp_path):
                 if server.poll() is not None:
                     pytest.fail(f"主服务启动失败，退出码 {server.returncode}")
                 try:
-                    health = requests.get(f"http://{HOST}:{port}/health", timeout=1)
+                    health = health_session.get(f"http://{HOST}:{port}/health", timeout=1)
                 except requests.ConnectionError:
                     time.sleep(0.2)
                     continue
@@ -60,6 +66,7 @@ def service_url(tmp_path):
                 pytest.fail("主服务在 45 秒内未就绪")
             yield f"ws://{HOST}:{port}/api/v1/ws/tools/generateWidgetCardCompactDsl"
         finally:
+            health_session.close()
             server.terminate()
             try:
                 server.wait(timeout=5)

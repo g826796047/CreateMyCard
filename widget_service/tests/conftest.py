@@ -1,6 +1,34 @@
-"""Focused test doubles for stages outside a test's scope."""
+"""微服务测试的公共夹具与测试分层标记。"""
+
+from pathlib import Path
 
 import pytest
+
+
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    """按目录添加分层标记，并拒绝未归类的业务测试。"""
+    for item in items:
+        test_path = Path(str(item.path))
+        path_parts = set(test_path.parts)
+        if test_path.name == "compact_dsl_smoke.py" and test_path.parent.name == "tests":
+            item.add_marker(pytest.mark.model_smoke)
+            continue
+        if "manual" in path_parts:
+            item.add_marker(pytest.mark.manual)
+            continue
+        if "l1" in path_parts:
+            item.add_marker(pytest.mark.l1)
+            continue
+        if "l0" not in path_parts:
+            raise pytest.UsageError(f"测试文件尚未归类到 l0、l1 或 manual：{test_path}")
+        item.add_marker(pytest.mark.l0)
+        if "unit" in path_parts:
+            item.add_marker(pytest.mark.unit)
+            continue
+        if "integration" in path_parts:
+            item.add_marker(pytest.mark.integration)
+            continue
+        raise pytest.UsageError(f"L0 测试尚未归类到 unit 或 integration：{test_path}")
 
 
 @pytest.fixture
