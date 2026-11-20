@@ -36,7 +36,17 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
+      - name: 主服务真实 DSL 生成冒烟
+        env:
+          WIDGET_SERVICE_LOCAL_FLAG: "true"
+          WIDGET_SERVICE_DESIGN_COMPACT_MODEL_BACKEND: openai
+          WIDGET_SERVICE_OPENAI_MASTER_CLIENT: deepseek_official_http
+          WIDGET_SERVICE_ENABLE_OPENAI_FALLBACK: "false"
+          WIDGET_SERVICE_DEEPSEEK_OFFICIAL_HTTP_API_KEY: ${{ secrets.WIDGET_SERVICE_DEEPSEEK_OFFICIAL_HTTP_API_KEY }}
+        run: python -m pytest tests/compact_dsl_smoke.py -q
+
       - name: Run tests
+        if: ${{ !cancelled() }}
         run: python -m pytest tests -q -ra --junitxml=test-results/pytest.xml
 
       - name: Upload test report

@@ -143,6 +143,17 @@ pip install -r requirements.txt
 py -3.12 cloud\start_websocket_server.py
 ```
 
+在 `widget_service` 目录激活项目的 Python 环境后，本地改完代码和 PR 检查都执行同一条命令：
+
+```powershell
+python -m pytest tests/compact_dsl_smoke.py -q
+```
+
+该用例在独立端口启动当前检出的主服务，通过真实模型生成一张 2×2 欢迎卡片。它从临时工作目录读取本次上传的产物，
+核对响应摘要，并用项目校验器检查最终 DSL 和 CardSpec。启动失败、请求超时、业务降级、产物缺失或校验错误均会导致命令失败。
+本地需配置可用的真实模型。PR 使用 DeepSeek 官方 HTTP 接口，从同名 GitHub Actions Secret 读取
+`WIDGET_SERVICE_DEEPSEEK_OFFICIAL_HTTP_API_KEY`。未获密钥的 PR（例如来自 fork 的 PR）无法完成真实模型检查，会报告失败。
+
 本地验证最新校验 API 和“校验失败不阻断保存”时，建议显式开启校验并关闭重试：
 
 ```powershell
