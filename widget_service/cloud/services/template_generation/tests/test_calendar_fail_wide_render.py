@@ -420,6 +420,8 @@ def test_three_details_has_three_separate_rows_without_losing_notes(
             assert style.get("fontWeight") == weight
             assert style.get("height") == 16
             assert style.get("maxLines") == 1
+
+
 @pytest.mark.parametrize("auxiliary_rows", (1, 2, 3))
 def test_two_events_preserve_two_equally_weighted_columns(
     registry: CardPlanRegistry, auxiliary_rows: int
