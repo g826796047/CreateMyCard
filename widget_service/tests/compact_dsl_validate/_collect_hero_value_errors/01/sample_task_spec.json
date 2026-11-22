@@ -1,9 +1,0 @@
-{
-  "dataModelSchema": {
-    "data": {
-      "weather": {}
-    }
-  },
-  "assetCandidates": [],
-  "eventCandidates": []
-}

@@ -1,9 +1,0 @@
-{
-  "dataBindings": [
-    {
-      "capabilityId": "ViewWeather",
-      "arguments": {},
-      "writeResultTo": "/data/weather"
-    }
-  ]
-}

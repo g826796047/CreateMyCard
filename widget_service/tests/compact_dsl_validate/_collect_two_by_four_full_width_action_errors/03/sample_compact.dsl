@@ -1,5 +1,0 @@
-["root","Stack",{},["foreground"]]
-["foreground","Column",{"width":"matchParent","height":"matchParent","padding":12},["content","action"]]
-["content","Column",{},["text"]]
-["text","Text",{"content":"内容","fontSize":12,"fontWeight":400,"maxLines":1,"fontColor":"#FF563D99"}]
-["action","Button",{"width":276,"height":36,"label":"打开","onClick":[{"call":"open","args":{}}]}]
