@@ -476,4 +476,3 @@ def test_two_events_preserve_two_equally_weighted_columns(
             assert style.get("maxLines") == 1
 
 # End of the wide schedule regression cases.
-

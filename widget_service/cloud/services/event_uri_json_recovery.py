@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Huawei Technologies Co., Ltd. 2026-2026. All rights reserved.
 """仅补齐事件 URI 完整绑定表达式后的 JSON 引号，不推断动作或业务值。"""
 
 import json
