@@ -36,12 +36,12 @@ def collect_bound_display_unit_rules(card_spec: Any, data_capabilities: Any):
             return
         units = schema.get("displayUnits")
         included = schema.get("unitIncluded")
-        if (
+        valid_units = (
             isinstance(units, list)
-            and units
+            and bool(units)
             and all(isinstance(item, str) and item.strip() for item in units)
-            and isinstance(included, bool)
-        ):
+        )
+        if valid_units and isinstance(included, bool):
             result["/" + "/".join(parts)] = DisplayUnitRule(
                 tuple(item.strip() for item in units), included
             )

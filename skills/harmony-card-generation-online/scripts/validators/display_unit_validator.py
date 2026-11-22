@@ -83,8 +83,8 @@ class DisplayUnitValidator(BaseValidator):
         sibling_ids = set()
         for parent in parents_by_child.get(component_id, []):
             children = parent.get("children", [])
-            value_index = children.index(component_id)
-            for child_id in children[value_index + 1 :]:
+            following_index = children.index(component_id) + 1
+            for child_id in children[following_index:]:
                 if not isinstance(child_id, str) or not static_text_matches_rule(
                     by_id.get(child_id, {}).get("content"), rule
                 ):

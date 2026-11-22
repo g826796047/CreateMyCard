@@ -24,7 +24,11 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from validators.api import ValidationOptions, validate_card
-from validators.source_parser import extract_combined, normalize_cardspec_text, normalize_dsl_text
+from validators.source_parser import (
+    extract_combined,
+    normalize_cardspec_text,
+    normalize_dsl_text,
+)
 
 
 def read_text(path: str | None) -> str:
@@ -48,31 +52,53 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Validate datamodel-first HarmonyOS A2UI Form DSL and CardSpec.")
     parser.add_argument("path", nargs="?", help="Combined draft file. Reads stdin when omitted or '-'.")
     parser.add_argument("--dsl", help="Path to genui JSONL file or fenced genui block.")
-    parser.add_argument("--cardspec", help="Path to cardspec JSON file or fenced cardspec block. Optional; DSL-only by default.")
+    parser.add_argument(
+        "--cardspec",
+        help="Path to cardspec JSON file or fenced cardspec block. Optional; DSL-only by default.",
+    )
     parser.add_argument("--artifact", help="Path to a full WidgetArtifact JSON file.")
-    parser.add_argument("--effective", help="Path to effectiveCapabilities JSON, or a JSON file containing effectiveCapabilities.")
-    parser.add_argument("--capabilities-dir", help="Path to cloud-new capability registry directory, used to resolve effective asset ids.")
+    parser.add_argument(
+        "--effective",
+        help="Path to effectiveCapabilities JSON, or a JSON file containing effectiveCapabilities.",
+    )
+    parser.add_argument(
+        "--capabilities-dir",
+        help="Path to cloud-new capability registry directory, used to resolve effective asset ids.",
+    )
     parser.add_argument("--stage", choices=["hard", "semantic", "quality", "all"], default="all")
-    parser.add_argument("--format", choices=["text", "json", "model"], default="model", help="Output format. Default: model (compact, model-friendly).")
+    parser.add_argument(
+        "--format",
+        choices=["text", "json", "model"],
+        default="model",
+        help="Output format. Default: model (compact, model-friendly).",
+    )
     parser.add_argument("--max-errors", type=int, default=50)
-    parser.add_argument("--strict", action="store_true", help="Treat warnings as errors when computing the exit code (only meaningful with --fail-on-error).")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Treat warnings as errors when computing the exit code (only meaningful with --fail-on-error).",
+    )
     parser.add_argument(
         "--stop-on-stage-error",
         action="store_true",
-        help="Stop after hard/semantic errors. Default collects independent later-stage issues to reduce repair rounds.",
+        help=(
+            "Stop after hard/semantic errors. "
+            "Default collects independent later-stage issues to reduce repair rounds."
+        ),
     )
     parser.add_argument(
         "--fail-on-error",
         action="store_true",
-        help="Exit with code 1 when errors are found. By default the CLI always exits 0 to stay non-blocking for the caller.",
+        help=(
+            "Exit with code 1 when errors are found. "
+            "By default the CLI always exits 0 to stay non-blocking for the caller."
+        ),
     )
     args = parser.parse_args()
 
     dsl_text = ""
     cardspec_text = ""
-    if not args.artifact:
-        dsl_text, cardspec_text = resolve_inputs(args)
-    elif args.dsl or args.cardspec:
+    if not args.artifact or args.dsl or args.cardspec:
         dsl_text, cardspec_text = resolve_inputs(args)
 
     artifact_text = read_text(args.artifact) if args.artifact else ""
@@ -99,7 +125,9 @@ def main() -> int:
     else:
         print(reporter.render_model())
 
-    if args.fail_on_error and (reporter.error_count or (args.strict and reporter.warning_count)):
+    if not args.fail_on_error:
+        return 0
+    if reporter.error_count or (args.strict and reporter.warning_count):
         return 1
     return 0
 
