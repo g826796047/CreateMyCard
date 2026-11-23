@@ -107,11 +107,16 @@ def fusion_photo_facts(
         expected = {"W-split-panels": 2, "W-four-slots": 4}.get(root.props.get("layout"))
         if expected is not None and len(root.children) == expected:
             count = expected
+    layout_id = root.props.get("layout") if root.component_type == "Layout" else None
+    if not isinstance(layout_id, str):
+        layout_id = None
     return PhotoMatchFacts(
         task.get("size"), scopes=scopes, panel_count=count,
         top_content=evidence.get("photoTopContent", {}),
         body_regions=evidence.get("photoBodyRegions", {}),
         subject_exclusion=photo_layout_exclusion_reason(task, evidence, final_layout),
+        countdown_pattern=evidence.get("countdownPattern", {}),
+        layout_id=layout_id,
     )
 
 

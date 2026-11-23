@@ -19,6 +19,7 @@ LAYOUT_IDS = frozenset(
     {
         "W-top-bottom",
         "W-countdown-center",
+        "W-countdown-pattern",
         "W-split-panels",
         "W-content-side-slots",
         "W-four-slots",
@@ -73,6 +74,7 @@ MIXED_FIXED_SLOT_ORDER_WARNING = (
 )
 SMALL_CHILD_ROLES = {
     "S-center": (1, "[content]"),
+    "S-countdown-pattern": (1, "[SCountdown]"),
     "S-title-content": (2, "[title, content]"),
     "S-title-dual-content": (3, "[title, primary, support]"),
     "S-quad-content": (4, "[top-left, top-right, bottom-left, bottom-right]"),
@@ -549,6 +551,18 @@ class _Compiler:
             _fail(identifier, "固定槽必须使用 InfoBlock、CardButton 或已登记的槽位 Group")
         self.content(identifier, compact=False, fixed=True)
 
+    def countdown_pattern(self, root: ComponentRow) -> SemanticLayoutExpansion:
+        from services.countdown_pattern import pattern_from_source
+
+        pattern_from_source(root, tuple(self.source))
+        layout = root.props.get("layout")
+        if not isinstance(layout, str):
+            _fail("root", "图案布局需要合法名称")
+        kind, styles = visual_recipe_part(layout, "root", size=self.size)
+        self.result.append(self.node(root.children[0]))
+        self.add("root", kind, styles, root.children, "root")
+        return self.finish(layout)
+
     def compile(self) -> SemanticLayoutExpansion:
         self.validate_tree("root", set(), set())
         # 延迟导入公共布局注册表，避免转换器/布局匹配入口的初始化循环。
@@ -570,6 +584,8 @@ class _Compiler:
         layout = root.props.get("layout")
         if not isinstance(layout, str) or layout not in LAYOUT_IDS:
             _fail("root", "Layout.layout 未登记")
+        if layout == "W-countdown-pattern":
+            return self.countdown_pattern(root)
         allowed_props = _BACKGROUND_PROPS | {"layout"}
         if layout == "W-top-bottom":
             allowed_props = allowed_props | {"variant"}
@@ -729,6 +745,8 @@ class _SmallCompiler(_Compiler):
         roles = SMALL_CHILD_ROLES.get(layout) if isinstance(layout, str) else None
         if root.component_type != "Layout" or roles is None:
             _fail("root", "2x2 必须选择已登记的 S 系列 Layout")
+        if layout == "S-countdown-pattern":
+            return self.countdown_pattern(root)
         self.props(root, _BACKGROUND_PROPS | {"layout", "variant", "design", "onClick"})
         default_variant = "standard"
         if layout == "S-content-dual-action" and len(root.children) == 2:

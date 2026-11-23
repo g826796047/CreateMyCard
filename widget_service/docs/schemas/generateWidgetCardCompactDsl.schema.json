@@ -86,6 +86,33 @@
             "minLength": 1,
             "description": "主 Agent 建议的卡片说明；微服务规范化后写入最终 CardSpec；新建必填，编辑可省略继承。"
           },
+          "options": {
+            "type": "Object",
+            "required": false,
+            "additionalProperties": false,
+            "properties": {
+              "allowDegradation": {
+                "type": "Boolean"
+              },
+              "countdownPattern": {
+                "type": "Object",
+                "description": "仅 Fusion 新建单次倒计时使用。柱条与圆点均按 days/intervalDays 连续填充，无剩余天数门槛。",
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "type": "String",
+                    "enum": [
+                      "bars",
+                      "dots"
+                    ]
+                  }
+                }
+              }
+            }
+          },
           "candidateDataBindings": {
             "type": "CandidateDataBinding[]",
             "required": false,

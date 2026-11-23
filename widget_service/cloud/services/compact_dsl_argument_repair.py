@@ -83,7 +83,12 @@ _TARGET_STRUCTURE = {
             },
         }
     ],
-    "options": {"allowDegradation": "boolean"},
+    "options": {
+        "allowDegradation": "boolean",
+        "countdownPattern": {
+            "kind": "bars|dots",
+        },
+    },
 }
 _MISSING = object()
 _MAX_ARGUMENT_CHARS = 131072

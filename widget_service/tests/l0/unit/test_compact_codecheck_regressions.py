@@ -1,6 +1,9 @@
 """Compact 历史 CodeCheck 整改保持可选返回、正文穿透和事实筛选语义。"""
 
 import copy
+import importlib
+import inspect
+import symtable
 from dataclasses import replace
 
 import pytest
@@ -157,3 +160,59 @@ def test_anchor_filter_preserves_title_action_and_duplicate_fact_handling(facts,
         assert len(errors) == 1
         assert errors[0].startswith("S-title-anchor requires one primary body fact")
     assert facts == before
+
+
+def _lexical_shadowing(source: str) -> list[tuple[int, str, tuple[str, ...]]]:
+    """类成员不是方法的词法外层；忽略约定的丢弃变量和独立推导式作用域。"""
+    findings: list[tuple[int, str, tuple[str, ...]]] = []
+
+    def visit(table: symtable.SymbolTable, outer_names: set[str]) -> None:
+        local_names = set()
+        for symbol in table.get_symbols():
+            if symbol.is_local() or symbol.is_parameter() or symbol.is_imported():
+                local_names.add(symbol.get_name())
+        implicit_scope = table.get_name() in {"listcomp", "dictcomp", "setcomp", "genexpr"}
+        if table.get_type() == "function" and not implicit_scope:
+            conflicts = (local_names & outer_names) - {"_"}
+            if conflicts:
+                findings.append((table.get_lineno(), table.get_name(), tuple(sorted(conflicts))))
+        inherited_names = outer_names
+        if table.get_type() != "class":
+            inherited_names = outer_names | local_names
+        for child in table.get_children():
+            visit(child, inherited_names)
+
+    visit(symtable.symtable(source, "<codecheck>", "exec"), set())
+    return findings
+
+
+@pytest.mark.parametrize("module_name", [
+    "services.compact_dsl_a2ui_converter",
+    "services.compact_high_level_components",
+    "services.countdown_pattern",
+    "services.theme_countdown_pattern",
+])
+def test_countdown_compilation_has_no_lexical_name_shadowing(module_name):
+    module = importlib.import_module(module_name)
+    assert _lexical_shadowing(inspect.getsource(module)) == []
+
+
+def test_countdown_create_callbacks_do_not_shadow_outer_locals():
+    module = importlib.import_module("test_countdown_pattern_create")
+    callback_test = module.test_fusion_create_delivers_pattern_after_real_theme_validation
+    assert _lexical_shadowing(inspect.getsource(callback_test)) == []
+
+
+@pytest.mark.parametrize("source,expected", [
+    ("from package import VERSION\ndef convert():\n    from package import VERSION\n", True),
+    ("def outer():\n    artifact = None\n    def save(artifact):\n        return artifact\n", True),
+    ("from package import field\ndef parse():\n    field = 'value'\n", True),
+    (
+        "def outer():\n    artifact = None\n    def save(saved_artifact):\n"
+        "        return saved_artifact\n",
+        False,
+    ),
+    ("class Item:\n    def value(self):\n        value = 1\n        return value\n", False),
+])
+def test_shadowing_check_covers_import_parameter_local_and_class_scopes(source, expected):
+    assert bool(_lexical_shadowing(source)) is expected

@@ -174,6 +174,19 @@ create 取最终数据候选；数据参数 edit 取调整后的完整列表；�
 - edit 仅追加本轮重新采用的外部事实，不复制旧请求的事实段落；原卡未修改内容按有效来源保留，纯视觉修改无需重查事实。
   本轮采用的展示版本无法可靠恢复时停止，不能把待查询、待推断或待生成工具补齐的数据放入请求。
 - 按“工具与参数”构造请求；create 无数据、动作或素材时对应列表传 `[]`，不为填满卡面增加内容。
+- 图案源 DSL 统一为 Layout＋一个高阶组件：2×2 的 S-countdown-pattern 只配 SCountdown，
+  2×4 的 W-countdown-pattern 只配 WCountdown；组件提交 label、pattern、value、relationValue、totalValue，
+  不兼容旧三个角色源，不提交 unit、fillMode、children；
+  字号等视觉规格由布局合同和配方决定，拒绝旧根属性和缺少总量的旧逐天格式。
+- 新建单次图案倒计时使用本轮可用的 `GetDateCounter` 单一绑定，选择 `/days`、`/relationText`、`/intervalDays`。
+  图案只承载事件名称和倒计时，不搭配动作或额外展示项。options.countdownPattern 仅传 kind（bars/dots），
+  不传 remainingDays 或 referenceDate；柱条和圆点均无剩余天数门槛。
+  SCountdown、WCountdown 固定连续比例填充，总量 totalValue 直接绑定同级 intervalDays；
+  源字段 pattern 使用 bars/dots，创建请求 options.countdownPattern.kind 保持不变。
+  柱条左往右、圆点底行往上且行内左往右，边界单元从底部部分点亮；当天、已过及零总量全暗。
+  亮色 #FFFFFFFF、暗色 #33FFFFFF；初始无真实总量时填 0，等待端侧刷新，不以样例或模型数字冒充。
+  周期倒计时走普通样式；编辑不提交该选项。明确要求的图案不适用时，告知原因并用 R09 等待确认替代；
+  用户未指定图案时，可直接采用现有合适样式。
 
 ### 6. 检查是否就绪，完成告知并生成
 
@@ -280,7 +293,7 @@ create 取最终数据候选；数据参数 edit 取调整后的完整列表；�
 ### Function: generateWidgetCardCompactDsl
 - **toolName**: generateWidgetCardCompactDsl
 - **description**: 生成极简协议版本的鸿蒙卡片
-- **参数**: {"properties":{"candidateEventCandidates":{"type":"Array","description":"候选点击事件对象数组，每项仅含 capabilityId 和 action；将概述的 actionTemplate 值复制到 action，不提交 actionTemplate 或 dynamicArguments 定义。","required":[],"properties":{"ArrayItem":{"type":"Object","description":"来自本轮概述的事件候选","required":["capabilityId","action"],"additionalProperties":false,"properties":{"capabilityId":{"type":"String","description":"本轮事件概述 ID"},"action":{"type":"Object","description":"完整复制对应模板的值，只替换声明的动态参数","required":["call","args"],"additionalProperties":false,"properties":{"call":{"type":"String","description":"模板原始调用类型，不填事件 ID"},"args":{"type":"Object","description":"模板完整参数对象，保留固定值与空字符串，禁止序列化成字符串","additionalProperties":true}}}}}}},"description":{"type":"String","description":"建议写入最终 CardSpec 的静态短概述，尽量不超过 12 个字；新建必填非空，编辑未修改时省略并继承"},"candidateAssetIds":{"type":"Array<String>","description":"候选素材 ID 列表","required":[],"properties":{"ArrayItem":{"type":"String","description":"候选素材 ID"}}},"userQuery":{"type":"String","description":"能力裁决后的本轮有效卡片需求；有外部事实时在后方追加固定标题‘本轮卡片静态内容（用作展示的外部事实）：’及本轮全部采用的静态展示内容（含用户文字及合法会话内容，可精简并保留关键信息与必要限定）；调整后生成时不得保留已移除或未经确认替代的内容"},"candidateDataBindings":{"type":"Array","description":"已通过能力概述裁决的候选数据能力调用列表","required":[],"properties":{"ArrayItem":{"type":"Object","description":"候选数据能力","required":["capabilityId","arguments","writeResultTo","candidateOutputFields"],"properties":{"writeResultTo":{"type":"String","description":"结果写入路径"},"arguments":{"type":"Object","description":"符合本轮 inputSchema 的 JSON 对象；无参用 {}，禁止 JSON 字符串、数组或 null","additionalProperties":true},"capabilityId":{"type":"String","description":"能力ID"},"candidateOutputFields":{"type":"Array<String>","minItems":1,"description":"必填非空候选展示字段数组；每项为对应能力 outputSchema 可推导的叶子 JSON Pointer","required":[],"properties":{"ArrayItem":{"type":"String","description":"候选展示字段叶子 JSON Pointer"}}}},"additionalProperties":false}}},"title":{"type":"String","description":"建议写入最终 CardSpec 的静态短标题，尽量不超过 8 个字；新建必填非空，编辑未修改时省略并继承"},"size":{"type":"String","description":"用户指定尺寸时必须显式传入，优先于默认或建议；未指定按尺寸规则。","enum":["2x2","2x4"]},"sourceArtifactUrl":{"type":"String","description":"上一版完整 artifact 的真实 URL；缺失表示首次生成，合法非空值表示编辑"}},"required":["userQuery"],"type":"object","additionalProperties":false,"description":"业务参数必须直接为 JSON 对象，不调用 JSON.stringify、不手工转义整个对象；创建和编辑共用此入口。"}
+- **参数**: {"properties":{"candidateEventCandidates":{"type":"Array","description":"候选点击事件对象数组，每项仅含 capabilityId 和 action；将概述的 actionTemplate 值复制到 action，不提交 actionTemplate 或 dynamicArguments 定义。","required":[],"properties":{"ArrayItem":{"type":"Object","description":"来自本轮概述的事件候选","required":["capabilityId","action"],"additionalProperties":false,"properties":{"capabilityId":{"type":"String","description":"本轮事件概述 ID"},"action":{"type":"Object","description":"完整复制对应模板的值，只替换声明的动态参数","required":["call","args"],"additionalProperties":false,"properties":{"call":{"type":"String","description":"模板原始调用类型，不填事件 ID"},"args":{"type":"Object","description":"模板完整参数对象，保留固定值与空字符串，禁止序列化成字符串","additionalProperties":true}}}}}}},"description":{"type":"String","description":"建议写入最终 CardSpec 的静态短概述，尽量不超过 12 个字；新建必填非空，编辑未修改时省略并继承"},"candidateAssetIds":{"type":"Array<String>","description":"候选素材 ID 列表","required":[],"properties":{"ArrayItem":{"type":"String","description":"候选素材 ID"}}},"userQuery":{"type":"String","description":"能力裁决后的本轮有效卡片需求；有外部事实时在后方追加固定标题‘本轮卡片静态内容（用作展示的外部事实）：’及本轮全部采用的静态展示内容（含用户文字及合法会话内容，可精简并保留关键信息与必要限定）；调整后生成时不得保留已移除或未经确认替代的内容"},"candidateDataBindings":{"type":"Array","description":"已通过能力概述裁决的候选数据能力调用列表","required":[],"properties":{"ArrayItem":{"type":"Object","description":"候选数据能力","required":["capabilityId","arguments","writeResultTo","candidateOutputFields"],"properties":{"writeResultTo":{"type":"String","description":"结果写入路径"},"arguments":{"type":"Object","description":"符合本轮 inputSchema 的 JSON 对象；无参用 {}，禁止 JSON 字符串、数组或 null","additionalProperties":true},"capabilityId":{"type":"String","description":"能力ID"},"candidateOutputFields":{"type":"Array<String>","minItems":1,"description":"必填非空候选展示字段数组；每项为对应能力 outputSchema 可推导的叶子 JSON Pointer","required":[],"properties":{"ArrayItem":{"type":"String","description":"候选展示字段叶子 JSON Pointer"}}}},"additionalProperties":false}}},"title":{"type":"String","description":"建议写入最终 CardSpec 的静态短标题，尽量不超过 8 个字；新建必填非空，编辑未修改时省略并继承"},"size":{"type":"String","description":"用户指定尺寸时必须显式传入，优先于默认或建议；未指定按尺寸规则。","enum":["2x2","2x4"]},"sourceArtifactUrl":{"type":"String","description":"上一版完整 artifact 的真实 URL；缺失表示首次生成，合法非空值表示编辑"},"options":{"type":"Object","additionalProperties":false,"properties":{"allowDegradation":{"type":"Boolean"},"countdownPattern":{"type":"Object","description":"仅 Fusion 新建单次倒计时使用。柱条与圆点均按 days/intervalDays 连续填充，无剩余天数门槛。","required":["kind"],"additionalProperties":false,"properties":{"kind":{"type":"String","enum":["bars","dots"]}}}},"required":[]}},"required":["userQuery"],"type":"object","additionalProperties":false,"description":"业务参数必须直接为 JSON 对象，不调用 JSON.stringify、不手工转义整个对象；创建和编辑共用此入口。"}
 
 完整创建与编辑调用示例见 [回归示例](references/examples.md)，不能替代本轮工具定义。
 
@@ -353,3 +366,6 @@ create 取最终数据候选；数据参数 edit 取调整后的完整列表；�
 - R23 示例只用本轮已确认支持且符合使用条件的范围，不包含未核实的数据、动作或素材；不将候选存在等同于设备可用或已经授权。
 - 成功用途和修改概括以有效需求及真实结果为依据，不复述查询读数、不将候选当作已展示内容，不透传业务 message。
 - 不输出能力 ID、schema、错误码、请求 ID、产物或来源 URL、内部模型与存储细节；不声称已添加桌面、已安装或已开启权限。
+
+图案倒计时的源结构仍为 Layout＋SCountdown/WCountdown；布局只展开外框，内部文字和图案
+由通用高阶组件流程展开，视觉由配方维护。此内部迁移不新增工具参数，不改变比例与图片准入。

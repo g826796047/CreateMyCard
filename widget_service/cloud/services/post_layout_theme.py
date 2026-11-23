@@ -11,6 +11,7 @@ from typing import Any
 from app.logger import json_for_log, logger
 from config.config import get_settings
 from services.content_business import BusinessContext, FinalBusinessContext
+from services.countdown_pattern import CountdownPattern, check_pattern_binding, paint_pattern
 from services.fusion_ball_expander import (
     build_fusion_ball_content_id,
     fusion_ball_enabled,
@@ -142,7 +143,7 @@ def photo_reason(
     if photo.get("pool") not in {"photos", "texturePhotos"}:
         return "图片不在当前主体图或抽象图集"
     if photo.get("contentEligibility", {}).get("kind") not in {
-        "uniform", "holiday-countdown", "weather-panels",
+        "uniform", "holiday-countdown", "weather-panels", "countdown-pattern",
     }:
         return "图片缺少统一准入配置"
     return photo_content_reason(
@@ -588,8 +589,15 @@ async def theme_artifact(
     artifact: Any, task: dict, client: Any, validator: Any, profile: dict,
     *, final_layout: str | None = None,
     business_context: BusinessContext | None = None,
+    countdown_pattern: CountdownPattern | None = None,
 ) -> Any:
     source = artifact.genui
+    if countdown_pattern is not None:
+        check_pattern_binding(countdown_pattern, artifact.cardSpec)
+        business_context = copy.deepcopy(business_context or prepare_business_context(task))
+        business_context.data[countdown_pattern.days_path] = "countdown"
+        business_context.data[countdown_pattern.relation_path] = "countdown"
+        business_context.data[countdown_pattern.total_path] = "countdown"
     with trace_span("theme.selection", stage="theme.selection") as span:
         result, audit = await select_theme(
             source, task, client,
@@ -606,6 +614,8 @@ async def theme_artifact(
     if theme.get("kind") == "photo":
         themed.genui = deliver_photo_source(themed.genui, theme)
         themed = register_photo_asset(themed)
+    if countdown_pattern is not None:
+        themed.genui = paint_pattern(themed.genui, countdown_pattern, task.get("size"))
     errors = _validate_theme(themed, validator, profile, fallback=False)
     user_colors = audit.get("userColors", {})
     if "text" in user_colors:
@@ -626,6 +636,8 @@ async def theme_artifact(
         fallback = preference_fallback(task, audit.get("userPreferences", []),
                                        audit.get("userColors", {}))
         themed.genui = apply_theme(source, fallback, task, audit.get("userColors", {}))
+        if countdown_pattern is not None:
+            themed.genui = paint_pattern(themed.genui, countdown_pattern, task.get("size"))
         fallback_errors = _validate_theme(themed, validator, profile, fallback=True)
         if fallback_errors:
             logger.error(

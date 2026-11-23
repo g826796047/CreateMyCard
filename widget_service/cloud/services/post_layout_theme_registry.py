@@ -42,9 +42,13 @@ _FRAME = {
 _CONTENT_ELIGIBILITY = {
     "type": "object", "additionalProperties": False, "required": ["kind", "businesses"],
     "properties": {
-        "kind": {"enum": ["uniform", "holiday-countdown", "weather-panels"]},
+        "kind": {"enum": ["uniform", "holiday-countdown", "weather-panels", "countdown-pattern"]},
         "maxTextLines": {"type": "integer", "minimum": 1, "maximum": 3},
         "wideLayout": {"enum": ["main-focus", "side-focus", "top-focus"]},
+        "patternLayouts": {
+            "type": "array", "minItems": 1, "maxItems": 1, "uniqueItems": True,
+            "items": {"enum": ["S-countdown-pattern", "W-countdown-pattern"]},
+        },
         "bodyRegions": {
             "type": "object", "additionalProperties": False,
             "required": ["mainMinLines", "mainMaxLines", "footerMaxRows"],
@@ -238,6 +242,10 @@ def _validate_content_eligibility(theme: dict) -> None:
             "holiday-countdown": (["2x2"], ["holiday"]),
             "weather-panels": (["2x4"], ["weather"]),
         }.get(policy.get("kind"))
+        if policy.get("kind") == "countdown-pattern":
+            sizes = theme.get("sizes")
+            if sizes in (["2x2"], ["2x4"]):
+                expected = (sizes, ["countdown"])
         if expected is None or is_texture:
             raise ValueError("Special photo eligibility requires a subject photo")
         sizes, businesses = expected
@@ -259,6 +267,25 @@ def _validate_content_eligibility(theme: dict) -> None:
     elif placement in {"center", "not-center"}:
         if not is_texture or theme.get("sizes") != ["2x2"]:
             raise ValueError("Centered shape selection requires a square texture photo")
+    _validate_pattern_layouts(theme, policy)
+
+
+def _validate_pattern_layouts(theme: dict, policy: dict) -> None:
+    layouts = policy.get("patternLayouts")
+    if layouts is None:
+        return
+    if policy.get("kind") != "uniform":
+        raise ValueError("Pattern layout extension requires uniform photo eligibility")
+    sizes = theme.get("sizes")
+    expected = None
+    if sizes == ["2x2"]:
+        expected = ["S-countdown-pattern"]
+    elif sizes == ["2x4"]:
+        expected = ["W-countdown-pattern"]
+    if expected is None or layouts != expected:
+        raise ValueError("Pattern layout extension must match the unique photo size")
+    if theme.get("pool") == "photos" and policy.get("businesses") != ["countdown"]:
+        raise ValueError("Pattern subject extension requires countdown business")
 
 
 def _validate_photo(theme: dict) -> None:

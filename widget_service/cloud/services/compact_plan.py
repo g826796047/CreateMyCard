@@ -1895,6 +1895,8 @@ def _compact_visible_state(
         from services.generation_content_policy import current_content_policy
 
         visible_names = _VISIBLE_PROP_NAMES
+        if component.component_type in {"SCountdown", "WCountdown"}:
+            visible_names = visible_names | {"relationValue"}
         if current_content_policy().is_static:
             visible_names = visible_names | {"body", "attributes", "description", "details"}
         visible_props = {

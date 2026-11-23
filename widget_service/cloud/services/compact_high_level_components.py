@@ -311,12 +311,16 @@ def expand_high_level_component_rows(
         "ProgressCircleSingle": _expand_progress_circle_single,
         "EventCard": _expand_event_card,
         "DataDisplay": _expand_data_display,
+        "SCountdown": _expand_countdown,
+        "WCountdown": _expand_countdown,
         "TopTextBottomValue": _expand_top_text_bottom_value,
         "SummaryList": _expand_summary_list,
     }
     for component in components:
         expander = expanders.get(component.component_type)
         parent = parents.get(component.component_id)
+        if component.component_type in {"SCountdown", "WCountdown"}:
+            _validate_pattern_parent(component, parent, size)
         static_type = component.component_type in STATIC_COMPONENTS
         static_support = (
             current_content_policy().is_static
@@ -400,6 +404,27 @@ def expand_high_level_component_rows(
             generated_ids.add(row.component_id)
             expanded.append(row)
     return expanded
+
+
+def _validate_pattern_parent(
+    component: ComponentRow, parent: ComponentRow | None, size: str,
+) -> None:
+    from services.countdown_pattern import COUNTDOWN_COMPONENTS, COUNTDOWN_LAYOUTS
+
+    layout = COUNTDOWN_LAYOUTS.get(size)
+    marker = f"{VISUAL_RECIPE_VERSION}:{layout}.root"
+    if parent is None or parent.component_id != "root":
+        raise CompactDslConversionError("倒计时专用组件只能用于对应的图案布局。")
+    if component.component_type != COUNTDOWN_COMPONENTS.get(size):
+        raise CompactDslConversionError("图案倒计时组件与卡片尺寸不一致。")
+    if parent.props.get("_visualRecipe") != marker or parent.children != (component.component_id,):
+        raise CompactDslConversionError("倒计时专用组件只能用于对应的图案布局。")
+
+
+def _expand_countdown(component: ComponentRow, size: str) -> list[ComponentRow]:
+    from services.countdown_pattern import expand_countdown_display
+
+    return expand_countdown_display(component, size)
 
 
 def _static_content_boxes(components: list[ComponentRow], size: str) -> dict[str, RegionBox]:

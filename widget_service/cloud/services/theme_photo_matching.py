@@ -29,6 +29,8 @@ class PhotoMatchFacts:
     error: str | None = None
     subject_exclusion: str | None = None
     body_regions: dict = field(default_factory=dict)
+    countdown_pattern: dict = field(default_factory=dict)
+    layout_id: str | None = None
 
 
 def photo_content_reason(photo: dict, facts: PhotoMatchFacts) -> str | None:
@@ -40,6 +42,8 @@ def photo_content_reason(photo: dict, facts: PhotoMatchFacts) -> str | None:
         return "图片缺少定稿根节点"
     policy = photo.get("contentEligibility", {})
     kind = policy.get("kind")
+    if kind == "countdown-pattern":
+        return _countdown_pattern_reason(facts, card)
     if kind == "holiday-countdown":
         if facts.size != "2x2" or not card.holiday:
             return "此图片仅用于2x2单业务节假日倒计时，每个展示对象均须属于节假日"
@@ -52,6 +56,8 @@ def photo_content_reason(photo: dict, facts: PhotoMatchFacts) -> str | None:
         return None
     if kind != "uniform":
         return "图片缺少已登记准入配置"
+    if facts.layout_id in policy.get("patternLayouts", []):
+        return _pattern_uniform_reason(photo, facts, card)
     texture = photo.get("pool") == "texturePhotos"
     scope = card
     if facts.size == "2x4" and not texture:
@@ -72,20 +78,59 @@ def photo_content_reason(photo: dict, facts: PhotoMatchFacts) -> str | None:
         if business not in policy.get("businesses", []):
             return "图片业务与实际可见的单业务内容不匹配"
     flow = scope.texture_flow if texture else scope.body_flow
+    return _flow_reason(photo, facts, scope, flow)
+
+
+def _pattern_uniform_reason(
+    photo: dict, facts: PhotoMatchFacts, card: PhotoScopeFacts,
+) -> str | None:
+    """仅登记的图案布局复用专用正文；其它场景不改变颜色或宽卡门禁。"""
+    reason = _countdown_pattern_reason(facts, card)
+    policy = photo.get("contentEligibility", {})
+    if reason is None and photo.get("pool") != "texturePhotos":
+        if card.businesses.single not in policy.get("businesses", []):
+            reason = "图片业务与实际可见的单业务内容不匹配"
+    if reason is None:
+        flow = facts.countdown_pattern.get("bodyFlow", {})
+        reason = _flow_reason(photo, facts, card, flow)
+    return reason
+
+
+def _flow_reason(
+    photo: dict, facts: PhotoMatchFacts, scope: PhotoScopeFacts, flow: dict,
+) -> str | None:
+    policy = photo.get("contentEligibility", {})
+    texture = photo.get("pool") == "texturePhotos"
     lines = flow.get("lineCount")
+    reason: str | None = None
     if type(lines) is not int or lines < 0:
-        return "无法确认图片正文行数"
-    rules = load_theme_registry().get("photoEligibility", {})
-    limit_key = "wideMaxTextLines" if facts.size == "2x4" and not texture else "maxTextLines"
-    limit = rules.get(limit_key, 0)
-    maximum = min(limit, policy.get("maxTextLines", limit))
-    if lines > maximum:
-        return f"图片正文超过{maximum}行（不含顶部标题和按钮文案）"
-    if not texture and facts.size == "2x2" and flow.get("leftAligned") is not True:
-        return "2x2主体图片要求正文整体居左，不能居中或两端对齐"
-    reason = _placement_reason(policy, scope, flow, facts.top_content)
-    if reason is None and policy.get("bodyRegions") is not None:
-        reason = _body_region_reason(policy.get("bodyRegions"), facts)
+        reason = "无法确认图片正文行数"
+    else:
+        rules = load_theme_registry().get("photoEligibility", {})
+        limit_key = "wideMaxTextLines" if facts.size == "2x4" and not texture else "maxTextLines"
+        limit = rules.get(limit_key, 0)
+        maximum = min(limit, policy.get("maxTextLines", limit))
+        if lines > maximum:
+            reason = f"图片正文超过{maximum}行（不含顶部标题和按钮文案）"
+        elif not texture and facts.size == "2x2" and flow.get("leftAligned") is not True:
+            reason = "2x2主体图片要求正文整体居左，不能居中或两端对齐"
+        else:
+            reason = _placement_reason(policy, scope, flow, facts.top_content)
+            if reason is None and policy.get("bodyRegions") is not None:
+                reason = _body_region_reason(policy.get("bodyRegions"), facts)
+    return reason
+
+
+def _countdown_pattern_reason(facts: PhotoMatchFacts, card: PhotoScopeFacts) -> str | None:
+    pattern = facts.countdown_pattern
+    expected = {"2x2": "S-countdown-pattern", "2x4": "W-countdown-pattern"}.get(facts.size)
+    reason: str | None = None
+    if expected is None or pattern.get("layout") != expected:
+        reason = "此图片仅用于同尺寸图案倒计时布局"
+    elif pattern.get("complete") is not True:
+        reason = "图案图片缺少可靠布局事实：" + str(pattern.get("reason"))
+    elif card.businesses.single != "countdown":
+        reason = "图案图片需要已确认的单一日期计数业务"
     return reason
 
 
@@ -144,7 +189,7 @@ def photo_reason(photo: dict, facts: PhotoMatchFacts) -> str | None:
     if photo.get("pool") not in {"photos", "texturePhotos"}:
         return "图片不在当前主体图或抽象图集"
     if photo.get("contentEligibility", {}).get("kind") not in {
-        "uniform", "holiday-countdown", "weather-panels",
+        "uniform", "holiday-countdown", "weather-panels", "countdown-pattern",
     }:
         return "图片缺少统一准入配置"
     reason = photo_content_reason(photo, facts)

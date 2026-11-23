@@ -469,6 +469,24 @@ item 使用 `layoutWeight:1`、`flexShrink:1` 和 `constraintSize.minWidth:0` �
 Progress 绑定类型归数据绑定，必要动作保留和 W9 动作数量归展示语义。
 后续实施以第 5 节的具体检查项为迁移单位；分类不改变现有触发条件、修复文案或行为。
 
+单次比例图案倒计时的创建准入由 `services/countdown_pattern.py` 检查有效绑定及三个字段，不设剩余天数门槛；
+剩余天数、关系与总量的同源性委托共享编译合同，总量为同级 intervalDays，固定 ratio 模式。
+`generation_pipeline.py` 消费裁决并拒绝模型绕过图案根或直写程序节点。图案源改为唯一 SCountdown/WCountdown：
+组件字段白名单及禁止自带 children 属于语法／组件；布局与组件的尺寸对应属于语义／布局，
+日期关系及总量同源属于语义／数据绑定，有效单次来源属于语义／有效能力。
+这些已有检查复用 countdown_pattern 的组件语义与绑定检查，不新增第二套判定或诊断码；拒绝旧三个角色及旧根格式。
+组件字段类型登记在 compact_component_bindings，模型类型登记在 compact_component_semantics。
+布局与唯一组件对应归 compact_semantic_layout；组件展开归 compact_high_level_components，
+复用 countdown_pattern 的内部展开与填充辅助函数。布局合同仅维护外框，取消专用 sourceRoles/visualParts。
+Plan 可见关系字段归现有事实覆盖；content_business 仅按已核对同源且 days 业务已确认为 countdown 的
+组件关系继承同一业务，避免自定义写入根被误判为多业务。固定几何与配方调用归组件展开；展开后继续执行通用组件、数据和容量检查。图案单元使用合法的原生叶子组件，
+不新增空容器豁免。有效日期计数来源和路径一致性复用 `check_pattern_binding`，Compact 公共入口只委托，
+不复制判定；模型组件类型检查按图案语义原文执行，程序生成的文字和图案仍受完整产物校验。
+文字单行宽度检查中的可见性判断归语义／布局与视觉，由 `semantic/layout/text_width.py`
+复用字段样例读取，仅跳过静态或受支持字符串相等条件下确定为 `none` 的节点。
+未知和可见状态继续执行宽度预算，回归见 `test_compact_fixed_emphasis_width.py` 与
+`test_countdown_pattern_create.py` 的当天首帧四组合及 Fusion 创建用例。
+
 ## 5. 主脚本诊断输出位置全量清单
 
 以下原始英文诊断仅用于技术核对；中文分类和迁移说明在各节中给出。

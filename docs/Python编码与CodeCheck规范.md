@@ -41,6 +41,9 @@
   `for`，把 `in` 后的元组换到下一行也会告警。固定少量 schema 字段优先写显式字典，动态字段用显式循环，
   不以跨行推导式规避行宽。2026-10-17 的主题注册表 frame 字段和 ballColors 字段均按此整改；
   `test_theme_codecheck_regressions.py` 检查注册表的推导式子句及 schema 等价性。
+  2026-11-23 组件配方测试的排除集合导致推导式 `if` 子句跨行，改为独立集合与显式循环，
+  保持筛选范围、字典顺序及配方对象引用不变；回归见
+  `tests/l0/unit/test_compact_component_runtime.py::test_visual_recipe_contract_uses_consistent_icon_and_overflow_rules`。
 - 展开 `dict.fromkeys(generator)` 等代码时必须保留原有顺序和去重语义；不能直接改成无序 `set`。
 - 除非当前作用域已显式证明键存在，否则不得直接使用 `mapping[key]`。可选键使用 `get()` 并检查结果；
   必选键使用 `get()` 后显式 `raise`，测试中使用 `get()` 后显式 `assert`。
@@ -62,6 +65,12 @@
   避免生命周期内由 `int` 隐式变为 `float`。
 - 遵守 `G.VAR.03`。局部变量和参数不得遮蔽外部作用域的标识符，包括导入的 `field`、`role`；
   改用 `schema_field`、`color_role` 等准确命名。
+  函数内延迟导入同样不得重复绑定模块级已导入的名称；已有可用模块导入时直接复用。
+  2026-11-20 转换器重复导入 `VISUAL_RECIPE_VERSION` 按此等价移除，
+  `test_theme_codecheck_regressions.py` 检查转换器局部导入不遮蔽模块级导入。
+  2026-11-22 图案创建回归的嵌套保存回调参数改为 `saved_artifact`，避免遮蔽外层产物变量；
+  参数改名须保持回调传参与对象身份不变。`tests/l0/unit/test_compact_codecheck_regressions.py`
+  覆盖图案编译模块及创建回调的词法作用域，区分真实外层绑定与类成员作用域。
 - 遵守 `G.ERR.09`。同一个 `except` 元组不得同时捕获父异常和子异常；例如已捕获 `OSError` 时，不再
   重复列出其子类 `TimeoutError`。
 - 遵守 `G.ERR.07`。不得使用 `except` 后直接 `pass`；可选流程发生异常时也要记录异常类型和原因，

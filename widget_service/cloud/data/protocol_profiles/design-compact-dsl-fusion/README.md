@@ -24,8 +24,8 @@
 | `combinations/2x2.md` | 共享组合到十个 2x2 正式骨架的落地矩阵 | 小卡组合兼容性 |
 | `combinations/2x4.md` | 共享组合到父布局、Sub-118/Sub-140 与固定槽的落地矩阵 | 宽卡组合兼容性 |
 | `layouts/common.md` | 画布、预算、区域槽位、路由总则 | 一级高度、非负空间 |
-| `layouts/2x2.md` | 十个正式语义布局；S1–S4 仅作为输入别名 | 小卡路由 |
-| `layouts/2x4.md` | 四个正式顶层布局；W1–W10 仅作为输入别名 | 宽卡路由 |
+| `layouts/2x2.md` | 十个通用语义布局与专用 `S-countdown-pattern`；S1–S4 仅作为输入别名 | 小卡路由 |
+| `layouts/2x4.md` | 四个通用顶层布局与专用 `W-countdown-pattern`；W1–W10 仅作为输入别名 | 宽卡路由 |
 | `composition.md` | 已接受 Plan 之后的内部决策顺序与冲突优先级 | 模型消息合同 |
 | `plan.md` | `submit_card_plan` 信息合同 | 不生成 DSL，不检索 Few-shot |
 | `repair.md` | 反馈定位、共同根因、最小修复及子树重算 | 创建约束继承 |
@@ -45,8 +45,12 @@ prompt_source 完整创建合同 → Plan → 已接受 Plan + 可选参考 → 
 ```
 
 `manifest.yaml` 使用 YAML 1.2 的 JSON 子集，由标准库解析，不新增部署依赖。
-`prompts` 中每个数组的顺序是唯一拼接顺序，引用格式为 `文件#片段`。七个名称是内存中的提示词标识：
-`plan`、`create`、`edit`、`repair`、`argument_repair`、`fewshot_2x2`、`fewshot_2x4`。
+`prompts` 中每个数组的顺序是唯一拼接顺序，引用格式为 `文件#片段`。内存中的提示词标识包括
+`plan`、`create`、`countdown_layout`、`edit`、`repair`、`argument_repair`、
+`fewshot_2x2` 和 `fewshot_2x4`。图案倒计时通过 Fusion 创建准入后，服务端按尺寸追加
+`countdown_layout` 片段和本轮 Layout＋唯一 SCountdown/WCountdown 的源组件示例；
+不兼容旧三个角色或旧根属性格式。内部 CountdownReadout/CountdownPattern 视觉配方继续共享，
+并非公开源组件；S-center/DataDisplay 不变。
 每种尺寸的 Few-shot 只维护一个文档，前言使用 `preamble`；案例使用与正式案例 ID 对应的
 `example-vNN` 片段。manifest 保留逐案例索引，加载器逐片段检查完整输入/输出，不按整文件放行。
 只有 `<!-- prompt:片段 -->` 与对应结束标记之间的正文发给模型；维护说明、索引、边界表、
@@ -66,7 +70,7 @@ Plan 接受后，DSL 阶段在 `WIDGET_SERVICE_ENABLE_DESIGN_COMPACT_FEW_SHOTS=t
 不再提供结构选例或可选运行时容量摘要开关。Plan 不接受额外组合容量合同，DSL 不追加组合容量工作表
 或 `compositionRecovery`；必要的组件容量提示、布局合同和视觉 Recipe 继续用于生成、转换、校验和渲染。
 示例字段数量不是实际容量，参考案例不能覆盖 Plan 必要事实。
-生成、编辑、repair 与源 Token 校验共用 S-plan-guided / W-plan-guided 范围，包含同尺寸全部登记布局；
+生成、编辑、repair 与源 Token 校验共用 S-plan-guided / W-plan-guided 范围，包含同尺寸全部通用布局；
 不再由业务关键词或候选字段数预先锁定骨架。每个布局自身的结构、几何与动作约束不变。
 完整业务案例保留测量读数、睡眠明细、同级数值、设备状态、列表和动作归属等覆盖；组件案例
 用于类型、语义及容量匹配的场景。两者共同维护，不以增加组件覆盖率为由替换掉必要信息。
@@ -86,6 +90,10 @@ Plan 接受后，DSL 阶段在 `WIDGET_SERVICE_ENABLE_DESIGN_COMPACT_FEW_SHOTS=t
 
 ## 显示回归保障
 
-七种模型文本继续由维护源确定性组装。组件合同调整属于有意的协议演进，
+模型文本继续由维护源确定性组装。组件合同调整属于有意的协议演进，
 不再要求与迁移前文本摘要完全一致；转换测试应证明使用视觉 Recipe 的组件展开后保持对应 Few-shot 的布局与视觉属性。
 案例另经 Compact 上下文校验和 A2UI 转换。这里不声称完成真实端侧截图验收或线上随机模型质量验收。
+
+### 图案倒计时展开职责
+
+图案倒计时沿用 Layout＋单一高阶组件的两阶段展开：Layout 只生成外框；SCountdown/WCountdown 在通用高阶组件阶段生成内部标题与图案。视觉数值由配方维护，不向源 DSL 增加参数。

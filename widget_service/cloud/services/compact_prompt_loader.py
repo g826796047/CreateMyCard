@@ -10,6 +10,7 @@ PROMPT_NAMES = frozenset(
     {
         "plan",
         "create",
+        "countdown_layout",
         "edit",
         "repair",
         "argument_repair",
@@ -77,7 +78,7 @@ def assemble_prompts(source_root: Path, size: str | None = None) -> dict[str, st
             raise ValueError(f"源文件未登记：{path}")
     prompts = _required(manifest, "prompts", dict)
     if set(prompts) != PROMPT_NAMES:
-        raise ValueError("manifest 必须声明全部七种 Compact 提示词")
+        raise ValueError("manifest 必须声明全部 Compact 提示词")
     result = {}
     used = set()
     for prompt_name, references in prompts.items():

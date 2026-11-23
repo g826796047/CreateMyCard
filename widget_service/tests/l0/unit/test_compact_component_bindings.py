@@ -601,3 +601,19 @@ def test_data_display_label_rejects_non_string_path(schema_type: str) -> None:
     assert len(errors) == 1
     assert "component display.props.label:" in errors[0]
     assert f"schema type {schema_type}" in errors[0]
+
+
+@pytest.mark.parametrize("component_type", ["SCountdown", "WCountdown"])
+@pytest.mark.parametrize(
+    ("prop", "source_type"), [
+        ("value", "string"), ("relationValue", "integer"), ("totalValue", "string"),
+    ],
+)
+def test_countdown_bindings_require_integer_days_total_and_string_relation(
+    component_type, prop, source_type,
+):
+    errors = collect_compact_component_binding_errors(
+        "subject", component_type, {prop: {"path": "/data/value"}},
+        schema_type_resolver=lambda _path: source_type,
+    )
+    assert errors

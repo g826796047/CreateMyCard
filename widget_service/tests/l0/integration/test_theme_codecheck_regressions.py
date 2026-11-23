@@ -10,6 +10,7 @@ import pytest
 from test_photo_asset_delivery import artifact as photo_artifact
 
 from config.config import get_settings
+from services import compact_dsl_a2ui_converter as converter
 from services import post_layout_theme as themes
 from services import post_layout_theme_registry as registry
 from services import theme_photo_eligibility, theme_texture_eligibility
@@ -200,3 +201,24 @@ def test_subject_overlap_preserves_touching_edges(rect, overlaps):
     evidence = {"complete": True, "occupied": [{"id": "title", "rect": rect}]}
     reason = themes._photo_geometry_reason(photo, evidence)
     assert reason == ("主体区域与内容 title 冲突" if overlaps else None)
+
+
+def test_converter_local_imports_do_not_shadow_module_imports():
+    tree = ast.parse(inspect.getsource(converter))
+    module_names = set()
+    for statement in tree.body:
+        if not isinstance(statement, ast.ImportFrom):
+            continue
+        for imported in statement.names:
+            module_names.add(imported.asname or imported.name)
+    for statement in tree.body:
+        if not isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        for node in ast.walk(statement):
+            if not isinstance(node, ast.ImportFrom):
+                continue
+            for imported in node.names:
+                name = imported.asname or imported.name
+                assert name not in module_names, (
+                    f"G.VAR.03: {statement.name} 的局部导入 {name} 遮蔽模块级导入"
+                )

@@ -332,6 +332,10 @@
       "layouts/2x2.md#s-layouts",
       "layouts/2x4.md#w-layouts"
     ],
+    "countdown_layout": [
+      "layouts/2x2.md#s-countdown-pattern",
+      "layouts/2x4.md#w-countdown-pattern"
+    ],
     "edit": [
       "edit.md#contract"
     ],

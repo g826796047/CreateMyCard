@@ -615,7 +615,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_airplane_tarmac_wide.jpg",
         "sourceSha256": "bef1e69ffc6f93deac2c6fe43c5d5a6279943c932cbedcae29a3c10b14b20c84",
         "assetSha256": "bef1e69ffc6f93deac2c6fe43c5d5a6279943c932cbedcae29a3c10b14b20c84",
         "assetBytes": 354271,
@@ -683,7 +682,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "ux_ddd_new_four_20261021/bg_ux_birds_countdown_square.jpg",
         "sourceSha256": "46c74e66a3a8e379504464cdaae6fe5f938967c1770b6fc955c00b2eb9227398",
         "assetSha256": "46c74e66a3a8e379504464cdaae6fe5f938967c1770b6fc955c00b2eb9227398",
         "assetBytes": 232229,
@@ -752,7 +750,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_bedside_lamp_wide.jpg",
         "sourceSha256": "91f3ac19584fb1520c99b8221837d4c9575a45a9f24938b13aba987804860e08",
         "assetSha256": "91f3ac19584fb1520c99b8221837d4c9575a45a9f24938b13aba987804860e08",
         "assetBytes": 374305,
@@ -823,7 +820,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_clouds_weather_square.jpg",
         "sourceSha256": "55861617bfbea33279768c55125265485a87d8c1c54d08b819ed02c2f7d9a5d0",
         "assetSha256": "55861617bfbea33279768c55125265485a87d8c1c54d08b819ed02c2f7d9a5d0",
         "assetBytes": 230056,
@@ -892,7 +888,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_concert_stage_wide.jpg",
         "sourceSha256": "7c72b015c3ca08000be74c99825c3fdb3e8073d59bb60c3961e9925d0a8f2be1",
         "assetSha256": "7c72b015c3ca08000be74c99825c3fdb3e8073d59bb60c3961e9925d0a8f2be1",
         "assetBytes": 425693,
@@ -961,7 +956,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_digital_wave_wide.jpg",
         "sourceSha256": "7695393dc0f1edf241800a994b10eccf77a19b16aa62fe911f34ca5a7b4697ec",
         "assetSha256": "7695393dc0f1edf241800a994b10eccf77a19b16aa62fe911f34ca5a7b4697ec",
         "assetBytes": 398835,
@@ -1029,7 +1023,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_running_pair_wide.jpg",
         "sourceSha256": "621dbb73b7350b32423e6f2a8e4df2fcb7e41b32ed3b098253c58e0e41006825",
         "assetSha256": "621dbb73b7350b32423e6f2a8e4df2fcb7e41b32ed3b098253c58e0e41006825",
         "assetBytes": 316382,
@@ -1097,7 +1090,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_sleep_square.jpg",
         "sourceSha256": "6e692ee8e9f8de9303aca98b291d176bbc5892d22cbfd42db256d8d6fd93cd00",
         "assetSha256": "6e692ee8e9f8de9303aca98b291d176bbc5892d22cbfd42db256d8d6fd93cd00",
         "assetBytes": 143737,
@@ -1165,7 +1157,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/44e32fb86baf4092a7e9ff70f1667fad/13da8ed871c8423a8c4d1c222d79d0a2.jpg",
         "sourceSha256": "f3de0dfd3fed4882736f5a72321a543e3c4e478903610dafc93eccdd5cfed5d7",
         "assetSha256": "f3de0dfd3fed4882736f5a72321a543e3c4e478903610dafc93eccdd5cfed5d7",
         "assetBytes": 483383,
@@ -1233,7 +1224,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/03ccd48e089743dea6849b1b0a1ed925/2234543ee8224addad15568479f82de2.jpg",
         "sourceSha256": "95ce8615498ea9e37c7c9fdfaeb2d92ea28c258813222c0a4899f14e42d75a3c",
         "assetSha256": "95ce8615498ea9e37c7c9fdfaeb2d92ea28c258813222c0a4899f14e42d75a3c",
         "assetBytes": 510712,
@@ -1299,7 +1289,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/ee1e75f0677b48e08878803025e692bf/22bf729e523748a1b822b6ea585539f4.JPG",
         "sourceSha256": "cf7251785e8dac75e1d7fcd25be546d0491f3a5dc5f1343075626cd289cd1081",
         "assetSha256": "cf7251785e8dac75e1d7fcd25be546d0491f3a5dc5f1343075626cd289cd1081",
         "assetBytes": 467818,
@@ -1367,7 +1356,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_sleep_wide.jpg",
         "sourceSha256": "dd136bbedba5042b12d3fed9cf5e714fceeb3c7bb34e180f7a54209a5a09db5d",
         "assetSha256": "dd136bbedba5042b12d3fed9cf5e714fceeb3c7bb34e180f7a54209a5a09db5d",
         "assetBytes": 239751,
@@ -1435,7 +1423,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_sport_center_wide.jpg",
         "sourceSha256": "7f337f875ea6bbaaa3b67032a7d3ae5f4a6184c4b74900eb96e09c8317a8571d",
         "assetSha256": "7f337f875ea6bbaaa3b67032a7d3ae5f4a6184c4b74900eb96e09c8317a8571d",
         "assetBytes": 393328,
@@ -1503,7 +1490,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_sunrise_runner_square.jpg",
         "sourceSha256": "fdb6777de824e936cd2dee8829c86dae06be2fe5ecae3e1f67641a9607a38e22",
         "assetSha256": "fdb6777de824e936cd2dee8829c86dae06be2fe5ecae3e1f67641a9607a38e22",
         "assetBytes": 200165,
@@ -1571,7 +1557,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_track_runner_square.jpg",
         "sourceSha256": "c7cd9fe4f97dfe170ddb35201e93c956f49d3151bf746628a11b316ae19450b6",
         "assetSha256": "c7cd9fe4f97dfe170ddb35201e93c956f49d3151bf746628a11b316ae19450b6",
         "assetBytes": 322029,
@@ -1639,7 +1624,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "photos_named_20261021/named/bg_ux_track_sprint_square.jpg",
         "sourceSha256": "b27995982b4037fd7b273d2b09d2ba6de066a03886a5c097b76ff56f182f9ba3",
         "assetSha256": "b27995982b4037fd7b273d2b09d2ba6de066a03886a5c097b76ff56f182f9ba3",
         "assetBytes": 302046,
@@ -1708,7 +1692,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "ux_ddd_new_four_20261021/bg_ux_violin_stage_square.jpg",
         "sourceSha256": "75442a3ae222dca2c8c5d05f8051b0f51ec17f25c3423d8e142c53c875dfbfe9",
         "assetSha256": "75442a3ae222dca2c8c5d05f8051b0f51ec17f25c3423d8e142c53c875dfbfe9",
         "assetBytes": 180020,
@@ -1776,7 +1759,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "ux_ddd_new_four_20261021/bg_ux_sand_arch_square.jpg",
         "sourceSha256": "2a4d3267fb001651a29678c1d55d5e7b332fd0b316ae0c9eae1aa6a8a11b5ce3",
         "assetSha256": "2a4d3267fb001651a29678c1d55d5e7b332fd0b316ae0c9eae1aa6a8a11b5ce3",
         "assetBytes": 187551,
@@ -1844,7 +1826,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "ux_ddd_new_four_20261021/bg_ux_starfield_weather_square.jpg",
         "sourceSha256": "a42c5799e2fcf80a9d6485a621ae178fb9886a60cebf0c0aab91451d9e569166",
         "assetSha256": "a42c5799e2fcf80a9d6485a621ae178fb9886a60cebf0c0aab91451d9e569166",
         "assetBytes": 458664,
@@ -1912,7 +1893,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "ux_battery_obs_20261021/bg_ux_starry_sky_square.jpg",
         "sourceSha256": "4340e139680ff9324de108418171148cda0f55a82d024891a49a6f126f51c9d0",
         "assetSha256": "4340e139680ff9324de108418171148cda0f55a82d024891a49a6f126f51c9d0",
         "assetBytes": 232538,
@@ -1980,7 +1960,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "ux_battery_obs_20261021/bg_ux_starry_sky_wide.jpg",
         "sourceSha256": "31d96e2f0259defe7db2815f6db3ddb09dc33999ff99706cfa398cb0addd973b",
         "assetSha256": "31d96e2f0259defe7db2815f6db3ddb09dc33999ff99706cfa398cb0addd973b",
         "assetBytes": 363121,
@@ -2048,7 +2027,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "resources/base/media/bg_ux_meeting_room_square.jpg",
         "sourceSha256": "8f9a2d73f00099fffbf69ab03466dcab8d0b6c19b2772caada5255bb3e47873e",
         "assetSha256": "8f9a2d73f00099fffbf69ab03466dcab8d0b6c19b2772caada5255bb3e47873e",
         "assetBytes": 471576,
@@ -2117,7 +2095,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "resources/base/media/bg_ux_meeting_room_wide.jpg",
         "sourceSha256": "f1e78d69f63325e7fb8ccdcc334a0c21bc56601d3078e8419770360ff2cf2f52",
         "assetSha256": "f1e78d69f63325e7fb8ccdcc334a0c21bc56601d3078e8419770360ff2cf2f52",
         "assetBytes": 504415,
@@ -2185,7 +2162,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/ffc5bb6c5645479799414fff68e61126/0310344f325941988566cac9fa549cd4.jpg",
         "sourceSha256": "e46d6f0dc502e2a4d2fa83d15dccb393b40ea90c7b816f711751c17253ddbc05",
         "assetSha256": "e46d6f0dc502e2a4d2fa83d15dccb393b40ea90c7b816f711751c17253ddbc05",
         "assetBytes": 507123,
@@ -2254,7 +2230,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/4ec25a5217b542208ee46c3f9b1bc074/a568268450794ee89d573b41d0262ace.jpg",
         "sourceSha256": "6dec441002fec4993251339430e7dd5f0ddfc706ab1a38fc05d579692ae20e2a",
         "assetSha256": "6dec441002fec4993251339430e7dd5f0ddfc706ab1a38fc05d579692ae20e2a",
         "assetBytes": 478612,
@@ -2323,7 +2298,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/f79de9bf55e148669f468344bb9b4290/3a9b912d859948fb90fe482e40c09579.jpg",
         "sourceSha256": "b809c1f213de6e880c8f9bad8e0af97a33078ca67d00ce46d8d3234ad224cf6a",
         "assetSha256": "b809c1f213de6e880c8f9bad8e0af97a33078ca67d00ce46d8d3234ad224cf6a",
         "assetBytes": 160342,
@@ -2392,7 +2366,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/55da5dff89014002b0daac98b9e6c12d/a30904689c3248a9b2e68b4bbbbf5879.jpg",
         "sourceSha256": "8d716867164b5b79a96364cfe47433cd0c1bff48abf525616d56f10e1018bb51",
         "assetSha256": "8d716867164b5b79a96364cfe47433cd0c1bff48abf525616d56f10e1018bb51",
         "assetBytes": 202006,
@@ -2458,12 +2431,14 @@
           "sport",
           "countdown"
         ],
-        "placement": "not-center"
+        "placement": "not-center",
+        "patternLayouts": [
+          "S-countdown-pattern"
+        ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X2Main Container_ orange1.jpg",
         "originalSize": [
           600,
           600
@@ -2529,12 +2504,14 @@
           "sport",
           "countdown"
         ],
-        "placement": "not-center"
+        "placement": "not-center",
+        "patternLayouts": [
+          "S-countdown-pattern"
+        ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X2Main Container_ orange2.jpg",
         "originalSize": [
           600,
           600
@@ -2605,7 +2582,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X2Main Container_ orange3.jpg",
         "originalSize": [
           600,
           600
@@ -2673,12 +2649,14 @@
           "music",
           "app-usage"
         ],
-        "placement": "not-center"
+        "placement": "not-center",
+        "patternLayouts": [
+          "S-countdown-pattern"
+        ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X2Main Container_ purple1.jpg",
         "originalSize": [
           600,
           600
@@ -2746,12 +2724,14 @@
           "music",
           "app-usage"
         ],
-        "placement": "not-center"
+        "placement": "not-center",
+        "patternLayouts": [
+          "S-countdown-pattern"
+        ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X2Main Container_ purple2.jpg",
         "originalSize": [
           600,
           600
@@ -2824,7 +2804,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X2Main Container_ purple3.jpg",
         "originalSize": [
           600,
           600
@@ -2892,12 +2871,14 @@
           "navigation",
           "settings"
         ],
-        "placement": "not-center"
+        "placement": "not-center",
+        "patternLayouts": [
+          "S-countdown-pattern"
+        ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X2Main Container_blue1.jpg",
         "originalSize": [
           600,
           600
@@ -2965,12 +2946,14 @@
           "navigation",
           "settings"
         ],
-        "placement": "not-center"
+        "placement": "not-center",
+        "patternLayouts": [
+          "S-countdown-pattern"
+        ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X2Main Container_blue2.jpg",
         "originalSize": [
           600,
           600
@@ -3043,7 +3026,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X2Main Container_blue3.jpg",
         "originalSize": [
           600,
           600
@@ -3108,12 +3090,14 @@
         "businesses": [
           "sport",
           "countdown"
+        ],
+        "patternLayouts": [
+          "W-countdown-pattern"
         ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X4Main Container_ orange1.jpg",
         "originalSize": [
           1200,
           600
@@ -3178,12 +3162,14 @@
         "businesses": [
           "sport",
           "countdown"
+        ],
+        "patternLayouts": [
+          "W-countdown-pattern"
         ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X4Main Container_ orange2.jpg",
         "originalSize": [
           1200,
           600
@@ -3253,7 +3239,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X4Main Container_ orange3.jpg",
         "originalSize": [
           1200,
           600
@@ -3320,12 +3305,14 @@
           "earphone",
           "music",
           "app-usage"
+        ],
+        "patternLayouts": [
+          "W-countdown-pattern"
         ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X4Main Container_ purple1.jpg",
         "originalSize": [
           1200,
           600
@@ -3392,12 +3379,14 @@
           "earphone",
           "music",
           "app-usage"
+        ],
+        "patternLayouts": [
+          "W-countdown-pattern"
         ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X4Main Container_ purple2.jpg",
         "originalSize": [
           1200,
           600
@@ -3469,7 +3458,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X4Main Container_ purple3.jpg",
         "originalSize": [
           1200,
           600
@@ -3536,12 +3524,14 @@
           "weather",
           "navigation",
           "settings"
+        ],
+        "patternLayouts": [
+          "W-countdown-pattern"
         ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X4Main Container_blue1.jpg",
         "originalSize": [
           1200,
           600
@@ -3608,12 +3598,14 @@
           "weather",
           "navigation",
           "settings"
+        ],
+        "patternLayouts": [
+          "W-countdown-pattern"
         ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X4Main Container_blue2.jpg",
         "originalSize": [
           1200,
           600
@@ -3685,7 +3677,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "qqq/qqq/2X4Main Container_blue3.jpg",
         "originalSize": [
           1200,
           600
@@ -3755,7 +3746,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/bb705bf693244ed7ac1d7168bbd5d345/310cbbc7dc6b4752bf38c0e88a5087c1.jpg",
         "sourceSha256": "e3656c2109f930f5bb1e2e1aa1e3a3d02266482e7c7bad7664dd7b576fb667ac",
         "assetSha256": "e3656c2109f930f5bb1e2e1aa1e3a3d02266482e7c7bad7664dd7b576fb667ac",
         "assetBytes": 216304,
@@ -3823,7 +3813,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/8cada9708f9d44508a222f81778ca52b/25ec17b9e36c4a16834a95319f1c24e8.jpg",
         "sourceSha256": "47fcb8d2b1fe04d7728a03f6c57b7bf6cb781b49574bca99631115b2043f4f63",
         "assetSha256": "47fcb8d2b1fe04d7728a03f6c57b7bf6cb781b49574bca99631115b2043f4f63",
         "assetBytes": 397948,
@@ -3886,12 +3875,14 @@
         "kind": "uniform",
         "businesses": [
           "countdown"
+        ],
+        "patternLayouts": [
+          "S-countdown-pattern"
         ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/e49b7d081e644fd8b86aab0befe7ff6a/ef44837f61cd47949f7c4eebea9ef222.jpg",
         "sourceSha256": "03ca196222dd75d6caf5659204ab37b39c078470ef9189dbb9e28820a9167673",
         "assetSha256": "03ca196222dd75d6caf5659204ab37b39c078470ef9189dbb9e28820a9167673",
         "assetBytes": 144958,
@@ -3959,7 +3950,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/55168f9741f44a10b044085401bf2c10/0b6a28db9fac47da8d2f1b6e65500e03.jpg",
         "sourceSha256": "3e7f7e78f491e336297f734fd1d5efcafffda5a10815ab34138316da3f021445",
         "assetSha256": "3e7f7e78f491e336297f734fd1d5efcafffda5a10815ab34138316da3f021445",
         "assetBytes": 180449,
@@ -4027,7 +4017,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/c2f9795c5d3c43288624f45d4da2b7f2/a81b453ae4e342869f450aa1296a0c1e.jpg",
         "sourceSha256": "d64c44f9e6498162e6390137f4e922340cf0f177df2f2c57abfb3fdffbda34c2",
         "assetSha256": "d64c44f9e6498162e6390137f4e922340cf0f177df2f2c57abfb3fdffbda34c2",
         "assetBytes": 183969,
@@ -4095,7 +4084,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/71ea4ef9762840a3b71df36e6f4f1495/96e20efa1a7f4296a6ec52cd62560a0e.jpg",
         "sourceSha256": "883b8d6d721ed36a182c69ec85f904b27e30215c9caba3390cbac19a02d49209",
         "assetSha256": "883b8d6d721ed36a182c69ec85f904b27e30215c9caba3390cbac19a02d49209",
         "assetBytes": 267896,
@@ -4163,7 +4151,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/ab1b9e6b48f242a59545ffad2f61c4dc/0fff9de42ed34388ab815063a0db6492.png",
         "sourceSha256": "40c491baf61c52f4d7add8222d550ea8d33415a458e52f56e3136b3f83b786e2",
         "assetSha256": "40c491baf61c52f4d7add8222d550ea8d33415a458e52f56e3136b3f83b786e2",
         "assetBytes": 147836,
@@ -4231,7 +4218,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/d513182466044587b281c103678ad9d5/2749e93b2e134f448fe6ae891a4221e8.png",
         "sourceSha256": "87950d1806d0ff6cba841ad1621e7068c7c315912a4bcd05a846e747f62cde9e",
         "assetSha256": "87950d1806d0ff6cba841ad1621e7068c7c315912a4bcd05a846e747f62cde9e",
         "assetBytes": 137797,
@@ -4294,12 +4280,14 @@
         "kind": "uniform",
         "businesses": [
           "countdown"
+        ],
+        "patternLayouts": [
+          "S-countdown-pattern"
         ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/84c4fe2fdc3e4e6f824bef0d266ceadc/74cb819aab6643ac8321814e123417e8.png",
         "sourceSha256": "8d8462853e2bc92ba437a26768b454006c9665bb780ab00e16f3bb59d8df495b",
         "assetSha256": "8d8462853e2bc92ba437a26768b454006c9665bb780ab00e16f3bb59d8df495b",
         "assetBytes": 180541,
@@ -4362,12 +4350,14 @@
         "kind": "uniform",
         "businesses": [
           "countdown"
+        ],
+        "patternLayouts": [
+          "W-countdown-pattern"
         ]
       },
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/b43e6aea617e4214a1e39eb4ea9e47a7/a30b29dd26cb474a818a893e4bd72fcb.png",
         "sourceSha256": "0b1af1554074a40efa5a23d03d64baa549bb07296020f6032fce9631cb14858d",
         "assetSha256": "0b1af1554074a40efa5a23d03d64baa549bb07296020f6032fce9631cb14858d",
         "assetBytes": 350198,
@@ -4435,7 +4425,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "C:/Users/dingdong/AppData/Roaming/WeLink/download/1111/1111/bg_ux_meeting_room_brown_chairs_square.png",
         "sourceSha256": "756b96f57b8b72d60568c6d6d36b751a99df636bcf7a9458d20dc995f4401acf",
         "assetSha256": "756b96f57b8b72d60568c6d6d36b751a99df636bcf7a9458d20dc995f4401acf",
         "assetBytes": 267971,
@@ -4503,7 +4492,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "C:/Users/dingdong/AppData/Roaming/WeLink/download/1111/1111/bg_ux_meeting_room_brown_chairs_wide.png",
         "sourceSha256": "0ca5b8df097692ba030faaaac955c2cce299139855564b254696789e65fdd792",
         "assetSha256": "b68ef2a425d742e0de9fc30df56fc2e0b155886efa61146c3a61e9981dd01bb0",
         "assetBytes": 306203,
@@ -4571,7 +4559,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/22657daf61a14b809bbff31a8dab1fac/638c2921bdc6482ea666fb4493dc4c2f.png",
         "sourceSha256": "9381db0e4994ce225c40dee9279e34459546cc81df4fa075f5c6b76eb244a8ce",
         "assetSha256": "9381db0e4994ce225c40dee9279e34459546cc81df4fa075f5c6b76eb244a8ce",
         "assetBytes": 323206,
@@ -4639,7 +4626,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/18c9b4025d7540b4b7f43ba7ea5dbbaf/ba181598ce8749d0a9534d3c987b8c31.jpg",
         "sourceSha256": "0ae092a06afe1bbced07b3eda38e1eb4f524d51fa09443df209d2fd5b53cfd78",
         "assetSha256": "0ae092a06afe1bbced07b3eda38e1eb4f524d51fa09443df209d2fd5b53cfd78",
         "assetBytes": 204357,
@@ -4712,7 +4698,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/34042b4421a146f0b40a9f4421b47981/698e8447e7094291ae9f1f64b4977b6c.png",
         "sourceSha256": "3c4882186784a0164a150950f40ce035853d214c1ed9db689e6a9d3940d56c99",
         "assetSha256": "3c4882186784a0164a150950f40ce035853d214c1ed9db689e6a9d3940d56c99",
         "assetBytes": 208251,
@@ -4780,7 +4765,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/438fb1956b664a0cb54e3ee538f232b0/f53ebdb0e5de4b1492faef8bc2dab9d2.png",
         "sourceSha256": "4ae6afe5f918faf2f9e65214433ee799d487d039ee35b5c51144c6a7c32cf9dd",
         "assetSha256": "4ae6afe5f918faf2f9e65214433ee799d487d039ee35b5c51144c6a7c32cf9dd",
         "assetBytes": 497846,
@@ -4853,7 +4837,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/318f310fe9134763b6769c24ea83a21e/de7821e4087041f9a69504e2918d8bdb.png",
         "sourceSha256": "88057cde00d010a138bc3e4f81b0c1b11ac5c2dbe270856ed063d226b7199687",
         "assetSha256": "88057cde00d010a138bc3e4f81b0c1b11ac5c2dbe270856ed063d226b7199687",
         "assetBytes": 188828,
@@ -4921,7 +4904,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/7f0fa51984e14f379a82a85416fb0b17/dd8d0671710d4498b402a8b4b1526e57.png",
         "sourceSha256": "cff75987e996eb08724e1ce562c7a5d2fd9814ad562d28401ed77f9e500fcf2b",
         "assetSha256": "cff75987e996eb08724e1ce562c7a5d2fd9814ad562d28401ed77f9e500fcf2b",
         "assetBytes": 348652,
@@ -4994,7 +4976,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "C:/Users/dingdong/AppData/Roaming/WeLink/download/weather/2X2天气.jpg",
         "sourceSha256": "ba72db145be759adecfb9238221d02555631f7fd054a0affca11dac05d4798bf",
         "assetSha256": "ba72db145be759adecfb9238221d02555631f7fd054a0affca11dac05d4798bf",
         "assetBytes": 90577,
@@ -5062,7 +5043,6 @@
       "matchingPolicy": "layout-only",
       "source": {
         "provider": "UX",
-        "file": "C:/Users/dingdong/AppData/Roaming/WeLink/download/weather/2X4天气.jpg",
         "sourceSha256": "a72228a56b2c899ee11f9952edafebaa767d0ffdc33d5371d5bd56f2d2d9e5db",
         "assetSha256": "a72228a56b2c899ee11f9952edafebaa767d0ffdc33d5371d5bd56f2d2d9e5db",
         "assetBytes": 145225,
@@ -5079,6 +5059,542 @@
       "background": {
         "src": "resources/base/media/bg_ux_cumulus_blue_wide.jpg",
         "remoteUrl": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/984d7a4a6c8b43fab600de6c28f67166/1f4dbedc82e74de2959e7b9ca67063dd.jpg",
+        "objectFit": "fill",
+        "frame": {
+          "slotWidth": 1,
+          "slotHeight": 1,
+          "imageWidth": 1,
+          "imageHeight": 1,
+          "align": "topStart"
+        }
+      },
+      "content": {
+        "roles": {
+          "primary": "#FFFFFFFF",
+          "secondary": "#CCFFFFFF",
+          "tertiary": "#99FFFFFF",
+          "graphicPrimary": "#FFFFFFFF",
+          "graphicSecondary": "#CCFFFFFF",
+          "graphicTertiary": "#99FFFFFF",
+          "componentSecondary": "#33FFFFFF",
+          "componentTertiary": "#1AFFFFFF"
+        },
+        "panelBySize": {
+          "2x4": "#33FFFFFF"
+        },
+        "explicitTextAlpha": {
+          "secondary": 204,
+          "tertiary": 153
+        }
+      }
+    },
+    {
+      "id": "photo-ux-desert-twilight-square",
+      "enabled": true,
+      "kind": "photo",
+      "pool": "photos",
+      "name": "沙漠暮色",
+      "description": "沙漠暮色；仅用于同尺寸图案倒计时，主副标题居左、图案底部居中，按 intervalDays 连续比例填充。",
+      "sizes": [
+        "2x2"
+      ],
+      "business": "countdown",
+      "composition": "native",
+      "subjectless": false,
+      "contentEligibility": {
+        "kind": "countdown-pattern",
+        "businesses": [
+          "countdown"
+        ]
+      },
+      "matchingPolicy": "layout-only",
+      "source": {
+        "sourceSha256": "4b2ba711caebbfc17babdfea9eec016febeba9c6611eb5dc879c6633499287a8",
+        "assetSha256": "4b2ba711caebbfc17babdfea9eec016febeba9c6611eb5dc879c6633499287a8",
+        "assetBytes": 357175,
+        "originalSize": [
+          600,
+          600
+        ],
+        "assetSize": [
+          600,
+          600
+        ],
+        "provider": "UX",
+        "processing": "从background.remoteUrl下载原始交付字节，未裁切或重新编码"
+      },
+      "background": {
+        "src": "resources/base/media/bg_ux_desert_twilight_square.png",
+        "remoteUrl": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/237b0295a4ae444cbe9a1cffa5c0a3d7/a223b23a5bd342c38acd9b00707b9448.png",
+        "objectFit": "fill",
+        "frame": {
+          "slotWidth": 1,
+          "slotHeight": 1,
+          "imageWidth": 1,
+          "imageHeight": 1,
+          "align": "topStart"
+        }
+      },
+      "content": {
+        "roles": {
+          "primary": "#FFFFFFFF",
+          "secondary": "#CCFFFFFF",
+          "tertiary": "#99FFFFFF",
+          "graphicPrimary": "#FFFFFFFF",
+          "graphicSecondary": "#CCFFFFFF",
+          "graphicTertiary": "#99FFFFFF",
+          "componentSecondary": "#33FFFFFF",
+          "componentTertiary": "#1AFFFFFF"
+        },
+        "panelBySize": {
+          "2x2": "#33FFFFFF"
+        },
+        "explicitTextAlpha": {
+          "secondary": 204,
+          "tertiary": 153
+        }
+      }
+    },
+    {
+      "id": "photo-ux-desert-twilight-wide",
+      "enabled": true,
+      "kind": "photo",
+      "pool": "photos",
+      "name": "沙漠暮色",
+      "description": "沙漠暮色；仅用于同尺寸图案倒计时，主副标题居左、图案底部居中，按 intervalDays 连续比例填充。",
+      "sizes": [
+        "2x4"
+      ],
+      "business": "countdown",
+      "composition": "native",
+      "subjectless": false,
+      "contentEligibility": {
+        "kind": "countdown-pattern",
+        "businesses": [
+          "countdown"
+        ]
+      },
+      "matchingPolicy": "layout-only",
+      "source": {
+        "sourceSha256": "bb35b0c3565cd95e6b26c8728c6899f085759548fddec076db365ce44ee3f8bc",
+        "assetSha256": "c7411c53de2a64c925378a25f917de32a46c634ca809de684053d359a18afa91",
+        "assetBytes": 256117,
+        "originalSize": [
+          1200,
+          600
+        ],
+        "assetSize": [
+          1200,
+          600
+        ],
+        "provider": "UX",
+        "processing": "从background.remoteUrl下载原始交付字节，未裁切或重新编码"
+      },
+      "background": {
+        "src": "resources/base/media/bg_ux_desert_twilight_wide.jpg",
+        "remoteUrl": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/7fc710ec57ce4d0ca56a597b0ba93c12/0ef28968b8794415b7ec7c848f82b624.jpg",
+        "objectFit": "fill",
+        "frame": {
+          "slotWidth": 1,
+          "slotHeight": 1,
+          "imageWidth": 1,
+          "imageHeight": 1,
+          "align": "topStart"
+        }
+      },
+      "content": {
+        "roles": {
+          "primary": "#FFFFFFFF",
+          "secondary": "#CCFFFFFF",
+          "tertiary": "#99FFFFFF",
+          "graphicPrimary": "#FFFFFFFF",
+          "graphicSecondary": "#CCFFFFFF",
+          "graphicTertiary": "#99FFFFFF",
+          "componentSecondary": "#33FFFFFF",
+          "componentTertiary": "#1AFFFFFF"
+        },
+        "panelBySize": {
+          "2x4": "#33FFFFFF"
+        },
+        "explicitTextAlpha": {
+          "secondary": 204,
+          "tertiary": 153
+        }
+      }
+    },
+    {
+      "id": "photo-ux-soft-pink-sunset-lake-square",
+      "enabled": true,
+      "kind": "photo",
+      "pool": "photos",
+      "name": "柔粉日落湖面",
+      "description": "柔粉日落湖面；仅用于同尺寸图案倒计时，主副标题居左、图案底部居中，按 intervalDays 连续比例填充。",
+      "sizes": [
+        "2x2"
+      ],
+      "business": "countdown",
+      "composition": "native",
+      "subjectless": false,
+      "contentEligibility": {
+        "kind": "countdown-pattern",
+        "businesses": [
+          "countdown"
+        ]
+      },
+      "matchingPolicy": "layout-only",
+      "source": {
+        "sourceSha256": "da233b0ef5b510d104d1208e4a508bc7c9d10d41f95af0b81fa72d2ef239ae51",
+        "assetSha256": "da233b0ef5b510d104d1208e4a508bc7c9d10d41f95af0b81fa72d2ef239ae51",
+        "assetBytes": 218550,
+        "originalSize": [
+          600,
+          600
+        ],
+        "assetSize": [
+          600,
+          600
+        ],
+        "provider": "UX",
+        "processing": "从background.remoteUrl下载原始交付字节，未裁切或重新编码"
+      },
+      "background": {
+        "src": "resources/base/media/bg_ux_soft_pink_sunset_lake_square.png",
+        "remoteUrl": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/5351073e421c4c699f6ac97135e0ddc7/042017d3b2ea4def8c2351de88a03ac4.png",
+        "objectFit": "fill",
+        "frame": {
+          "slotWidth": 1,
+          "slotHeight": 1,
+          "imageWidth": 1,
+          "imageHeight": 1,
+          "align": "topStart"
+        }
+      },
+      "content": {
+        "roles": {
+          "primary": "#FFFFFFFF",
+          "secondary": "#CCFFFFFF",
+          "tertiary": "#99FFFFFF",
+          "graphicPrimary": "#FFFFFFFF",
+          "graphicSecondary": "#CCFFFFFF",
+          "graphicTertiary": "#99FFFFFF",
+          "componentSecondary": "#33FFFFFF",
+          "componentTertiary": "#1AFFFFFF"
+        },
+        "panelBySize": {
+          "2x2": "#33FFFFFF"
+        },
+        "explicitTextAlpha": {
+          "secondary": 204,
+          "tertiary": 153
+        }
+      }
+    },
+    {
+      "id": "photo-ux-soft-pink-sunset-lake-wide",
+      "enabled": true,
+      "kind": "photo",
+      "pool": "photos",
+      "name": "柔粉日落湖面",
+      "description": "柔粉日落湖面；仅用于同尺寸图案倒计时，主副标题居左、图案底部居中，按 intervalDays 连续比例填充。",
+      "sizes": [
+        "2x4"
+      ],
+      "business": "countdown",
+      "composition": "native",
+      "subjectless": false,
+      "contentEligibility": {
+        "kind": "countdown-pattern",
+        "businesses": [
+          "countdown"
+        ]
+      },
+      "matchingPolicy": "layout-only",
+      "source": {
+        "sourceSha256": "bc79f68a81f8dfab7fccf1ab1dd17aa415b3e56b853eb0db45da69d97e554f42",
+        "assetSha256": "bc79f68a81f8dfab7fccf1ab1dd17aa415b3e56b853eb0db45da69d97e554f42",
+        "assetBytes": 438775,
+        "originalSize": [
+          1200,
+          600
+        ],
+        "assetSize": [
+          1200,
+          600
+        ],
+        "provider": "UX",
+        "processing": "从background.remoteUrl下载原始交付字节，未裁切或重新编码"
+      },
+      "background": {
+        "src": "resources/base/media/bg_ux_soft_pink_sunset_lake_wide.png",
+        "remoteUrl": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/670c746678cd42d3ae740ea29bf75e43/d885b7cc6fd64a5ca36fe464ae7307b4.png",
+        "objectFit": "fill",
+        "frame": {
+          "slotWidth": 1,
+          "slotHeight": 1,
+          "imageWidth": 1,
+          "imageHeight": 1,
+          "align": "topStart"
+        }
+      },
+      "content": {
+        "roles": {
+          "primary": "#FFFFFFFF",
+          "secondary": "#CCFFFFFF",
+          "tertiary": "#99FFFFFF",
+          "graphicPrimary": "#FFFFFFFF",
+          "graphicSecondary": "#CCFFFFFF",
+          "graphicTertiary": "#99FFFFFF",
+          "componentSecondary": "#33FFFFFF",
+          "componentTertiary": "#1AFFFFFF"
+        },
+        "panelBySize": {
+          "2x4": "#33FFFFFF"
+        },
+        "explicitTextAlpha": {
+          "secondary": 204,
+          "tertiary": 153
+        }
+      }
+    },
+    {
+      "id": "photo-ux-starry-coast-square",
+      "enabled": true,
+      "kind": "photo",
+      "pool": "photos",
+      "name": "星空海岸",
+      "description": "星空海岸；仅用于同尺寸图案倒计时，主副标题居左、图案底部居中，按 intervalDays 连续比例填充。",
+      "sizes": [
+        "2x2"
+      ],
+      "business": "countdown",
+      "composition": "native",
+      "subjectless": false,
+      "contentEligibility": {
+        "kind": "countdown-pattern",
+        "businesses": [
+          "countdown"
+        ]
+      },
+      "matchingPolicy": "layout-only",
+      "source": {
+        "sourceSha256": "99127194bde6c21674db607dbcf3cc6d7fe2ff3dfe887458695c50e8834c9697",
+        "assetSha256": "99127194bde6c21674db607dbcf3cc6d7fe2ff3dfe887458695c50e8834c9697",
+        "assetBytes": 384749,
+        "originalSize": [
+          600,
+          600
+        ],
+        "assetSize": [
+          600,
+          600
+        ],
+        "provider": "UX",
+        "processing": "从background.remoteUrl下载原始交付字节，未裁切或重新编码"
+      },
+      "background": {
+        "src": "resources/base/media/bg_ux_starry_coast_square.png",
+        "remoteUrl": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/8df945932af74969af4ae703045a0a65/62ab518a168146b48548168eccb9cafe.png",
+        "objectFit": "fill",
+        "frame": {
+          "slotWidth": 1,
+          "slotHeight": 1,
+          "imageWidth": 1,
+          "imageHeight": 1,
+          "align": "topStart"
+        }
+      },
+      "content": {
+        "roles": {
+          "primary": "#FFFFFFFF",
+          "secondary": "#CCFFFFFF",
+          "tertiary": "#99FFFFFF",
+          "graphicPrimary": "#FFFFFFFF",
+          "graphicSecondary": "#CCFFFFFF",
+          "graphicTertiary": "#99FFFFFF",
+          "componentSecondary": "#33FFFFFF",
+          "componentTertiary": "#1AFFFFFF"
+        },
+        "panelBySize": {
+          "2x2": "#33FFFFFF"
+        },
+        "explicitTextAlpha": {
+          "secondary": 204,
+          "tertiary": 153
+        }
+      }
+    },
+    {
+      "id": "photo-ux-starry-coast-wide",
+      "enabled": true,
+      "kind": "photo",
+      "pool": "photos",
+      "name": "星空海岸",
+      "description": "星空海岸；仅用于同尺寸图案倒计时，主副标题居左、图案底部居中，按 intervalDays 连续比例填充。",
+      "sizes": [
+        "2x4"
+      ],
+      "business": "countdown",
+      "composition": "native",
+      "subjectless": false,
+      "contentEligibility": {
+        "kind": "countdown-pattern",
+        "businesses": [
+          "countdown"
+        ]
+      },
+      "matchingPolicy": "layout-only",
+      "source": {
+        "sourceSha256": "895ab3510ac77f66f676e69fddcaea6cdd1d8ae4fb124a80b23ffe9665c1bfd3",
+        "assetSha256": "423833f07ca12c641595d9a7849ca388232da8fd79c21c641cec9e5c75549e61",
+        "assetBytes": 249456,
+        "originalSize": [
+          1200,
+          600
+        ],
+        "assetSize": [
+          1200,
+          600
+        ],
+        "provider": "UX",
+        "processing": "从background.remoteUrl下载原始交付字节，未裁切或重新编码"
+      },
+      "background": {
+        "src": "resources/base/media/bg_ux_starry_coast_wide.jpg",
+        "remoteUrl": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/3bb9eede6f0148a2ba15b14d39342200/717f442ca6584c6b99b6838e8fcbb023.jpg",
+        "objectFit": "fill",
+        "frame": {
+          "slotWidth": 1,
+          "slotHeight": 1,
+          "imageWidth": 1,
+          "imageHeight": 1,
+          "align": "topStart"
+        }
+      },
+      "content": {
+        "roles": {
+          "primary": "#FFFFFFFF",
+          "secondary": "#CCFFFFFF",
+          "tertiary": "#99FFFFFF",
+          "graphicPrimary": "#FFFFFFFF",
+          "graphicSecondary": "#CCFFFFFF",
+          "graphicTertiary": "#99FFFFFF",
+          "componentSecondary": "#33FFFFFF",
+          "componentTertiary": "#1AFFFFFF"
+        },
+        "panelBySize": {
+          "2x4": "#33FFFFFF"
+        },
+        "explicitTextAlpha": {
+          "secondary": 204,
+          "tertiary": 153
+        }
+      }
+    },
+    {
+      "id": "photo-ux-tree-grass-hill-square",
+      "enabled": true,
+      "kind": "photo",
+      "pool": "photos",
+      "name": "草坡独树",
+      "description": "草坡独树；仅用于同尺寸图案倒计时，主副标题居左、图案底部居中，按 intervalDays 连续比例填充。",
+      "sizes": [
+        "2x2"
+      ],
+      "business": "countdown",
+      "composition": "native",
+      "subjectless": false,
+      "contentEligibility": {
+        "kind": "countdown-pattern",
+        "businesses": [
+          "countdown"
+        ]
+      },
+      "matchingPolicy": "layout-only",
+      "source": {
+        "sourceSha256": "558a6fa77474cc588e0ac97d0a8b40cdc07d2a4144ec3d8affe7e4416e4939dd",
+        "assetSha256": "558a6fa77474cc588e0ac97d0a8b40cdc07d2a4144ec3d8affe7e4416e4939dd",
+        "assetBytes": 495242,
+        "originalSize": [
+          600,
+          600
+        ],
+        "assetSize": [
+          600,
+          600
+        ],
+        "provider": "UX",
+        "processing": "从background.remoteUrl下载原始交付字节，未裁切或重新编码"
+      },
+      "background": {
+        "src": "resources/base/media/bg_ux_tree_grass_hill_square.png",
+        "remoteUrl": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/5cee119207ae4dbcab9ddcbfb44af996/1af7c257da574eea9958671f75354d8f.png",
+        "objectFit": "fill",
+        "frame": {
+          "slotWidth": 1,
+          "slotHeight": 1,
+          "imageWidth": 1,
+          "imageHeight": 1,
+          "align": "topStart"
+        }
+      },
+      "content": {
+        "roles": {
+          "primary": "#FFFFFFFF",
+          "secondary": "#CCFFFFFF",
+          "tertiary": "#99FFFFFF",
+          "graphicPrimary": "#FFFFFFFF",
+          "graphicSecondary": "#CCFFFFFF",
+          "graphicTertiary": "#99FFFFFF",
+          "componentSecondary": "#33FFFFFF",
+          "componentTertiary": "#1AFFFFFF"
+        },
+        "panelBySize": {
+          "2x2": "#33FFFFFF"
+        },
+        "explicitTextAlpha": {
+          "secondary": 204,
+          "tertiary": 153
+        }
+      }
+    },
+    {
+      "id": "photo-ux-tree-grass-hill-wide",
+      "enabled": true,
+      "kind": "photo",
+      "pool": "photos",
+      "name": "草坡独树",
+      "description": "草坡独树；仅用于同尺寸图案倒计时，主副标题居左、图案底部居中，按 intervalDays 连续比例填充。",
+      "sizes": [
+        "2x4"
+      ],
+      "business": "countdown",
+      "composition": "native",
+      "subjectless": false,
+      "contentEligibility": {
+        "kind": "countdown-pattern",
+        "businesses": [
+          "countdown"
+        ]
+      },
+      "matchingPolicy": "layout-only",
+      "source": {
+        "sourceSha256": "9382df7ec1d5d06bc68872725263fdaea11e968add350feac10753c56a8d8e75",
+        "assetSha256": "666b4812975068ece0ffec8ccd4e5445c2c70c1a0857e20aecc102ff726ad476",
+        "assetBytes": 308073,
+        "originalSize": [
+          1200,
+          600
+        ],
+        "assetSize": [
+          1200,
+          600
+        ],
+        "provider": "UX",
+        "processing": "从background.remoteUrl下载原始交付字节，未裁切或重新编码"
+      },
+      "background": {
+        "src": "resources/base/media/bg_ux_tree_grass_hill_wide.jpg",
+        "remoteUrl": "https://lfcontentcenterdev.hwcloudtest.cn/pub_5/FaStore_fa_900_9/bb/v3/fa/osms/1/1/7c3c04bb1c194df5be7a64022eee84d5/2198fc5a17e74fb38904fd1b114f64e5.jpg",
         "objectFit": "fill",
         "frame": {
           "slotWidth": 1,

@@ -117,7 +117,12 @@
       "parts": {
         "root": {
           "component": "Column",
-          "styles": {"padding": 12, "itemMargin": 5, "alignItems": "center", "justifyContent": "center"}
+          "styles": {
+            "padding": 12,
+            "itemMargin": 5,
+            "alignItems": "center",
+            "justifyContent": "center"
+          }
         }
       }
     },
@@ -154,16 +159,39 @@
             "objectFit": "contain",
             "flexShrink": 0
           }
+        },
+        "countdownSubtitle": {
+          "component": "Text",
+          "styles": {
+            "width": "matchParent",
+            "height": 21,
+            "fontSize": 16,
+            "fontWeight": 400,
+            "maxLines": 1,
+            "textAlign": "start",
+            "textOverflow": "ellipsis",
+            "flexShrink": 0,
+            "fontColor": "@theme:secondary/1"
+          }
         }
       },
       "variants": {
         "countdown-center": {
           "parts": {
-            "root": {"styles": {"height": 21, "justifyContent": "center"}},
-            "title": {"styles": {
-              "height": 21, "fontSize": 16, "fontWeight": 500,
-              "textAlign": "center"
-            }}
+            "root": {
+              "styles": {
+                "height": 21,
+                "justifyContent": "center"
+              }
+            },
+            "title": {
+              "styles": {
+                "height": 21,
+                "fontSize": 16,
+                "fontWeight": 500,
+                "textAlign": "center"
+              }
+            }
           }
         },
         "withIcon": {
@@ -368,8 +396,13 @@
               "replace": true,
               "component": "Text",
               "styles": {
-                "width": "matchParent", "height": 21, "fontSize": 16, "fontWeight": 500,
-                "maxLines": 1, "textAlign": "center", "flexShrink": 0
+                "width": "matchParent",
+                "height": 21,
+                "fontSize": 16,
+                "fontWeight": 500,
+                "maxLines": 1,
+                "textAlign": "center",
+                "flexShrink": 0
               }
             }
           }
@@ -666,17 +699,37 @@
           "parts": {
             "root": {
               "component": "Column",
-              "styles": {"height": 74, "itemMargin": 0, "justifyContent": "center", "alignItems": "center"}
+              "styles": {
+                "height": 74,
+                "itemMargin": 0,
+                "justifyContent": "center",
+                "alignItems": "center"
+              }
             },
             "countdownRow": {
               "component": "Row",
               "styles": {
-                "width": "matchParent", "height": 56, "itemMargin": 2,
-                "justifyContent": "center", "alignItems": "bottom", "flexShrink": 0
+                "width": "matchParent",
+                "height": 56,
+                "itemMargin": 2,
+                "justifyContent": "center",
+                "alignItems": "bottom",
+                "flexShrink": 0
               }
             },
-            "value": {"styles": {"height": 56, "fontSize": 56}},
-            "unit": {"styles": {"height": 21, "fontSize": 16, "fontWeight": 700}}
+            "value": {
+              "styles": {
+                "height": 56,
+                "fontSize": 56
+              }
+            },
+            "unit": {
+              "styles": {
+                "height": 21,
+                "fontSize": 16,
+                "fontWeight": 700
+              }
+            }
           }
         }
       },
@@ -2025,6 +2078,193 @@
             "fontWeight": 400,
             "maxLines": 1,
             "textOverflow": "ellipsis"
+          }
+        }
+      }
+    },
+    "S-countdown-pattern": {
+      "alignment": "native",
+      "parts": {
+        "root": {
+          "component": "Column",
+          "styles": {
+            "width": "matchParent",
+            "height": "matchParent",
+            "padding": 12,
+            "alignItems": "center",
+            "justifyContent": "start",
+            "borderRadius": 20,
+            "clip": true
+          }
+        }
+      }
+    },
+    "SCountdown": {
+      "alignment": "native",
+      "parts": {
+        "root": {
+          "component": "Column",
+          "styles": {
+            "width": "matchParent",
+            "height": "matchParent",
+            "alignItems": "center",
+            "justifyContent": "spaceBetween",
+            "flexShrink": 0
+          }
+        }
+      }
+    },
+    "W-countdown-pattern": {
+      "alignment": "native",
+      "parts": {
+        "root": {
+          "component": "Column",
+          "styles": {
+            "width": "matchParent",
+            "height": "matchParent",
+            "padding": 12,
+            "alignItems": "center",
+            "justifyContent": "start",
+            "borderRadius": 20,
+            "clip": true
+          }
+        }
+      }
+    },
+    "WCountdown": {
+      "alignment": "native",
+      "parts": {
+        "root": {
+          "component": "Column",
+          "styles": {
+            "width": "matchParent",
+            "height": "matchParent",
+            "alignItems": "center",
+            "justifyContent": "spaceBetween",
+            "flexShrink": 0
+          }
+        }
+      }
+    },
+    "CountdownReadout": {
+      "alignment": "aligned",
+      "parts": {
+        "root": {
+          "component": "Stack",
+          "styles": {
+            "width": "matchParent",
+            "height": 27,
+            "alignContent": "topStart",
+            "flexShrink": 0
+          }
+        },
+        "text": {
+          "component": "Text",
+          "styles": {
+            "width": "matchParent",
+            "height": 27,
+            "fontSize": 20,
+            "fontWeight": 700,
+            "maxLines": 1,
+            "textAlign": "start",
+            "textOverflow": "ellipsis",
+            "flexShrink": 0,
+            "fontColor": "@theme:primary/1"
+          }
+        }
+      }
+    },
+    "CountdownPattern": {
+      "alignment": "native",
+      "parts": {
+        "labels": {
+          "component": "Column",
+          "styles": {
+            "width": "matchParent",
+            "height": 50,
+            "itemMargin": 2,
+            "flexShrink": 0
+          }
+        },
+        "cell": {
+          "component": "Stack",
+          "styles": {
+            "flexShrink": 0,
+            "clip": true,
+            "alignContent": "bottomStart",
+            "backgroundColor": "@theme:componentSecondary/1"
+          }
+        },
+        "row": {
+          "component": "Row",
+          "styles": {
+            "flexShrink": 0
+          }
+        },
+        "group": {
+          "component": "Column",
+          "styles": {
+            "flexShrink": 0,
+            "alignItems": "center"
+          }
+        },
+        "fill": {
+          "component": "Divider",
+          "styles": {
+            "flexShrink": 0,
+            "strokeWidth": 0,
+            "color": "#00000000",
+            "backgroundColor": "@theme:graphicPrimary/1"
+          }
+        }
+      },
+      "colors": {
+        "active": "#FFFFFFFF",
+        "inactive": "#33FFFFFF"
+      },
+      "sizes": {
+        "2x2": {
+          "geometry": {
+            "bars": {
+              "rows": 1,
+              "columns": 7,
+              "width": 10,
+              "height": 60,
+              "gap": 9.33,
+              "row_gap": 0,
+              "radius": 5
+            },
+            "dots": {
+              "rows": 4,
+              "columns": 12,
+              "width": 8,
+              "height": 8,
+              "gap": 2.72,
+              "row_gap": 4,
+              "radius": 4
+            }
+          }
+        },
+        "2x4": {
+          "geometry": {
+            "bars": {
+              "rows": 1,
+              "columns": 7,
+              "width": 30,
+              "height": 60,
+              "gap": 11.0,
+              "row_gap": 0,
+              "radius": 15
+            },
+            "dots": {
+              "rows": 4,
+              "columns": 25,
+              "width": 8,
+              "height": 8,
+              "gap": 3.16,
+              "row_gap": 4,
+              "radius": 4
+            }
           }
         }
       }

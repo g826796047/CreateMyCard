@@ -45,6 +45,24 @@
     }
   },
   "layouts": {
+    "S-countdown-pattern": {
+      "size": "2x2",
+      "requestOnly": true,
+      "actionCount": {"min": 0, "max": 0},
+      "patterns": [{"rules": [
+        {"path": [], "types": ["Column"], "props": {"padding": 12, "borderRadius": 20, "clip": true, "alignItems": "center", "justifyContent": "start"}, "childCount": 1},
+        {"path": [0], "types": ["SCountdown", "Column"]}
+      ]}]
+    },
+    "W-countdown-pattern": {
+      "size": "2x4",
+      "requestOnly": true,
+      "actionCount": {"min": 0, "max": 0},
+      "patterns": [{"rules": [
+        {"path": [], "types": ["Column"], "props": {"padding": 12, "borderRadius": 20, "clip": true, "alignItems": "center", "justifyContent": "start"}, "childCount": 1},
+        {"path": [0], "types": ["WCountdown", "Column"]}
+      ]}]
+    },
     "S-center": {
       "size": "2x2",
       "actionCount": {"min": 0, "max": 0},

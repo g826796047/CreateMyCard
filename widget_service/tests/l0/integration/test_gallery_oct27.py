@@ -88,11 +88,11 @@ def test_assets_have_exact_delivery_bytes_in_both_copies(filename):
     assert len(data) == source.get("assetBytes")
     assert hashlib.sha256(data).hexdigest() == source.get("assetSha256")
     remote = item.get("remoteUrl")
-    # 全部图片交付地址已补齐；原始PNG来源与OBS的JPG交付字节分别追溯。
-    source_file = source.get("file")
-    assert isinstance(source_file, str)
-    if source_file.startswith("https://"):
-        assert remote == source_file
+    # 原图与交付图按摘要追溯，不依赖本机路径或重复来源地址。
+    assert "file" not in source
+    assert isinstance(source.get("sourceSha256"), str)
+    assert isinstance(source.get("originalSize"), list)
+    assert isinstance(source.get("assetSize"), list)
     assert isinstance(remote, str)
     assert remote.startswith("https://lfcontentcenterdev.hwcloudtest.cn/")
     assert "[" not in remote and "]" not in remote

@@ -71,6 +71,16 @@ COMPACT_COMPONENT_BINDING_CONTRACTS: dict[
     dict[str, CompactPropBindingContract],
 ] = {
     "SingleLineTitle": {"title": DISPLAY_BINDING},
+    "SCountdown": {
+        "totalValue": CompactPropBindingContract(frozenset({_PATH}), frozenset({"integer"})),
+        "value": CompactPropBindingContract(frozenset({_PATH}), frozenset({"integer"})),
+        "relationValue": CompactPropBindingContract(frozenset({_PATH}), _STRING_TYPES),
+    },
+    "WCountdown": {
+        "totalValue": CompactPropBindingContract(frozenset({_PATH}), frozenset({"integer"})),
+        "value": CompactPropBindingContract(frozenset({_PATH}), frozenset({"integer"})),
+        "relationValue": CompactPropBindingContract(frozenset({_PATH}), _STRING_TYPES),
+    },
     "DoubleLineTitle": {
         "title": DISPLAY_BINDING,
         "secondaryInfo": DISPLAY_BINDING,

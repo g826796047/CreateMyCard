@@ -11,7 +11,7 @@ from services.theme_content_regions import button_ids
 
 def test_current_subject_and_texture_assets_are_active_and_present():
     root = Path(__file__).resolve().parents[4]
-    expected = {"photos": 31, "texturePhotos": 15,
+    expected = {"photos": 39, "texturePhotos": 15,
                 "subjectlessWidePhotos": 0, "squareExpansions": 0}
     for key, count in expected.items():
         entries = themes.registered_themes(key)

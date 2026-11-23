@@ -71,6 +71,7 @@ def test_generation_tool_schema_matches_source_direct_result_contract():
         "candidateDataBindings",
         "candidateEventCandidates",
         "candidateAssetIds",
+        "options",
     }
     assert set(data_item["properties"]) == {
         "writeResultTo",

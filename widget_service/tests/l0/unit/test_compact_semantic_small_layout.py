@@ -54,6 +54,10 @@ def _leaf(identifier: str, kind: str) -> list:
 
 
 def _layout_source(layout: str, variant: str = "standard", action: bool = False) -> str:
+    if layout == "S-countdown-pattern":
+        from test_countdown_pattern_create import _source as pattern_source
+
+        return pattern_source("2x2", "bars")
     kinds = {
         "S-center": ["DataDisplay"],
         "S-title-content": ["SingleLineTitle", "EmphasisText"],
@@ -245,5 +249,6 @@ def test_documented_small_templates_can_be_completed_and_converted() -> None:
             assert target[1] == declared[1]
             target[2] = declared[2]
         convert_compact_dsl_to_a2ui(_source(rows), size="2x2")
-    assert layouts == set(SMALL_CHILD_ROLES)
+    # 请求专属图案布局由单独的专用提示词加载，不进入普通 fewshot。
+    assert layouts == set(SMALL_CHILD_ROLES) - {"S-countdown-pattern"}
     assert groups == {"hero-support", "label-value", "peer-pair", "supporting-items"}

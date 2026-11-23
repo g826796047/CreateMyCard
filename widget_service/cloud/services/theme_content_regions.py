@@ -5,6 +5,7 @@ from __future__ import annotations
 from services.card_validation.base import read_pointer
 from services.display_text import current_display_text
 from services.theme_body_regions import body_region_evidence
+from services.theme_countdown_pattern import countdown_pattern_evidence
 from services.theme_style_roles import ROLE_PATTERN, is_role
 from services.theme_text_allocation import content_sized_width_ids
 
@@ -59,6 +60,10 @@ def photo_layout_evidence(nodes: list[dict], data_model: dict | None = None,
               "nonTextAncestors": _non_text_ancestors(nodes, non_text_ids),
               "textFlow": text_flow_evidence(nodes, content_width_ids=content_widths),
               "deviceGeometryKnown": False}
+    if final_layout is not None:
+        result["countdownPattern"] = countdown_pattern_evidence(
+            final_layout, nodes, data_model, size,
+        )
     if data_model is not None:
         result["bodyTextFlow"] = body_text_flow_evidence(
             nodes, data_model, content_width_ids=content_widths,

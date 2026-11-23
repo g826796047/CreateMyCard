@@ -4,6 +4,8 @@
 
 CORE_INFORMATION_COMPONENT_TYPES = frozenset(
     {
+        "SCountdown",
+        "WCountdown",
         "DataDisplay",
         "EmphasizedData",
         "EmphasisText",

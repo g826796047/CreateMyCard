@@ -38,6 +38,8 @@ def test_split_panels_only_admit_explicit_weather_panel_policy(identity):
         assert reason == "2x4图片需要左右主焦点加另一侧上下双槽，不支持上下或双大背板布局"
     elif policy.get("wideLayout") == "top-focus":
         assert reason == "2x4图片需要上下主次布局，不支持左右或双大背板布局"
+    elif policy.get("kind") == "countdown-pattern":
+        assert reason == "此图片仅用于同尺寸图案倒计时布局"
     else:
         assert reason == "2x4图片需要左主焦点和右侧上下两个背板"
 

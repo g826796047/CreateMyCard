@@ -96,12 +96,21 @@ def validate_compact_dsl(
     skip_static_group_errors: bool = False,
 ) -> CompactDslValidationResult:
     """Validate expressions, first-frame data, and TaskSpec data boundaries."""
+    from services.countdown_pattern import (
+        check_pattern_binding,
+        pattern_from_source,
+        pattern_layout,
+    )
+
     try:
         original_rows = parse_compact_dsl_rows(
             compact_dsl,
             expand_layouts=False,
             size=task_spec.get("size"),
         )
+        countdown_root = pattern_layout(original_rows)
+        if countdown_root is not None:
+            check_pattern_binding(pattern_from_source(countdown_root, original_rows), card_spec)
         from services.generation_content_policy import current_content_policy
 
         if current_content_policy().is_static:
@@ -131,7 +140,12 @@ def validate_compact_dsl(
         compact_dsl, size=task_spec.get("size"),
     )
     if enforce_model_component_types and not current_content_policy().is_static:
-        model_errors = collect_model_component_errors(components)
+        model_components = components
+        if countdown_root is not None:
+            model_components = ComponentRows(
+                row for row in original_rows if isinstance(row, ComponentRow)
+            )
+        model_errors = collect_model_component_errors(model_components)
         if model_errors:
             raise _validation_error(model_errors, context, repair_context)
     data_rows = [row for row in rows if isinstance(row, DataRow)]

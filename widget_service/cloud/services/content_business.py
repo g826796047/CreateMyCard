@@ -6,6 +6,8 @@ import json
 import re
 from dataclasses import dataclass, field
 
+from loguru import logger
+
 from services.compact_dsl_a2ui_converter import ComponentRow, DataRow, parse_compact_dsl_rows
 from services.compact_plan import _compact_visible_state, compact_plan_data_paths
 from services.event_matching import is_optional_switch_event
@@ -175,19 +177,25 @@ class BusinessContext:
 
     def visible(self, rows: list[ComponentRow]) -> VisibleBusinesses:
         state = _compact_visible_state(rows)
+        relation_businesses = self._countdown_relation_businesses(rows)
         ordered_data = []
         data_businesses = set()
         for occurrence in state.path_occurrences:
             if occurrence.data_id.rsplit("/", 1)[-1] in _METADATA_FIELDS:
                 continue
-            business = self.data_business(occurrence.data_id)
+            business = relation_businesses.get(occurrence.data_id)
+            if business is None:
+                business = self.data_business(occurrence.data_id)
             data_businesses.add(business)
             if business not in ordered_data:
                 ordered_data.append(business)
         # paths是完整可见集合；顺序仍只由实际内容树中的occurrences决定。
         for path in state.paths:
             if path.rsplit("/", 1)[-1] not in _METADATA_FIELDS:
-                data_businesses.add(self.data_business(path))
+                business = relation_businesses.get(path)
+                if business is None:
+                    business = self.data_business(path)
+                data_businesses.add(business)
         actions = []
         for row in rows:
             handlers = row.props.get("onClick", [])
@@ -206,6 +214,25 @@ class BusinessContext:
         return VisibleBusinesses(
             single, first, tuple(ordered), frozenset(data_businesses), state.paths,
         )
+
+    def _countdown_relation_businesses(self, rows: list[ComponentRow]) -> dict[str, str]:
+        from services.countdown_pattern import pattern_from_display
+
+        result = {}
+        for component in rows:
+            if component.component_type not in {"SCountdown", "WCountdown"}:
+                continue
+            try:
+                pattern = pattern_from_display(component)
+            except ValueError as exc:
+                logger.debug(
+                    "[Content Business] countdown_relation_rejected component={} type={} reason={}",
+                    component.component_id, type(exc).__name__, str(exc),
+                )
+                continue
+            if self.data_business(pattern.days_path) == "countdown":
+                result[pattern.relation_path] = "countdown"
+        return result
 
 
 @dataclass

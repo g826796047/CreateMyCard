@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import ast
+import re
 from typing import Any
 
 from services.card_validation.compact_validation.text import (
@@ -11,6 +13,35 @@ from services.card_validation.compact_validation.text import (
 )
 from services.compact_dsl_a2ui_converter import ComponentRow
 from services.compact_region_layout import reference_region_boxes
+
+
+def _sample_hides_text(value: Any, task_spec: dict[str, Any]) -> bool:
+    """仅识别静态 none 或已知字符串样例的相等条件，未知状态继续检查宽度。"""
+    from services.compact_composition_planner import _schema_value
+
+    if value == "none":
+        return True
+    if not isinstance(value, str):
+        return False
+    literal = r'''(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')'''
+    match = re.fullmatch(
+        r"\s*\{\{\s*\$\{(?P<path>/[^{}]+)\}\s*==\s*"
+        rf"(?P<expected>{literal})\s*\?\s*(?P<yes>{literal})"
+        rf"\s*:\s*(?P<no>{literal})\s*\}}\}}\s*",
+        value,
+    )
+    if match is None:
+        return False
+    sample = _schema_value(task_spec, match.group("path")).get("sampleValue")
+    if not isinstance(sample, str):
+        return False
+    try:
+        expected = ast.literal_eval(match.group("expected"))
+        branch = match.group("yes" if sample == expected else "no")
+        hidden = ast.literal_eval(branch) == "none"
+    except (SyntaxError, ValueError):
+        hidden = False
+    return hidden
 
 
 def _collect_text_width_budget_errors(
@@ -58,6 +89,8 @@ def _collect_text_width_budget_errors(
         if row.component_type not in {"Text", "Button"}:
             continue
         props = row.props
+        if _sample_hides_text(props.get("visibility"), task_spec):
+            continue
         is_main_title = _uses_visual_recipe_part(row, "DataDisplay.mainTitle")
         if props.get("maxLines", 1) != 1 and not is_main_title:
             continue

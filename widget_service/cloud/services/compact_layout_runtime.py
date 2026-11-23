@@ -97,13 +97,15 @@ def load_layout_contract() -> dict[str, Any]:
 
 
 def layout_ids_for_size(size: str) -> tuple[str, ...]:
-    """Return all formal layout IDs registered for one widget size."""
+    """返回当前尺寸可供通用规划选择的布局。"""
     layouts = load_layout_contract().get("layouts")
     if not isinstance(layouts, dict):
         return ()
     identifiers: list[str] = []
     for layout_id, layout in layouts.items():
         if not isinstance(layout_id, str) or not isinstance(layout, dict):
+            continue
+        if layout.get("requestOnly") is True:
             continue
         if layout.get("size") == size:
             identifiers.append(layout_id)

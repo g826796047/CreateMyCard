@@ -31,7 +31,7 @@ def test_only_requested_gallery_entries_are_disabled_but_preserved():
     all_photos = registry.registered_themes(include_disabled=True)
     disabled = {item.get("id") for item in all_photos if not item.get("enabled")}
     assert disabled == {"photo-ux-" + name for name in DISABLED}
-    assert len(registry.registered_themes("photos")) == 31
+    assert len(registry.registered_themes("photos")) == 39
     assert len(registry.registered_themes("texturePhotos")) == 15
     for item in all_photos:
         if item.get("id") in disabled:

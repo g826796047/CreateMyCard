@@ -23,6 +23,36 @@ from services.generation_pipeline import DesignCompactProcessor, DslProcessingCo
 _HANDLER = {"call": "clickToDeeplink", "args": {"intentName": "Settings", "uri": "status"}}
 
 
+@pytest.mark.parametrize(("visibility", "sample", "overflow"), [
+    ("none", None, False),
+    ("visible", None, True),
+    ("{{ ${/data/counter/relation} == '就是今天' ? 'none' : 'visible' }}", "就是今天", False),
+    ("{{ ${/data/counter/relation} == '就是今天' ? 'none' : 'visible' }}", "还剩", True),
+    ("{{ ${/data/counter/relation} == '就是今天' ? 'none' : 'visible' }}", None, True),
+    ("{{ ${/data/counter/relation} == '就是今天' ? 'visible' : 'none' }}", "就是今天", True),
+    ("{{ unsupported() }}", "就是今天", True),
+    (r"{{ ${/data/counter/relation} == '\x' ? 'none' : 'visible' }}", "就是今天", True),
+])
+def test_text_width_respects_known_visibility_and_keeps_unknown_checks(
+    visibility, sample, overflow,
+):
+    components = [
+        ComponentRow("root", "Column", {"width": 126, "height": 126}, ("text",)),
+        ComponentRow("text", "Text", {
+            "content": "这是一段超过单行宽度的文字", "fontSize": 20,
+            "width": 50, "height": 27, "maxLines": 1, "visibility": visibility,
+        }, ()),
+    ]
+    task = {"size": "2x2", "dataModelSchema": {"data": {"counter": {
+        "relation": {"type": "string", "sampleValue": sample},
+    }}}}
+    errors = []
+    _collect_text_width_budget_errors(
+        components, task, {"suggestSize": "2x2"}, errors, None,
+    )
+    assert any("text width overflow" in error for error in errors) is overflow
+
+
 def _source(rows):
     return "\n".join(json.dumps(row, ensure_ascii=False, separators=(",", ":")) for row in rows)
 

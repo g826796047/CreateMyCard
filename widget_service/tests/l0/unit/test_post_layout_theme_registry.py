@@ -92,8 +92,8 @@ def test_blue_replaces_only_the_retired_ball_colors(case):
 def test_all_themes_are_self_contained_and_only_current_photos_remain():
     config = registry.load_theme_registry()
     entries = config.get("themes", [])
-    assert len(entries) == 75
-    assert len({theme.get("id") for theme in entries}) == 75
+    assert len(entries) == 83
+    assert len({theme.get("id") for theme in entries}) == 83
     for theme in entries:
         assert "palette" not in theme
         assert theme.get("background")
@@ -101,9 +101,9 @@ def test_all_themes_are_self_contained_and_only_current_photos_remain():
         assert set(content.get("roles", {})) == set(registry._ROLE_NAMES)
         assert set(theme.get("sizes", [])).issubset(content.get("panelBySize", {}))
     photos = registry.registered_themes("photos", include_disabled=True)
-    assert len(photos) == 47
+    assert len(photos) == 55
     kinds = {item.get("contentEligibility", {}).get("kind") for item in photos}
-    assert kinds == {"uniform", "holiday-countdown", "weather-panels"}
+    assert kinds == {"uniform", "holiday-countdown", "weather-panels", "countdown-pattern"}
     for pool in ("subjectlessWidePhotos", "squareExpansions"):
         assert registry.registered_themes(pool, include_disabled=True) == []
 
@@ -151,7 +151,28 @@ def test_duplicate_theme_id_rejected():
 def test_registry_returns_independent_copies():
     first = registry.load_theme_registry()
     first.get("themes", []).clear()
-    assert len(registry.load_theme_registry().get("themes", [])) == 75
+    assert len(registry.load_theme_registry().get("themes", [])) == 83
+
+
+def test_photo_sources_keep_asset_metadata_without_local_file_paths():
+    photos = registry.registered_themes("photos", include_disabled=True)
+    photos.extend(registry.registered_themes("texturePhotos", include_disabled=True))
+    assert len(photos) == 73
+    required = {
+        "provider", "sourceSha256", "assetSha256", "assetBytes",
+        "originalSize", "assetSize", "processing",
+    }
+    for photo in photos:
+        metadata = photo.get("source")
+        assert isinstance(metadata, dict)
+        assert "file" not in metadata
+        assert required.issubset(metadata)
+        assert isinstance(photo.get("src"), str)
+        assert photo.get("remoteUrl", "").startswith("https://")
+        for name in ("sourceSha256", "assetSha256"):
+            digest = metadata.get(name)
+            assert isinstance(digest, str)
+            assert len(digest) == 64
 
 
 def test_adding_disabling_and_deleting_themes_only_requires_registry(monkeypatch):

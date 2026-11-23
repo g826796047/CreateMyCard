@@ -20,6 +20,12 @@ def test_visual_recipe_contract_registers_all_high_level_components() -> None:
     assert contract["version"] == VISUAL_RECIPE_VERSION
     assert set(contract["components"]) == {
         "W-countdown-center",  # 布局和日期共用的内部视觉配方。
+        "S-countdown-pattern",
+        "W-countdown-pattern",
+        "SCountdown",
+        "WCountdown",
+        "CountdownReadout",
+        "CountdownPattern",
         "SingleLineTitle",
         "DoubleLineTitle",
         "Badge",
@@ -169,8 +175,21 @@ def test_single_line_title_visual_recipe_keeps_default_title_only() -> None:
     assert "itemMargin" not in recipe["parts"]["root"]["styles"]
     assert recipe["parts"]["root"]["styles"]["height"] == 12
     assert recipe["parts"]["title"]["styles"]["lineHeight"] == 1
-    assert set(recipe["parts"]) == {"root", "title", "icon"}
+    assert set(recipe["parts"]) == {"root", "title", "icon", "countdownSubtitle"}
     assert "withIcon" in recipe["variants"]
+
+
+def test_countdown_text_recipes_keep_default_line_height_and_theme_hierarchy() -> None:
+    readout = component_visual_recipe("CountdownReadout").get("parts", {}).get("text", {})
+    subtitle = component_visual_recipe("SingleLineTitle").get("parts", {}).get(
+        "countdownSubtitle", {},
+    )
+    for part, expected in ((readout, (27, 20, 700)), (subtitle, (21, 16, 400))):
+        styles = part.get("styles", {})
+        assert (styles.get("height"), styles.get("fontSize"), styles.get("fontWeight")) == expected
+        assert "lineHeight" not in styles
+    assert readout.get("styles", {}).get("fontColor") == "@theme:primary/1"
+    assert subtitle.get("styles", {}).get("fontColor") == "@theme:secondary/1"
 
 
 def test_emphasized_data_visual_recipe_aligns_value_and_unit_baselines() -> None:
@@ -325,11 +344,15 @@ def test_visual_recipe_contract_uses_consistent_icon_and_overflow_rules() -> Non
     assert components["InfoBlock"]["parts"]["secondary"]["styles"][
         "textOverflow"
     ] == "ellipsis"
-    other_components = {
-        name: recipe
-        for name, recipe in components.items()
-        if name not in {"InfoBlock", "SummaryList", "TextBlock", "CardButton"}
+    ellipsis_components = {
+        "InfoBlock", "SummaryList", "TextBlock", "CardButton",
+        "SingleLineTitle", "CountdownReadout",
     }
+    other_components = {}
+    for name, recipe in components.items():
+        if name in ellipsis_components:
+            continue
+        other_components[name] = recipe
     assert components["SummaryList"]["parts"]["text"]["styles"][
         "textOverflow"
     ] == "ellipsis"

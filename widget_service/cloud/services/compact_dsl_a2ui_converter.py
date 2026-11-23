@@ -84,6 +84,8 @@ COMPACT_INPUT_COMPONENT_TYPES = frozenset(
         "PillButton",
         "CircleButton",
         "SingleLineTitle",
+        "SCountdown",
+        "WCountdown",
         "DoubleLineTitle",
         "Badge",
         "EmphasizedData",
@@ -661,6 +663,7 @@ def convert_compact_dsl_to_a2ui(
     """Convert one Design Compact DSL card to standard three-message A2UI."""
     # 布局运行时复用本模块的行类型，延迟导入避免模块初始化循环。
     from services.compact_layout_runtime import adaptive_slot_ids
+    from services.countdown_pattern import COUNTDOWN_LAYOUTS
 
     profile = protocol_profile or {"version": "v0.9"}
     rows = list(parse_compact_dsl_rows(
@@ -716,15 +719,20 @@ def convert_compact_dsl_to_a2ui(
                 card_size=size,
             )
         )
-    converted_components = adapt_region_layout(
-        converted_components,
-        author_types=author_types,
-        size=size,
-        profile=profile if "sizes" in profile else None,
-        slots=region_slots,
-        slot_actions=frozenset(slot_actions),
-        author_weights=author_weights,
-    )
+    # 图案单元宽高和间距由专用布局精确给出，不能被参考权重编译改写。
+    pattern_markers = set()
+    for layout in COUNTDOWN_LAYOUTS.values():
+        pattern_markers.add(f"{VISUAL_RECIPE_VERSION}:{layout}.root")
+    if components[0].props.get("_visualRecipe") not in pattern_markers:
+        converted_components = adapt_region_layout(
+            converted_components,
+            author_types=author_types,
+            size=size,
+            profile=profile if "sizes" in profile else None,
+            slots=region_slots,
+            slot_actions=frozenset(slot_actions),
+            author_weights=author_weights,
+        )
     if fusion_palette is not None:
         try:
             converted_components = expand_fusion_ball_components(

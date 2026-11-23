@@ -64,6 +64,7 @@ from services.compact_repair_strategy import (
     CompactRepairStrategyTracker,
     compact_capacity_recovery_failure_category,
 )
+from services.countdown_pattern import authorize_pattern, countdown_prompt
 from services.device_capability_resolver import DeviceCapabilityResolver
 from services.edit_request_normalizer import EditRequestNormalizer
 from services.generation_content_policy import (
@@ -582,6 +583,36 @@ class WidgetGenerationService:
         task_spec = preflight.task_spec
         if card_spec is None or task_spec is None:
             raise RuntimeError("generation preflight did not build generation specs")
+        countdown_pattern = None
+        preference = request.options.countdownPattern
+        if preference is not None:
+            try:
+                if generation_mode != "create":
+                    raise ValueError("图案倒计时仅用于新建。")
+                if policy.operation != "generateWidgetCardCompactDsl":
+                    raise ValueError("图案倒计时仅用于 Fusion 创建。")
+                countdown_pattern = authorize_pattern(
+                    preference,
+                    effective_bindings,
+                    has_events=bool(request.candidateEventCandidates or effective_events),
+                )
+            except ValueError as exc:
+                logger.info(
+                    f"[Countdown Pattern] selection_rejected kind={preference.kind} "
+                    f"type={type(exc).__name__} reason={json_for_log(str(exc))}"
+                )
+                return GenerateWidgetCardResponse(
+                    status=GenerationStatus.UNSUPPORTED,
+                    suggestSize=card_spec.suggestSize,
+                    message=str(exc),
+                    errorCode=ErrorCode.PROTOCOL_CAPABILITY_UNSUPPORTED.value,
+                )
+            logger.info(
+                f"[Countdown Pattern] selection_accepted kind={preference.kind} "
+                f"size={card_spec.suggestSize}"
+            )
+            template_source_generator = None
+            need_fallback = True
         content_policy = resolve_content_policy(
             operation=policy.operation,
             enabled=settings.enable_static_content_generation_policy,
@@ -760,6 +791,13 @@ class WidgetGenerationService:
                         and not settings.enable_a2ui_model_mock
                     ),
                 )
+                if countdown_pattern is not None:
+                    system_message = next(iter(prompt))
+                    system_content = system_message.get("content")
+                    if not isinstance(system_content, str):
+                        raise RuntimeError("Fusion 图案倒计时缺少系统提示。")
+                    pattern_contract = countdown_prompt(countdown_pattern, task_spec.size)
+                    system_message["content"] = f"{system_content}\n\n{pattern_contract}"
             else:
                 prompt = PromptBuilder().build(
                     task_spec,
@@ -847,6 +885,8 @@ class WidgetGenerationService:
             data_capabilities=effective_data_capabilities,
             event_candidates=effective_events,
             repair_context=RepairGuidanceContext(mode="edit" if source_load_result else "create"),
+            countdown_pattern=countdown_pattern,
+            initialize_countdown_total=countdown_pattern is not None,
             layout_scope=(
                 PromptBuilder.layout_scope(display_task)
                 if policy.processor_kind == DslProcessorKind.DESIGN_COMPACT
@@ -2179,6 +2219,7 @@ class WidgetGenerationService:
                     protocol_profile,
                     final_layout=design_token,
                     business_context=business_context,
+                    **({"countdown_pattern": countdown_pattern} if countdown_pattern else {}),
                 )
                 if content_policy.is_static:
                     from services.static_content_context import final_static_display_errors
@@ -2625,6 +2666,14 @@ class WidgetGenerationService:
     ) -> GenerateWidgetCardResponse:
         """复制请求并锁定路由对应的协议 profile。"""
         is_edit = "sourceArtifactUrl" in request.model_fields_set
+        if is_edit and request.options.countdownPattern is not None:
+            logger.info("[Countdown Pattern] selection_rejected reason=edit")
+            return GenerateWidgetCardResponse(
+                status=GenerationStatus.UNSUPPORTED,
+                suggestSize=request.size or DEFAULT_WIDGET_SIZE,
+                message="图案倒计时仅用于新建，已有卡片暂不支持切换为图案样式。",
+                errorCode=ErrorCode.PROTOCOL_CAPABILITY_UNSUPPORTED.value,
+            )
         if is_edit:
             from services.widget_edit_service import WidgetEditService
 
@@ -2727,6 +2776,7 @@ class WidgetGenerationService:
             task_spec=source.artifact.taskSpec,
             protocol_profile=conversion_protocol_profile,
             design_profile_id=policy.design_profile_id,
+            replay_countdown_pattern=True,
             layout_scope=(
                 PromptBuilder.layout_scope(TaskSpec.model_validate(source.artifact.taskSpec))
                 if policy.processor_kind == DslProcessorKind.DESIGN_COMPACT
