@@ -97,7 +97,7 @@ semantic_layout_contract_repair 只修复错误消息定位的 Layout、Region �
 | 2x4 EmphasisText.mainText 超宽且无已有次文本 | 用户与Plan未要求大字强调、且原输入已有同对象核心名称或状态时，可将完整原值或绑定移入secondaryText，以已有名称或状态作为mainText；例如mainText为“领事保护”，secondaryText为完整电话号码。字段为secondaryText而非subText；不编造正文、不覆盖已有次文本，完整保留事实和拨号参数，复检12fp次文本单行宽度与总高；仍放不下时重组布局 |
 | TextBlock 项目被拆散或超出槽宽 | 用完整显示格式核对每格文字净宽；将放不下的长值移到较宽正文行。保留已选事实及绑定，短值仍可并列；移出后不足两项则改选合法组件 |
 | EventCard 缺 title / 地点超宽 / 时间序列过长 | 无真实事件标题则普通属性合组，不伪造名称；长地点用普通密度或更宽合法内容区。多事件默认合并一实例；仅W-top-bottom可将同一序列有序分入primary/details两个EventCard，但不因分段跳过总高校验 |
-| W-countdown-center 槽位错误或内容超限 | 标题、天数与单位、目标日期分别放在 SingleLineTitle、EmphasizedData、SecondaryBody；日期只用一项。必要事实或动作无法放入三槽时，改用能完整承载的布局，保留绑定和动作 |
+| W-countdown-center 槽位错误或内容超限 | 根仅引用一个 InfoDisplay，把标题、天数、独立单位、单条目标日期分别放入 label、value、unit、secondaryInfo。移除字号和样式覆盖，保留原文与绑定。容量或动作无法满足时，改用能完整承载的布局 |
 | EventCard 总高超出父槽 | 若 accepted Plan 只保留 2–3 条同级短事件，且每条的 title、time 和可选 location 合并后仍能单行完整显示，优先比较改用 `SummaryList`：按原顺序将同一 item 的完整文本合为一个显示值，动态字段用 Expression 保留全部 PathBinding。2项按64vp、3项按102vp重算高度并复查单行宽度。超过3项、存在多行长地点，或任一事实未获准省略时，不得借此删项、截断或改写事实；继续比较 compact EventCard、更宽合法区域或父布局重组 |
 | PillButton/CardButton 标签超过6个字符 | 只缩短可见label为最多6个字符，使用“动作+必要目标”，例如“一键导航去公司”改为“导航去公司”；完整保留onClick、参数、真实目标、图标和唯一Action，不靠labelLines绕过 |
 | CardButton 图标不一致 | accepted Plan 已为动作分配素材时，恢复对应原始 src；Plan 为 null 或没有素材候选时保留 CardButton 也合法，原始 DSL 必须省略业务 icon，由转换器展示固定回退图标 `resources/base/media/ic_fallback_light.svg` |

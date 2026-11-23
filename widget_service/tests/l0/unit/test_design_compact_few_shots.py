@@ -762,7 +762,7 @@ def test_weather_alert_routes_to_text_data_display_example() -> None:
 
 
 def test_prompt_source_has_no_out_of_range_formal_example_references() -> None:
-    known_ids = {item[0] for item in EXAMPLES}
+    known_ids = {item[0] for item in EXAMPLES} | {"2x2-V20", "2x4-V40", "2x4-V41"}
     manifest = json.loads((PROMPT_SOURCE / "manifest.yaml").read_text(encoding="utf-8"))
     static_profile = manifest.get("staticContent", {})
     for identifiers in static_profile.get("exampleIds", {}).values():

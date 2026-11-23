@@ -24,6 +24,7 @@ class DateCounterResult:
     relation: Literal["countdown", "countup", "today"]
     days: int
     target_date: date
+    interval_days: int | None = None
 
 
 class DateCounterError(ValueError):
@@ -63,6 +64,13 @@ _DATE_COUNTER_ISSUES = {
         "周期单位为 day、week、month 或 year，间隔为大于等于 1 的整数",
         "按用户指定的单位和间隔修正周期。用户只要求单次计时时可省略周期。",
     ),
+    "future_repeat_start": DateCounterIssue(
+        "targetDate",
+        "周期倒计时的首个有效目标晚于今天。",
+        "首个有效目标为今天或历史日期",
+        "当前系统不支持创建起始周期在未来的周期倒计时，"
+        "如果用户同意可以修改targetDate为历史日期，否则明确拒绝用户",
+    ),
     "lunar_out_of_range": DateCounterIssue(
         "targetDate",
         "目标日期超出云侧支持的农历年份范围。",
@@ -95,6 +103,12 @@ class _Repeat:
     interval: int
 
 
+@dataclass(frozen=True)
+class _TargetDates:
+    current: date
+    previous: date | None = None
+
+
 def _parse_repeat(value: object) -> _Repeat | None:
     repeat: _Repeat | None = None
     if value is not _MISSING:
@@ -113,17 +127,30 @@ def _parse_repeat(value: object) -> _Repeat | None:
     return repeat
 
 
-def _next_linear_date(start: date, today: date, repeat: _Repeat) -> date:
+def _uses_first_target(start: date, today: date, repeat: _Repeat | None) -> bool:
+    if repeat is not None and start > today:
+        raise DateCounterError("future_repeat_start")
+    return repeat is None or start == today
+
+
+def _next_linear_date(start: date, today: date, repeat: _Repeat) -> _TargetDates:
     step = repeat.interval * (7 if repeat.unit == "week" else 1)
     elapsed = (today - start).days
     offset = ((elapsed + step - 1) // step) * step
     ordinal = start.toordinal() + offset
     if ordinal > date.max.toordinal():
         raise DateCounterError("no_next_occurrence")
-    return date.fromordinal(ordinal)
+    return _TargetDates(date.fromordinal(ordinal), date.fromordinal(ordinal - step))
 
 
-def _gregorian_target(target: str, today: date, repeat: _Repeat | None) -> date:
+def _gregorian_month_date(month_index: int, target_day: int) -> date:
+    year, month_from_zero = divmod(month_index, 12)
+    month = month_from_zero + 1
+    last_day = monthrange(year, month)[1]
+    return date(year, month, min(target_day, last_day))
+
+
+def _gregorian_target(target: str, today: date, repeat: _Repeat | None) -> _TargetDates:
     year, month, target_day = map(int, target.split("-"))
     monthly = repeat is not None and repeat.unit == "month"
     if not 1 <= target_day <= 31:
@@ -137,8 +164,9 @@ def _gregorian_target(target: str, today: date, repeat: _Repeat | None) -> date:
     except ValueError as error:
         raise DateCounterError("invalid_target_date") from error
 
-    if repeat is None or start >= today:
-        return start
+    first_target = _uses_first_target(start, today, repeat)
+    if repeat is None or first_target:
+        return _TargetDates(start)
     if repeat.unit in ("day", "week"):
         return _next_linear_date(start, today, repeat)
 
@@ -148,12 +176,10 @@ def _gregorian_target(target: str, today: date, repeat: _Repeat | None) -> date:
     elapsed_months = current_month - start_month
     offset = ((elapsed_months + step - 1) // step) * step
     for month_index in range(start_month + offset, (date.max.year + 1) * 12, step):
-        year, month_from_zero = divmod(month_index, 12)
-        month = month_from_zero + 1
-        last_day = monthrange(year, month)[1]
-        candidate = date(year, month, min(target_day, last_day))
+        candidate = _gregorian_month_date(month_index, target_day)
         if candidate >= today:
-            return candidate
+            previous = _gregorian_month_date(month_index - step, target_day)
+            return _TargetDates(candidate, previous)
     raise DateCounterError("no_next_occurrence")
 
 
@@ -190,15 +216,19 @@ def _lunar_to_solar(target: LunarDate, *, use_month_end: bool) -> date:
         return LunarDate(target.year, target.month, 29, target.is_leap_month).to_solar_date()
 
 
-def _next_lunar_date(anchor: LunarDate, today: date, repeat: _Repeat) -> date:
+def _next_lunar_date(anchor: LunarDate, today: date, repeat: _Repeat) -> _TargetDates:
+    previous: date | None = None
     for lunar_date in _lunar_candidates(anchor, repeat):
         candidate = _lunar_to_solar(lunar_date, use_month_end=True)
         if candidate >= today:
-            return candidate
+            return _TargetDates(candidate, previous)
+        previous = candidate
     raise DateCounterError("no_next_occurrence")
 
 
-def _lunar_target(target: str, is_leap: bool, today: date, repeat: _Repeat | None) -> date:
+def _lunar_target(
+    target: str, is_leap: bool, today: date, repeat: _Repeat | None,
+) -> _TargetDates:
     year, month, day = map(int, target.split("-"))
     if not _FIRST_LUNAR_YEAR <= year <= _LAST_LUNAR_YEAR:
         raise DateCounterError("lunar_out_of_range")
@@ -208,15 +238,16 @@ def _lunar_target(target: str, is_leap: bool, today: date, repeat: _Repeat | Non
         start = _lunar_to_solar(anchor, use_month_end=monthly)
     except ValueError as error:
         raise DateCounterError("invalid_target_date") from error
-    if repeat is None or start >= today:
-        return start
+    first_target = _uses_first_target(start, today, repeat)
+    if repeat is None or first_target:
+        return _TargetDates(start)
     if repeat.unit in ("day", "week"):
         return _next_linear_date(start, today, repeat)
     return _next_lunar_date(anchor, today, repeat)
 
 
 def resolve_date_counter(arguments: Mapping[str, object], *, today: date) -> DateCounterResult:
-    """返回指定参考日的计时关系、非负日差和实际目标的公历日期。"""
+    """返回计时关系、非负日差、实际目标的公历日期及真实周期间隔。"""
     target = arguments.get("targetDate")
     calendar = arguments.get("calendar", "gregorian")
     is_leap = arguments.get("isLeapMonth", False)
@@ -230,14 +261,15 @@ def resolve_date_counter(arguments: Mapping[str, object], *, today: date) -> Dat
     if is_leap and calendar == "gregorian" and repeat is None:
         raise DateCounterError("invalid_leap_month")
     if calendar == "lunar":
-        target_date = _lunar_target(target, is_leap, today, repeat)
+        targets = _lunar_target(target, is_leap, today, repeat)
     else:
-        target_date = _gregorian_target(target, today, repeat)
+        targets = _gregorian_target(target, today, repeat)
 
-    days = (target_date - today).days
+    days = (targets.current - today).days
     relation: Literal["countdown", "countup", "today"] = "today"
     if days > 0:
         relation = "countdown"
     elif days < 0:
         relation = "countup"
-    return DateCounterResult(relation, abs(days), target_date)
+    interval_days = None if targets.previous is None else (targets.current - targets.previous).days
+    return DateCounterResult(relation, abs(days), targets.current, interval_days)

@@ -109,12 +109,13 @@ def test_auto_size_detects_wide_card(client):
 
 def test_preview_converts_countdown_with_object_data_row(client):
     rows = [
-        ["root", "Layout", {"layout": "W-countdown-center"}, ["header", "countdown", "target"]],
-        ["header", "SingleLineTitle", {"title": "运动会倒计时"}],
-        ["countdown", "EmphasizedData", {"value": {"path": "/data/countdown/days"}, "unit": "天"}],
-        ["target", "SecondaryBody", {"items": [
-            {"label": "目标日：", "value": {"path": "/data/countdown/targetDateText"}},
-        ]}],
+        ["root", "Layout", {"layout": "W-countdown-center"}, ["countdown"]],
+        ["countdown", "InfoDisplay", {
+            "label": "运动会倒计时",
+            "value": {"path": "/data/countdown/days"},
+            "unit": "天",
+            "secondaryInfo": {"path": "/data/countdown/targetDateText"},
+        }],
         ["/data/countdown", {"days": 7, "targetDateText": "2026/11/23"}],
     ]
     source = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
@@ -127,7 +128,7 @@ def test_preview_converts_countdown_with_object_data_row(client):
     genui = result.get("genui")
     assert isinstance(genui, str)
     nodes = components(decode(genui))
-    date = next(node for node in nodes if node.get("id") == "target")
+    date = next(node for node in nodes if node.get("id") == "__layout__countdown__date")
     assert date.get("component") == "Text"
     styles = date.get("styles")
     assert isinstance(styles, dict)

@@ -10,7 +10,8 @@ description: 共用单组件的语义、Props、容量和示例；尺寸差异�
 图案倒计时专用语义组件仅在已准入的图案倒计时布局中使用：
 2×2 使用 SCountdown，2×4 使用 WCountdown；父 Layout 只引用一个对应专用组件，不能互换。
 Layout 只展开外框；专用组件在通用组件展开阶段展开内部标题与图案，视觉数值由配方维护。
-组件只接收 label（静态事件名称）、pattern（bars/dots）、value（整数天数路径）、relationValue（同级日期关系路径）、totalValue（同级 intervalDays 路径）。
+组件只接收 label（静态事件名称）、pattern（bars/dots）、value（整数天数路径）、relationValue（同级日期关系路径）和 totalValue。
+自动单次图案使用本轮固定整数作为 totalValue，自动周期和显式图案绑定同级 intervalDays。
 不接受 children、unit、fillMode、动作或视觉覆盖；默认按总量连续比例填充，全部样式由布局选择共享配方。
 不兼容旧 CountdownReadout/SingleLineTitle/CountdownPattern 三角色源；DataDisplay 的合同不变。
 其他布局不使用这两个专用组件。

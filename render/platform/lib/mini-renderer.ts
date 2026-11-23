@@ -49,7 +49,9 @@ function expandSemanticLayoutsForPreview(
       throw new Error("countdown-center 组件变体仅由宽卡倒计时布局启用。");
     }
   }
-  if (![...input.values()].some(node => SEMANTIC_LAYOUT_TYPES.has(node.type))) return input;
+  if (![...input.values()].some(node => (
+    SEMANTIC_LAYOUT_TYPES.has(node.type) || node.type === "InfoDisplay"
+  ))) return input;
   const output = new Map<string, MiniNode>();
   for (const [id, node] of input) {
     output.set(id, {
@@ -155,25 +157,35 @@ function expandSemanticLayoutsForPreview(
       }
       children = rows;
     } else if (layout === "W-countdown-center") {
-      const expected = ["SingleLineTitle", "EmphasizedData", "SecondaryBody"];
       const rootKeys = ["layout", "backgroundColor", "backgroundImage", "linearGradient"];
-      if (id !== "root" || size !== "2x4" || children.length !== 3) {
-        throw new Error("W-countdown-center 要求三个宽卡区域，根节点不接受 variant。");
+      if (id !== "root" || size !== "2x4" || children.length !== 1) {
+        throw new Error("W-countdown-center 只允许一个宽卡 InfoDisplay。");
       }
       if (Object.keys(original.props).some(key => !rootKeys.includes(key))) {
         throw new Error("W-countdown-center 根节点仅接受布局和背景属性。");
       }
-      const slotKeys = [["title", "fontColor"], ["value", "unit", "fontColor"], ["items", "fontColor"]];
-      children.forEach((child, index) => {
-        const node = output.get(child);
-        if (!node || node.type !== expected[index] || node.children.length) {
-          throw new Error("countdown-center 区域类型或顺序错误。");
-        }
-        if (Object.keys(node.props).some(key => !slotKeys[index].includes(key))) {
-          throw new Error("countdown-center 的组件样式由布局选择。");
-        }
-        node.props.variant = "countdown-center";
+      const [displayId] = children;
+      const display = output.get(displayId);
+      if (!display || display.type !== "InfoDisplay" || display.children.length) {
+        throw new Error("W-countdown-center 必须使用一个不含 children 的 InfoDisplay。");
+      }
+      const fields = ["label", "value", "unit", "secondaryInfo"];
+      if (Object.keys(display.props).some(key => !fields.includes(key))) {
+        throw new Error("InfoDisplay 的组件样式由布局选择。");
+      }
+      if (fields.some(field => !Object.hasOwn(display.props, field))) {
+        throw new Error("InfoDisplay 需要 label、value、unit、secondaryInfo。");
+      }
+      const { label, value, unit, secondaryInfo } = display.props;
+      const titleId = generatedPreviewId(output, `__layout__${displayId}__title`);
+      const variant = "countdown-center";
+      output.set(titleId, { type: "SingleLineTitle", props: { title: label, variant }, children: [] });
+      const dateId = generatedPreviewId(output, `__layout__${displayId}__date`);
+      output.set(displayId, { type: "EmphasizedData", props: { value, unit, variant }, children: [] });
+      output.set(dateId, {
+        type: "SecondaryBody", props: { items: [{ value: secondaryInfo }], variant }, children: [],
       });
+      children = [titleId, displayId, dateId];
       Object.assign(rootProps, visualRecipePart(layout, "root", size).styles);
     } else if (layout === "W-top-bottom" && children.length >= 2) {
       if (original.props.variant === "countdown-center") {
@@ -202,6 +214,9 @@ function expandSemanticLayoutsForPreview(
     output.set(id, { type, props: rootProps, children });
   }
 
+  if ([...output.values()].some(node => node.type === "InfoDisplay")) {
+    throw new Error("InfoDisplay 只能作为 W-countdown-center 的唯一子组件。");
+  }
   warn(
     "宽松预览已将 Layout / Region / Group 近似展开为基础布局；"
       + "该画面只用于定位错误，不代表正式 A2UI 或可发布结果。",
@@ -349,7 +364,8 @@ export function compileMiniDsl(
     }
     if (row.length < 2 || row.length > 4) fail("组件格式应为 [ID, 类型, 属性, 子节点列表]。");
     const normalizedType = typeof type === "string" ? type.replace(/^Extended\./, "") : "";
-    const previewSemanticType = options.previewMode && SEMANTIC_LAYOUT_TYPES.has(normalizedType);
+    const previewSemanticType = options.previewMode
+      && (SEMANTIC_LAYOUT_TYPES.has(normalizedType) || normalizedType === "InfoDisplay");
     if (!normalizedType || (!TYPES.has(normalizedType) && !previewSemanticType)) {
       fail(`不支持的组件类型：${String(type)}`);
     }

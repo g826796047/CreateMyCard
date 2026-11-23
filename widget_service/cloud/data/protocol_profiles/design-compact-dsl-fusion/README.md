@@ -46,9 +46,9 @@ prompt_source 完整创建合同 → Plan → 已接受 Plan + 可选参考 → 
 
 `manifest.yaml` 使用 YAML 1.2 的 JSON 子集，由标准库解析，不新增部署依赖。
 `prompts` 中每个数组的顺序是唯一拼接顺序，引用格式为 `文件#片段`。内存中的提示词标识包括
-`plan`、`create`、`countdown_layout`、`edit`、`repair`、`argument_repair`、
-`fewshot_2x2` 和 `fewshot_2x4`。图案倒计时通过 Fusion 创建准入后，服务端按尺寸追加
-`countdown_layout` 片段和本轮 Layout＋唯一 SCountdown/WCountdown 的源组件示例；
+`plan`、`create`、`edit`、`repair`、`argument_repair`、同尺寸通用 Few-shot 和倒计时专用 Few-shot。
+图案布局合同随主布局 `s-layouts` 或 `w-layouts` 进入 `create`，实际使用由本轮已接受 Plan
+或显式创建准入决定。显式请求额外追加本轮 Layout＋唯一 SCountdown/WCountdown 的源组件示例；
 不兼容旧三个角色或旧根属性格式。内部 CountdownReadout/CountdownPattern 视觉配方继续共享，
 并非公开源组件；S-center/DataDisplay 不变。
 每种尺寸的 Few-shot 只维护一个文档，前言使用 `preamble`；案例使用与正式案例 ID 对应的

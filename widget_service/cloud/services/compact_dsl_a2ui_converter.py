@@ -92,6 +92,7 @@ COMPACT_INPUT_COMPONENT_TYPES = frozenset(
         "EmphasisText",
         "SecondaryBody",
         "InfoBlock",
+        "InfoDisplay",
         "ProgressLine2",
         "H_BarChart",
         "NumericRatioStack",
@@ -496,6 +497,19 @@ def repair_compact_dsl_safe_structure(
             )
             changed = True
         rows = repaired_rows
+
+    is_wide_layout = size == "2x4" and root is not None and root.component_type == "Layout"
+    if is_wide_layout and root.props.get("layout") == "W-countdown-center":
+        display = (
+            components_by_id.get(root.children[0]) if len(root.children) == 1 else None
+        )
+        if display is not None and display.component_type == "InfoDisplay" and not display.children:
+            if "fontSize" in display.props:
+                props = dict(display.props)
+                props.pop("fontSize")
+                repaired = ComponentRow(display.component_id, "InfoDisplay", props, ())
+                rows = [repaired if row is display else row for row in rows]
+                changed = True
 
     if size == "2x4" and _is_formal_split_panel_root(root, components_by_id):
         repaired_rows: list[CompactRow] = []

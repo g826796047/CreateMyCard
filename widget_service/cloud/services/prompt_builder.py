@@ -12,8 +12,10 @@ from services.compact_composition_context import (
     compact_text_block_capacity_context,
     repair_display_roles,
 )
+from services.compact_date_counter_plan import PRESENTATION
 from services.compact_layout_runtime import allowed_layout_ids
 from services.compact_plan import (
+    SUBMIT_CARD_PLAN,
     build_compact_plan_tool,
     compact_plan_context,
     compact_plan_required_route,
@@ -26,8 +28,10 @@ from services.compact_plan_output import (
     REVIEW_JSON_OUTPUT_INSTRUCTION,
     plan_output_format_feedback,
 )
+from services.compact_prompt_loader import COUNTDOWN_FEWSHOT_PROMPTS, read_prompt
 from services.compact_repair_context import joint_repair_contract
 from services.content_business import BusinessContext
+from services.countdown_pattern import COUNTDOWN_LAYOUTS
 from services.generation_input_feedback import MISSING_DATA_PLAN_INSTRUCTION, missing_data_tool
 from services.protocol_registry import DESIGN_COMPACT_PROFILE_ID, A2UIProtocolRegistry
 from services.static_plan_review import (
@@ -1582,6 +1586,8 @@ class PromptBuilder:
     @staticmethod
     def _compact_few_shot_context(
         task_spec: TaskSpec,
+        *,
+        compact_plan: dict[str, Any] | None = None,
     ) -> str:
         """只构造 DSL 阶段追加的同尺寸案例，不重复创建合同。"""
         settings = get_settings()
@@ -1594,6 +1600,28 @@ class PromptBuilder:
             root = A2UIProtocolRegistry.design_prompt_directory(DESIGN_COMPACT_PROFILE_ID)
             examples = read_static_prompt(root, "fewshot", task_spec.size)
             return examples
+        presentation = (compact_plan or {}).get(PRESENTATION)
+        if isinstance(presentation, dict):
+            layout = presentation.get("layout")
+            example_name = (
+                COUNTDOWN_FEWSHOT_PROMPTS.get(layout) if isinstance(layout, str) else None
+            )
+            if example_name is not None:
+                root = A2UIProtocolRegistry.design_prompt_directory(DESIGN_COMPACT_PROFILE_ID)
+                example = read_prompt(root, example_name, task_spec.size)
+                if example:
+                    guidance = (
+                        f"本轮生效 Plan 首选 `{layout}`，下方示例演示对应的完整源结构。"
+                        "以本轮事件名、真实绑定及事实为准，不复制示例值、路径或配色。"
+                    )
+                    if presentation.get("pattern") in ("bars", "dots"):
+                        guidance += (
+                            f"本轮日期选型已开放 `{layout}`。label 填静态事件名，"
+                            "用 relationValue 绑定本轮 Plan 的 labelRelation。"
+                            "pattern 按本轮 Plan；totalValue 用本轮固定整数或周期同源绑定，"
+                            "不复制示例的图案类型和分母。"
+                        )
+                    return f"{guidance}\n\n{example.strip()}"
         examples = A2UIProtocolRegistry.read_design_few_shot(
             DESIGN_COMPACT_PROFILE_ID,
             task_spec.size,
@@ -1614,6 +1642,7 @@ class PromptBuilder:
         """构造 Plan 与 DSL 共享的本轮布局范围和动态字段提醒。"""
         layout_scope = PromptBuilder.layout_scope(task_spec)
         layouts = "、".join(allowed_layout_ids(task_spec.size, layout_scope))
+        pattern_layout = COUNTDOWN_LAYOUTS.get(task_spec.size)
         output_contract = (
             "最终 DSL 使用 Layout 选择本尺寸登记的 S 系列布局，children 按角色顺序填写；"
             "同区内容可用登记的 Group 合组。不输出 Region、Row/Column/Stack 或内部几何参数。"
@@ -1625,7 +1654,8 @@ class PromptBuilder:
             )
         prompt = (
             "# 本轮组件与布局选择\n\n"
-            f"当前尺寸 {task_spec.size}，合法布局范围：{layouts}。\n"
+            f"当前尺寸 {task_spec.size}，常规合法布局范围：{layouts}。\n"
+            f"`{pattern_layout}` 在本轮服务端明确准入或已接受 Plan 选中时额外开放。\n"
             "以已接受 Plan 的必要事实与动作为硬合同；优先落实语义、类型和容量匹配的"
             "组件软候选，再按完整内容选择合法布局。布局建议不是硬锁，"
             "不能按业务名称、候选字段总数或示例强制构图。"
@@ -2168,23 +2198,33 @@ class PromptBuilder:
         if len(conversation) < 4 or conversation[0].get("role") != "system":
             raise ValueError("Compact DSL continuation requires the accepted Plan conversation")
         updated = copy.deepcopy(conversation)
-        updated.append(
-            {
-                "role": "user",
-                "content": json.dumps(
-                    {
-                        "toolResult": {
-                            "name": "submit_card_plan",
-                            "ok": True,
-                            "acceptedPlan": compact_plan,
-                            "warnings": list(plan_warnings),
-                        }
-                    },
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                ),
-            }
-        )
+        date_plan_rewritten = isinstance(compact_plan.get(PRESENTATION), dict)
+        tool_result: dict[str, Any] = {
+            "name": SUBMIT_CARD_PLAN,
+            "ok": True,
+        }
+        if date_plan_rewritten:
+            if updated[-1].get("role") != "assistant":
+                raise ValueError("Rewritten date Plan requires the accepted assistant submission")
+            # 早期提交与反馈只用于 Plan 重试，原文仍可通过 Trace 核对。
+            for index, message in enumerate(updated):
+                if message.get("role") == "assistant":
+                    del updated[index:-1]
+                    break
+            updated[-1]["content"] = json.dumps(
+                {"name": SUBMIT_CARD_PLAN, "arguments": compact_plan},
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        else:
+            tool_result["acceptedPlan"] = compact_plan
+        tool_result["warnings"] = list(plan_warnings)
+        updated.append({
+            "role": "user",
+            "content": json.dumps(
+                {"toolResult": tool_result}, ensure_ascii=False, separators=(",", ":"),
+            ),
+        })
 
         from services.compact_prompt_loader import read_static_prompt
         from services.generation_content_policy import current_content_policy
@@ -2206,7 +2246,7 @@ class PromptBuilder:
             return updated
         context_parts: list[str] = []
         few_shot_context = PromptBuilder._compact_few_shot_context(
-            task_spec,
+            task_spec, compact_plan=compact_plan,
         )
         if few_shot_context:
             context_parts.append(few_shot_context)
@@ -2214,6 +2254,7 @@ class PromptBuilder:
             compact_plan_context(
                 compact_plan,
                 execution_selected=True,
+                include_plan_payload=not date_plan_rewritten,
             )
         )
         context_parts.append(

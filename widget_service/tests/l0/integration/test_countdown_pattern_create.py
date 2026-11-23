@@ -2,6 +2,8 @@
 
 import json
 from dataclasses import replace
+from datetime import date
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -9,10 +11,11 @@ from pydantic import ValidationError
 
 from api.schemas import GenerateWidgetCardRequest
 from config.config import get_settings
+from core.date_counter import resolve_date_counter
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
 from models.generation import CandidateDataBinding, CountdownPatternPreference
-from services import post_layout_theme
+from services import generation_preflight, post_layout_theme
 from services.artifact_store import ArtifactStore
 from services.countdown_pattern import (
     COUNTDOWN_COMPONENTS,
@@ -24,6 +27,7 @@ from services.countdown_pattern import (
     paint_pattern,
 )
 from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.theme_countdown_pattern import countdown_pattern_evidence
 from services.widget_generation_service import WidgetGenerationService
 
 ROOT = "/data/customCounter"
@@ -66,21 +70,23 @@ def test_dots_have_no_day_gate_but_reject_recurrence():
         authorize_pattern(options, [_binding(repeat={"unit": "month"})], has_events=False)
 
 
-def _source(size, kind, *, days=3, relation="还剩", total=6, **extra) -> str:
+def _source(size, kind, *, days=3, relation="还剩", total=6, fixed_total=None, **extra) -> str:
     bindings = {
         "value": {"path": ROOT + "/days"},
         "relationValue": {"path": ROOT + "/relationText"},
     }
+    denominator = fixed_total if fixed_total is not None else {"path": ROOT + "/intervalDays"}
     rows = [
         ["root", "Layout", {"layout": COUNTDOWN_LAYOUTS.get(size), **extra}, ["countdown"]],
         ["countdown", COUNTDOWN_COMPONENTS.get(size), {
             "label": "考试", "pattern": kind, **bindings,
-            "totalValue": {"path": ROOT + "/intervalDays"},
+            "totalValue": denominator,
         }],
         [ROOT + "/days", days],
         [ROOT + "/relationText", relation],
-        [ROOT + "/intervalDays", total],
     ]
+    if fixed_total is None:
+        rows.append([ROOT + "/intervalDays", total])
     return "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
 
 
@@ -424,6 +430,179 @@ async def test_fusion_create_delivers_pattern_after_real_theme_validation(
     assert "#33FFFFFF" in artifact.genui
     assert "@theme:" not in artifact.genui
     _assert_square_countdown_titles(artifact.genui)
+
+
+def _recorded_plan_attachment(
+    trace_path: Path, records: list[dict], event: str, name: str,
+):
+    record = next(item for item in records if item.get("event") == event)
+    contents = record.get("artifacts")
+    assert isinstance(contents, dict)
+    attachment = contents.get(name)
+    assert isinstance(attachment, dict)
+    relative_path = attachment.get("path")
+    assert isinstance(relative_path, str)
+    payload = json.loads((trace_path.parent / relative_path).read_text(encoding="utf-8"))
+    return attachment, payload
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(("size", "kind", "recurring", "use_pattern"), [
+    ("2x2", "bars", False, True),
+    ("2x4", "bars", False, True),
+    ("2x2", "dots", True, True),
+    ("2x4", "dots", True, True),
+    ("2x2", "bars", False, False),
+])
+async def test_automatic_plan_can_deliver_and_replay_its_pattern(
+    monkeypatch, tmp_path, size, kind, recurring, use_pattern,
+):
+    settings = get_settings()
+    monkeypatch.setattr(settings, "enable_a2ui_model_mock", False)
+    monkeypatch.setattr(settings, "enable_artifact_validation", True)
+    monkeypatch.setattr(settings, "enable_generation_trace_recording", True)
+    monkeypatch.setattr(settings, "generation_trace_root", tmp_path)
+    monkeypatch.setattr(
+        WidgetGenerationService, "_enable_card_template", staticmethod(lambda: False),
+    )
+
+    def resolve_at_creation(arguments, **_kwargs):
+        return resolve_date_counter(arguments, today=date(2026, 11, 23))
+
+    monkeypatch.setattr(generation_preflight, "resolve_date_counter", resolve_at_creation)
+    bindings = _binding(targetDate="2026-11-26")
+    if recurring:
+        bindings = _binding(targetDate="2026-10-26", repeat={"unit": "month"})
+    else:
+        bindings.candidateOutputFields = ["/days", "/relationText"]
+    bindings.candidateOutputFields.append("/targetDateText")
+    plan_facts = [
+        {
+            "requirement": "考试", "priority": "must", "text": "考试",
+            "componentHints": ["SingleLineTitle"],
+        },
+        {"requirement": "天数", "priority": "must", "dataId": ROOT + "/days"},
+        {"requirement": "日期关系", "priority": "must", "dataId": ROOT + "/relationText"},
+        {"requirement": "考试日期", "priority": "must", "dataId": ROOT + "/targetDateText"},
+    ]
+    artifacts = []
+
+    async def generate(_client, prompt, profile=None, **_kwargs):
+        if (profile or {}).get("format") == "raw-json":
+            return json.dumps({
+                "name": "submit_card_plan",
+                "arguments": {"info_required": plan_facts},
+            }, ensure_ascii=False)
+        assistant_messages = [item for item in prompt if item.get("role") == "assistant"]
+        assert len(assistant_messages) == 1
+        plan_submission = json.loads(assistant_messages[0].get("content", ""))
+        assert plan_submission.get("name") == "submit_card_plan"
+        effective_plan = plan_submission.get("arguments")
+        assert isinstance(effective_plan, dict)
+        assert "dateCounterPresentation" in effective_plan
+        assert ROOT + "/targetDateText" not in json.dumps(effective_plan)
+        assert "dateCounterPresentation" not in prompt[-1].get("content", "")
+        if use_pattern:
+            return _source(size, kind, fixed_total=None if recurring else 3)
+        label = "{{ '考试 ' + ${/data/customCounter/relationText} }}"
+        rows = [
+            ["root", "Layout", {"layout": "S-center"}, ["content"]],
+            ["content", "DataDisplay", {
+                "label": label, "value": {"path": ROOT + "/days"}, "unit": "天",
+            }],
+            [ROOT + "/days", 3],
+            [ROOT + "/relationText", "还剩"],
+        ]
+        return "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
+
+    async def select(source, task, _client, **kwargs):
+        if use_pattern:
+            final_layout = kwargs.get("final_layout")
+            assert isinstance(final_layout, str)
+            messages = [json.loads(line) for line in source.splitlines()]
+            nodes = messages[1].get("updateComponents", {}).get("components")
+            data = messages[2].get("updateDataModel", {}).get("value")
+            assert isinstance(nodes, list)
+            assert isinstance(data, dict)
+            evidence = countdown_pattern_evidence(final_layout, nodes, data, size)
+            assert evidence.get("complete"), evidence
+            if recurring:
+                assert evidence.get("totalPath") == ROOT + "/intervalDays"
+            else:
+                assert evidence.get("totalValue") == 3
+        theme = post_layout_theme.fallback_theme(None)
+        return post_layout_theme.apply_theme(source, theme, task, {}), {"theme": theme}
+
+    def save(_store, saved_artifact):
+        artifacts.append(saved_artifact)
+        return SimpleNamespace(artifactUrl="https://artifact.test/countdown", artifactDigest="test")
+
+    monkeypatch.setattr(A2UIModelClient, "generate", generate)
+    monkeypatch.setattr(post_layout_theme, "select_theme", select)
+    monkeypatch.setattr(ArtifactStore, "save", save)
+    request = GenerateWidgetCardRequest(
+        uid="batch-countdow-00001-000", prdVer="11.9.9.342", device={"romVersion": "7.0"},
+        userQuery="做张考试倒计时卡，显示考试日期", title="考试", description="考试倒计时",
+        size=size, candidateDataBindings=[bindings.model_dump()],
+    )
+    response = await WidgetGenerationService().generate_widget_card_compact_dsl(request)
+    assert response.status == GenerationStatus.SUCCESS, response
+    trace_path, = tmp_path.rglob("trace.jsonl")
+    records = [json.loads(line) for line in trace_path.read_text(encoding="utf-8").splitlines()]
+    _, original_plan = _recorded_plan_attachment(
+        trace_path, records, "plan.validation.completed", "accepted_plan",
+    )
+    rewrite_step = next(
+        record for record in records if record.get("event") == "plan.date_counter_presentation"
+    )
+    plan_span = next(record for record in records if record.get("operation") == "plan")
+    assert rewrite_step.get("recordType") == "span"
+    assert rewrite_step.get("parentSpanId") == plan_span.get("spanId")
+    duration = rewrite_step.get("durationMs")
+    assert isinstance(duration, (float, int)) and duration >= 0
+    rewrite_ref, rewritten_plan = _recorded_plan_attachment(
+        trace_path, records, "plan.date_counter_presentation", "rewritten_plan",
+    )
+    _, prompt_messages = _recorded_plan_attachment(
+        trace_path, records, "dsl.prompt.finalized", "dsl_prompt_final",
+    )
+    assistant = next(message for message in prompt_messages if message.get("role") == "assistant")
+    assert rewrite_ref.get("role") == "output"
+    assert ROOT + "/targetDateText" in json.dumps(original_plan)
+    assert ROOT + "/targetDateText" not in json.dumps(rewritten_plan)
+    assert rewritten_plan == json.loads(assistant.get("content", "")).get("arguments")
+
+    artifact = next(iter(artifacts))
+    if use_pattern:
+        assert PATTERN_PREFIX + "cell_0_0" in artifact.genui
+        assert "#33FFFFFF" in artifact.genui
+        if recurring:
+            assert ROOT + "/intervalDays" in artifact.genui
+        else:
+            assert ROOT + "/intervalDays" not in artifact.genui
+            assert "/ 3)" in artifact.genui
+        context = replace(
+            _context(size, kind), countdown_pattern=None, replay_countdown_pattern=True,
+            card_spec=artifact.cardSpec, task_spec=artifact.taskSpec,
+        )
+        replay = DesignCompactProcessor().process(
+            _source(size, kind, fixed_total=None if recurring else 3), context,
+        )
+        assert not replay.errors, replay.errors
+    else:
+        assert PATTERN_PREFIX not in artifact.genui
+
+
+@pytest.mark.parametrize(("fixed_total", "kind"), [(None, "bars"), (4, "bars"), (3, "dots")])
+def test_automatic_plan_rejects_pattern_with_different_mode_total_or_kind(fixed_total, kind):
+    plan = {"dateCounterPresentation": {
+        "layout": "S-countdown-pattern", "component": "SCountdown", "pattern": "bars",
+        "value": {"path": ROOT + "/days"}, "totalValue": 3,
+    }}
+    context = replace(_context("2x2", kind), countdown_pattern=None, compact_plan=plan)
+    source = _source("2x2", kind, fixed_total=fixed_total)
+    result = DesignCompactProcessor().process(source, context)
+    assert any("未通过本轮创建准入" in issue.message for issue in result.errors)
 
 
 def _assert_square_countdown_titles(genui: str) -> None:

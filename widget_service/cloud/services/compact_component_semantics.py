@@ -12,6 +12,7 @@ CORE_INFORMATION_COMPONENT_TYPES = frozenset(
         "EventCard",
         "H_BarChart",
         "InfoBlock",
+        "InfoDisplay",
         "NumericRatioStack",
         "ProgressCircle",
         "ProgressCircleSingle",
@@ -33,6 +34,6 @@ MODEL_COMPONENT_TYPES_BY_SIZE = {
     "2x2": (*SHARED_FACT_COMPONENTS, "DataDisplay", "CircleButton", "CardButton"),
     "2x4": (
         *SHARED_FACT_COMPONENTS, "ProgressLine2", "TextBlock", "CardButton",
-        "TopTextBottomValue", "SummaryList",
+        "TopTextBottomValue", "SummaryList", "InfoDisplay",
     ),
 }

@@ -131,7 +131,7 @@ def test_preflight_resolves_date_counters_with_one_china_date_and_preserves_spec
     now.assert_called_once_with(timezone(timedelta(hours=8)))
     assert result.date_counters == {
         "/data/festival": DateCounterResult("today", 0, date(2026, 2, 17)),
-        "/data/anniversary": DateCounterResult("countdown", 6, date(2026, 2, 23)),
+        "/data/anniversary": DateCounterResult("countdown", 6, date(2026, 2, 23), 7),
     }
     assert result.card_spec is not None
     assert result.task_spec is not None
@@ -601,6 +601,13 @@ def test_preflight_rejects_unknown_asset():
             _date_counter_binding("/data/dateCounter", {"targetDate": "2026-13-01"}),
             "targetDate",
         ),
+        (
+            "11.7.9.300",
+            _date_counter_binding(
+                "/data/customCounter", {"targetDate": "2026-02-18", "repeat": {"unit": "year"}},
+            ),
+            "targetDate",
+        ),
     ],
 )
 async def test_generation_preflight_failure_does_not_call_model_or_start_directive(
@@ -616,6 +623,8 @@ async def test_generation_preflight_failure_does_not_call_model_or_start_directi
         pytest.fail("preflight failure must happen before AIWidgetStart")
 
     monkeypatch.setattr(A2UIModelClient, "generate", unexpected_generate)
+    now = datetime(2026, 2, 17, tzinfo=timezone(timedelta(hours=8)))
+    monkeypatch.setattr(generation_preflight, "datetime", Mock(now=Mock(return_value=now)))
     request = _request(
         prdVer=app_version,
         device={"romVersion": "7.0"},
@@ -644,6 +653,13 @@ async def test_generation_preflight_failure_does_not_call_model_or_start_directi
     assert "修正全部 issues" in instruction
     issues = details.get("issues")
     assert isinstance(issues, list) and len(issues) == 1
+    arguments = binding.get("arguments")
+    if isinstance(arguments, dict) and "repeat" in arguments:
+        assert issues[0].get("code") == "DATA_DATE_COUNTER_INVALID"
+        assert issues[0].get("repairInstruction") == (
+            "当前系统不支持创建起始周期在未来的周期倒计时，"
+            "如果用户同意可以修改targetDate为历史日期，否则明确拒绝用户"
+        )
     assert issues[0].get("path") == f"/candidateDataBindings/0/arguments/{field_path}"
     assert "滨江区" not in str(details)
 

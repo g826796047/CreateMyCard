@@ -249,6 +249,6 @@ def test_documented_small_templates_can_be_completed_and_converted() -> None:
             assert target[1] == declared[1]
             target[2] = declared[2]
         convert_compact_dsl_to_a2ui(_source(rows), size="2x2")
-    # 请求专属图案布局由单独的专用提示词加载，不进入普通 fewshot。
+    # 图案布局有主合同，案例仍按已接受 Plan 单独投放。
     assert layouts == set(SMALL_CHILD_ROLES) - {"S-countdown-pattern"}
     assert groups == {"hero-support", "label-value", "peer-pair", "supporting-items"}

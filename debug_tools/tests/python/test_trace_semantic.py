@@ -17,6 +17,7 @@ from services.generation_trace_recorder import (
     trace_phase,
     trace_record,
     trace_span,
+    trace_step,
 )
 
 UID = "batch-1234abcd-00001-000"
@@ -95,6 +96,51 @@ def test_real_record_import_http_and_content_ownership(tmp_path, content):
     assert response.status_code == 200
     assert response.content == content.encode("utf-8")
     assert hashlib.sha256(response.content).hexdigest() == output.get("sha256")
+
+
+def test_import_shows_rewritten_plan_as_a_separate_plan_output(tmp_path):
+    recorder = GenerationTraceRecorder()
+    recorder.bind_request(UID, enabled=True, trace_root=tmp_path / "traces")
+    token = recorder.activate()
+    try:
+        with trace_span("plan", stage="plan", kind="group"):
+            trace_record(
+                "plan.validation.completed",
+                json_artifacts={"accepted_plan": {"layoutHints": ["W-countdown-center"]}},
+                artifact_roles={"accepted_plan": "output"},
+            )
+            trace_step(
+                "plan.date_counter_presentation",
+                stage="plan",
+                status="success",
+                duration_ms=0.5,
+                json_artifacts={"rewritten_plan": {"layoutHints": ["W-countdown-pattern"]}},
+                artifact_roles={"rewritten_plan": "output"},
+            )
+        recorder.finalize(status="success")
+    finally:
+        recorder.deactivate(token)
+
+    view, run_dir = _import(tmp_path)
+    nodes = view.get("nodes")
+    assert isinstance(nodes, list)
+    plan = next(node for node in nodes if node.get("operation") == "plan")
+    before = next(ref for ref in plan.get("contentIndex", []) if ref.get("name") == "accepted_plan")
+    rewrite = next(
+        node for node in nodes if node.get("operation") == "plan.date_counter_presentation"
+    )
+    assert rewrite.get("title") == "日期 Plan 改写"
+    assert rewrite.get("parentId") == plan.get("id")
+    after = next(ref for ref in rewrite.get("artifacts", []) if ref.get("name") == "rewritten_plan")
+    assert after in plan.get("contentIndex", [])
+    assert before.get("label") == "通过的生成计划"
+    assert after.get("label") == "改写后的生效计划"
+    assert before.get("role") == after.get("role") == "output"
+    assert before.get("sha256") != after.get("sha256")
+    digest = after.get("sha256")
+    assert isinstance(digest, str)
+    source = (run_dir / "trace_blobs" / digest).read_text(encoding="utf-8")
+    assert json.loads(source) == {"layoutHints": ["W-countdown-pattern"]}
 
 
 @pytest.mark.parametrize("damage", ["missing", "size", "digest", "unregistered"])

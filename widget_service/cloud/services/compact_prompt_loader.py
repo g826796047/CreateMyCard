@@ -6,18 +6,23 @@ from functools import lru_cache
 from pathlib import Path
 
 FRAGMENT = re.compile(r"<!-- prompt:([a-z0-9_-]+) -->\n(.*?)<!-- /prompt:\1 -->\n", re.S)
+COUNTDOWN_FEWSHOT_PROMPTS = {
+    "S-center": "countdown_fewshot_s_center",
+    "S-countdown-pattern": "countdown_fewshot_s_pattern",
+    "W-countdown-center": "countdown_fewshot_w_center",
+    "W-countdown-pattern": "countdown_fewshot_w_pattern",
+}
 PROMPT_NAMES = frozenset(
     {
         "plan",
         "create",
-        "countdown_layout",
         "edit",
         "repair",
         "argument_repair",
         "fewshot_2x2",
         "fewshot_2x4",
     }
-)
+) | frozenset(COUNTDOWN_FEWSHOT_PROMPTS.values())
 
 
 def _inside(root: Path, relative: str) -> Path:

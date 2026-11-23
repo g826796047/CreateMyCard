@@ -66,7 +66,9 @@ def countdown_pattern_evidence(
         return {"complete": False, "reason": "图案前景包含额外组件"}
     _, days = read_pointer(data, pattern.days_path)
     _, relation = read_pointer(data, pattern.relation_path)
-    _, total = read_pointer(data, pattern.total_path)
+    total = pattern.fixed_total
+    if total is None:
+        _, total = read_pointer(data, pattern.total_path)
     if type(total) is not int or total < 0:
         return result
     if type(days) is not int or days < 0:
@@ -86,9 +88,12 @@ def countdown_pattern_evidence(
     result = {
         "complete": True, "layout": root.props.get("layout"), "kind": pattern.kind,
         "daysPath": pattern.days_path, "relationPath": pattern.relation_path,
-        "totalPath": pattern.total_path,
         "bodyFlow": {"lineCount": 1, "leftAligned": True},
         "textPlacement": "top-left", "graphicPlacement": "bottom-center",
         "basis": "validated-pattern-layout", "deviceGeometryKnown": False,
     }
+    if pattern.fixed_total is None:
+        result["totalPath"] = pattern.total_path
+    else:
+        result["totalValue"] = pattern.fixed_total
     return result

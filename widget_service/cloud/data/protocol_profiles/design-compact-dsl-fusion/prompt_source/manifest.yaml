@@ -332,9 +332,17 @@
       "layouts/2x2.md#s-layouts",
       "layouts/2x4.md#w-layouts"
     ],
-    "countdown_layout": [
-      "layouts/2x2.md#s-countdown-pattern",
-      "layouts/2x4.md#w-countdown-pattern"
+    "countdown_fewshot_s_center": [
+      "fewshots/2x2.md#example-v01"
+    ],
+    "countdown_fewshot_s_pattern": [
+      "fewshots/2x2.md#countdown-pattern"
+    ],
+    "countdown_fewshot_w_center": [
+      "fewshots/2x4.md#countdown-number"
+    ],
+    "countdown_fewshot_w_pattern": [
+      "fewshots/2x4.md#countdown-pattern"
     ],
     "edit": [
       "edit.md#contract"

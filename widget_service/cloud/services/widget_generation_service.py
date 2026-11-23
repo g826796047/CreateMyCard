@@ -47,12 +47,14 @@ from services.artifact_store import ArtifactStore, ArtifactUploadError, RepairAr
 from services.asset_url_mapper import AssetUrlMapper
 from services.capability_registry import CapabilityRegistry
 from services.card_validation.compact_validation.repair_guidance import RepairGuidanceContext
+from services.compact_date_counter_plan import PRESENTATION, apply_date_counter_plan
 from services.compact_dsl_a2ui_converter import serialize_compact_dsl_source
 from services.compact_list_review import review_list_plan, second_member_targets
 from services.compact_plan import (
     CompactPlanValidationError,
     CompactPlanValidationResult,
     build_compact_recovery_plan,
+    compact_plan_data_paths,
     compact_plan_omitted_facts,
     compact_plan_recovery_facts,
     compact_recovery_plan_errors,
@@ -981,6 +983,7 @@ class WidgetGenerationService:
                         accepted_plan = copy.deepcopy(recovery_plan)
                         plan_arguments = copy.deepcopy(accepted_plan)
                         plan_arguments.pop("wholeCardActionId", None)
+                        plan_arguments.pop(PRESENTATION, None)
                         raw_plan = json.dumps(
                             {
                                 "name": "submit_card_plan",
@@ -1467,6 +1470,38 @@ class WidgetGenerationService:
                 if source_fallback_started:
                     trace_phase_outcome("degraded", reason="fallback_to_model")
                 accepted_compact_plan = await generate_compact_plan()
+                automatic_date_counter = countdown_pattern is None and preflight.date_counters
+                if generation_mode == "create" and automatic_date_counter and not capacity_recovery:
+                    rewrite_started_at = time.perf_counter()
+                    task_value = display_task.model_dump(mode="json", exclude_none=True)
+                    selection = apply_date_counter_plan(
+                        accepted_compact_plan,
+                        display_task.size,
+                        set(compact_plan_data_paths(task_value)),
+                        preflight.date_counters,
+                    )
+                    accepted_compact_plan = selection.plan
+                    rewrite_duration_ms = self._elapsed_ms(rewrite_started_at)
+                    presentation = accepted_compact_plan.get(PRESENTATION, {})
+                    logger.info(
+                        f"{_MODULE} compact_date_counter_plan reason={selection.reason} "
+                        f"layout={presentation.get('layout')} "
+                        f"component={presentation.get('component')} "
+                        f"pattern={presentation.get('pattern')}"
+                    )
+                    rewritten = selection.reason == "selected"
+                    plan_trace_artifacts = {"date_counter_presentation": presentation}
+                    if rewritten:
+                        plan_trace_artifacts["rewritten_plan"] = accepted_compact_plan
+                    trace_step(
+                        "plan.date_counter_presentation",
+                        stage="plan",
+                        status="success" if rewritten else "skipped",
+                        duration_ms=rewrite_duration_ms,
+                        details={"reason": selection.reason},
+                        json_artifacts=plan_trace_artifacts,
+                        artifact_roles={"rewritten_plan": "output"},
+                    )
                 trace_phase("dsl")
                 if compact_agent_messages is None:
                     raise RuntimeError("Compact Agent conversation is missing after Plan")
@@ -1949,10 +1984,8 @@ class WidgetGenerationService:
                     )
                 )
             validation_issues = tuple(validation_issues_list)
-            latest_processing_result = DslProcessingResult(
-                source_dsl=processing_result.source_dsl,
-                standard_dsl=processing_result.standard_dsl,
-                issues=processing_result.issues + validation_issues,
+            latest_processing_result = replace(
+                processing_result, issues=processing_result.issues + validation_issues,
             )
             self._append_repair_record(
                 repair_records,
@@ -2211,6 +2244,7 @@ class WidgetGenerationService:
                 theme_task = task_spec.model_dump(mode="json", exclude_none=True)
                 if content_policy.is_static and accepted_compact_plan is not None:
                     theme_task["staticPaletteFamily"] = accepted_compact_plan.get("paletteFamily")
+                final_countdown_pattern = latest_processing_result.countdown_pattern
                 artifact = await theme_artifact(
                     artifact,
                     theme_task,
@@ -2219,7 +2253,10 @@ class WidgetGenerationService:
                     protocol_profile,
                     final_layout=design_token,
                     business_context=business_context,
-                    **({"countdown_pattern": countdown_pattern} if countdown_pattern else {}),
+                    **(
+                        {"countdown_pattern": final_countdown_pattern}
+                        if final_countdown_pattern else {}
+                    ),
                 )
                 if content_policy.is_static:
                     from services.static_content_context import final_static_display_errors

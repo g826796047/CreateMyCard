@@ -1,8 +1,11 @@
 # Compact DSL 现有校验规则分类清单 v1
 
 2026-11-13：`W-countdown-center` 根据源 DSL 声明匹配，参与 2x4 线上生成和修复的布局选型。
-三槽顺序、样式归属及无动作约束归语义／布局与视觉，复用 `compact_semantic_layout.py`、
-`compact_layout_runtime.py` 与共享组件合同。固定高度和完整单行容量继续由
+源合同要求唯一 `InfoDisplay`；组件字段与禁止 children 归语法／组件，唯一直属组件、视觉归属和无动作
+归语义／布局与视觉。 `compact_semantic_layout.py` 展开内部标题、读数、日期，继续复用
+`compact_layout_runtime.py` 的三槽定稿校验。授权路径与表达式沿用共享绑定检查。
+`compact_dsl_a2ui_converter.py` 在安全结构修复中移除单组件上误填的字号，保留其余属性与绑定。
+固定高度和完整单行容量继续由
 `semantic/layout/geometry.py`、`text_width.py` 检查。根容器使用 `W-countdown-center.root`
 配方标记；日期单行检查识别带 `SecondaryBody.root` 配方标记的 `Text` 节点。
 数值和单位的合计宽度由同一行容量检查负责。回归见 `test_countdown_center_layout.py`。
@@ -469,12 +472,12 @@ item 使用 `layoutWeight:1`、`flexShrink:1` 和 `constraintSize.minWidth:0` �
 Progress 绑定类型归数据绑定，必要动作保留和 W9 动作数量归展示语义。
 后续实施以第 5 节的具体检查项为迁移单位；分类不改变现有触发条件、修复文案或行为。
 
-单次比例图案倒计时的创建准入由 `services/countdown_pattern.py` 检查有效绑定及三个字段，不设剩余天数门槛；
-剩余天数、关系与总量的同源性委托共享编译合同，总量为同级 intervalDays，固定 ratio 模式。
-`generation_pipeline.py` 消费裁决并拒绝模型绕过图案根或直写程序节点。图案源改为唯一 SCountdown/WCountdown：
-组件字段白名单及禁止自带 children 属于语法／组件；布局与组件的尺寸对应属于语义／布局，
-日期关系及总量同源属于语义／数据绑定，有效单次来源属于语义／有效能力。
-这些已有检查复用 countdown_pattern 的组件语义与绑定检查，不新增第二套判定或诊断码；拒绝旧三个角色及旧根格式。
+比例图案倒计时由 `services/countdown_pattern.py` 复用组件语义及有效能力绑定检查。
+`generation_pipeline.py` 区分显式创建偏好与自动 Plan 推荐的准入：显式要求图案，自动仅在使用图案时比对
+已接受 Plan 的尺寸、类型、绑定与总量。模型直写程序节点仍被拒绝。图案源使用唯一 SCountdown/WCountdown：
+组件字段白名单及禁止自带 children 属于语法／组件；布局与组件的尺寸对应属于语义／布局；
+日期关系和动态总量同源、单次固定总量与试算一致属于语义／数据绑定；有效日期计数来源属于语义／有效能力。
+发布和重放复用组件及绑定判定，不新增第二套诊断码。旧三个角色及旧根格式仍被拒绝。
 组件字段类型登记在 compact_component_bindings，模型类型登记在 compact_component_semantics。
 布局与唯一组件对应归 compact_semantic_layout；组件展开归 compact_high_level_components，
 复用 countdown_pattern 的内部展开与填充辅助函数。布局合同仅维护外框，取消专用 sourceRoles/visualParts。
@@ -1502,6 +1505,15 @@ Plan 试排原有的无保护 should 省略候选保持原优先级与遗漏反�
   不新建错误码、字号档位、画布常数或修复预算，模型建议仍维护在 repair.md。
 - 新回归覆盖主槽中标题／辅助文字、合法核心 Group、普通旧布局、数值读数另有正式展示、
   装饰性长标题和未知绑定；转换不因首帧样值隐式重排 TextBlock。
+
+### 日期计数图案的 Plan 覆盖
+
+图案推荐在 `compact_date_counter_plan.py` 的计划编排阶段移除同对象目标日期事实。
+生成、修复和容量恢复复用修正后的事实范围，`compact_plan.py` 的既有覆盖检查不需要日期豁免。
+日期选型覆盖原 Plan 的单焦点硬锁。短倒计时仅在计划编排阶段替换布局和组件推荐，
+DSL 的布局判定、自动重排和重试沿用既有检查。
+日期组件的标签若为事件名常量加关系绑定的无条件拼接，事件名常量计入原有可见文字覆盖。
+事实重复、其它事实、动作和组件协议仍沿用原检查。
 
 ### 同组件数值和单位的 Plan 覆盖
 

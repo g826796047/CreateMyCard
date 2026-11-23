@@ -597,7 +597,8 @@ async def theme_artifact(
         business_context = copy.deepcopy(business_context or prepare_business_context(task))
         business_context.data[countdown_pattern.days_path] = "countdown"
         business_context.data[countdown_pattern.relation_path] = "countdown"
-        business_context.data[countdown_pattern.total_path] = "countdown"
+        if countdown_pattern.fixed_total is None:
+            business_context.data[countdown_pattern.total_path] = "countdown"
     with trace_span("theme.selection", stage="theme.selection") as span:
         result, audit = await select_theme(
             source, task, client,

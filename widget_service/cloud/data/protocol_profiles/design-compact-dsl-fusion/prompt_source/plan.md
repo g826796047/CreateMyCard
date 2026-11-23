@@ -90,9 +90,8 @@ dataId/text 不推荐按钮，actionId 仅推荐合法动作组件。标题按�
 仅有条目详情动作时可使用 W-top-bottom，无须为详情预留动作槽；
 保留2x2已登记单对象整卡点击例外，不同时生成条目点击和整卡点击。
 2x4 含独立按钮 actionId 时排除无独立动作槽的 W-top-bottom；含任何必要动作时排除 W-countdown-center。
-同一个倒计时的标题、天数与目标日期能完整放入三个固定槽时，可选 W-countdown-center；
-依次用 SingleLineTitle、EmphasizedData、SecondaryBody 承载三个事实。输出 composition 时，
-按路径 `[0]`、`[1]`、`[2]` 分配各一个组件组，目标日期按一个内容项规划。
+同一个倒计时的标题、天数与目标日期能由一个 InfoDisplay 完整承载时，可选 W-countdown-center。
+输出 composition 时，将这些事实规划到路径 `[0]` 的同一个 InfoDisplay，目标日期按一个内容项规划。
 2x2 图标操作只有满足 CircleButton 的全部条件才首选 S-title-anchor，缺独立支撑事实时排除它；不能为偏好某布局增造事实。
 2x2 两个入选 Action 使用 S-content-dual-action：有展示事实的标准变体两个按钮均为 PillButton；仅恰好两个动作、没有其它信息时使用 actions-only 变体的两个 CardButton。先扣除动作与固定间距，再核算完整内容组合；不因非 Action 事实至少两项就推荐 TableText。表格仍须满足等权语义，按实际条数、行数与 Recipe 高度核算；有明确核心时按核心与补充关系选型。不得把三个事实机械变成三行表格，不用 SecondaryBody 独自承担整卡核心，也不为纯动作需求补造展示事实。
 2x2 恰好一个入选 Action，且至多一个标记 displayRole:title 或首选 SingleLineTitle 的标题事实时，使用 S-title-content-action 的 title-action 变体：保留请求可得的稳定标题和一个 PillButton，不补造正文事实；只要有任一正文或 dataId 展示事实，就必须使用该布局的标准三角色结构。

@@ -90,7 +90,7 @@ SMALL_CHILD_ROLES = {
 _CHILD_ROLES = {
     "Layout": {
         "W-top-bottom": "[title?, primary, details]",
-        "W-countdown-center": "[SingleLineTitle, EmphasizedData, SecondaryBody]",
+        "W-countdown-center": "[InfoDisplay]",
         "W-split-panels": "[左侧 Region, 右侧 Region]",
         "W-content-side-slots": (
             "[内容 Region, 上方 InfoBlock/CardButton, 下方 InfoBlock/CardButton]"
@@ -518,29 +518,30 @@ class _Compiler:
         return (*title, body)
 
     def countdown_center(self, root: ComponentRow) -> tuple[str, ...]:
-        """只在显式倒计时布局中选择组件配方，不修改已有标题默认值。"""
-        self.count(root, {3})
-        expected = ("SingleLineTitle", "EmphasizedData", "SecondaryBody")
-        slot_props = (
-            {"title", "fontColor"}, {"value", "unit", "fontColor"}, {"items", "fontColor"},
-        )
-        for identifier, kind, allowed in zip(root.children, expected, slot_props, strict=True):
-            source = self.node(identifier)
-            if source.component_type != kind:
-                _fail(identifier, f"W-countdown-center 按顺序要求 {expected}")
-            if "variant" in source.props:
-                _prop_fail(identifier, "countdown-center 的组件变体由布局选择")
-            if "fontSize" in source.props:
-                _prop_fail(identifier, "countdown-center 的字号由布局选择")
-            if source.props.get("icon") is not None:
-                _prop_fail(identifier, "countdown-center 不接受标题图标")
-            self.props(source, allowed)
-            self.content(identifier, compact=False)
-            compiled = self.result[-1]
-            self.result[-1] = ComponentRow(
-                identifier, kind, {**compiled.props, "variant": "countdown-center"}, (),
-            )
-        return root.children
+        """将唯一 InfoDisplay 展开为布局拥有的标题、读数和日期。"""
+        self.count(root, {1})
+        identifier = root.children[0]
+        source = self.node(identifier)
+        if source.component_type != "InfoDisplay" or source.children:
+            _fail(identifier, "W-countdown-center 必须使用一个不含 children 的 InfoDisplay")
+        fields = {"label", "value", "unit", "secondaryInfo"}
+        self.props(source, fields)
+        missing = fields.difference(source.props)
+        if missing:
+            _prop_fail(identifier, "InfoDisplay 缺少必填属性：" + ", ".join(sorted(missing)))
+        values = deepcopy(source.props)
+        variant = "countdown-center"
+        title = self.generated(identifier, "title")
+        date = self.generated(identifier, "date")
+        self.add(title, "SingleLineTitle", {"title": values["label"], "variant": variant},
+                 (), identifier)
+        self.add(identifier, "EmphasizedData", {
+            "value": values["value"], "unit": values["unit"], "variant": variant,
+        }, (), identifier)
+        self.add(date, "SecondaryBody", {
+            "items": [{"value": values["secondaryInfo"]}], "variant": variant,
+        }, (), identifier)
+        return title, identifier, date
 
     def fixed_slot(self, identifier: str, *, combination: bool) -> None:
         kind = self.node(identifier).component_type
@@ -981,12 +982,18 @@ def expand_semantic_layout_rows(
     *,
     size: str | None = None,
 ) -> SemanticLayoutExpansion:
-    if not has_semantic_layout(rows):
+    has_info_display = any(
+        isinstance(row, ComponentRow) and row.component_type == "InfoDisplay" for row in rows
+    )
+    if not has_info_display and not has_semantic_layout(rows):
         return SemanticLayoutExpansion(tuple(rows), {})
     root = next(
         (row for row in rows if isinstance(row, ComponentRow) and row.component_id == "root"), None
     )
     layout = root.props.get("layout") if root is not None else None
+    is_countdown_layout = root is not None and root.component_type == "Layout"
+    if has_info_display and (not is_countdown_layout or layout != "W-countdown-center"):
+        _fail("root", "InfoDisplay 只能作为 W-countdown-center 的唯一子组件")
     from services.generation_content_policy import STATIC_LAYOUTS, current_content_policy
 
     if isinstance(layout, str) and layout in STATIC_LAYOUTS.values():

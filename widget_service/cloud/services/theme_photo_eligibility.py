@@ -57,8 +57,8 @@ def _wide_scope(root: ComponentRow, by_id: dict, final_layout: str,
     elif vertical and layout == "W-top-bottom" and len(root.children) in {2, 3}:
         if root.props.get("variant", "continuous") in ("continuous", "bottom-details", "equal"):
             result = by_id.get(root.children[-2])
-    elif vertical and layout == "W-countdown-center" and len(root.children) == 3:
-        result = by_id.get(root.children[1])
+    elif vertical and layout == "W-countdown-center" and len(root.children) == 1:
+        result = by_id.get(root.children[0])
     if result is not None:
         if result.component_type in {"SingleLineTitle", "DoubleLineTitle"}:
             result = None

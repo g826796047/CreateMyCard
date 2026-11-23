@@ -1,4 +1,4 @@
-"""单次倒计时的图案准入与确定性布局。"""
+"""倒计时的图案准入与确定性布局。"""
 
 from __future__ import annotations
 
@@ -14,8 +14,6 @@ from services.compact_dsl_a2ui_converter import (
     ComponentRow,
     DataRow,
 )
-from services.compact_prompt_loader import read_prompt
-from services.protocol_registry import DESIGN_COMPACT_PROFILE_ID, A2UIProtocolRegistry
 
 COUNTDOWN_LAYOUTS = {"2x2": "S-countdown-pattern", "2x4": "W-countdown-pattern"}
 COUNTDOWN_COMPONENTS = {"2x2": "SCountdown", "2x4": "WCountdown"}
@@ -31,6 +29,7 @@ if not isinstance(ACTIVE_COLOR, str) or not isinstance(INACTIVE_COLOR, str):
 class CountdownPattern:
     kind: Literal["bars", "dots"]
     days_path: str
+    fixed_total: int | None = None
 
     @property
     def total_path(self) -> str:
@@ -154,25 +153,55 @@ def pattern_from_display(display: ComponentRow) -> CountdownPattern:
     if any(marker in title for marker in ("{{", "}}", "${")):
         raise CompactDslConversionError("图案倒计时事件名称必须是静态文字。")
     path = _date_path(display)
-    expected_total = {"path": path.removesuffix("/days") + "/intervalDays"}
-    if display.props.get("totalValue") != expected_total:
-        raise CompactDslConversionError("总量必须绑定同一日期计数的 /intervalDays。")
     kind = display.props.get("pattern")
     if kind not in ("bars", "dots"):
         raise CompactDslConversionError("图案类型只允许 bars 或 dots。")
-    return CountdownPattern("bars" if kind == "bars" else "dots", path)
+    return _pattern_with_total(kind, path, display.props.get("totalValue"))
+
+
+def _pattern_with_total(
+    kind: Literal["bars", "dots"], days_path: str, total: object,
+) -> CountdownPattern:
+    fixed_total: int | None = None
+    if isinstance(total, int) and not isinstance(total, bool) and total > 0:
+        fixed_total = total
+    pattern = CountdownPattern(kind, days_path, fixed_total)
+    if fixed_total is None and total != {"path": pattern.total_path}:
+        raise CompactDslConversionError(
+            "总量必须为创建时的正整数或绑定同一日期计数的 /intervalDays。"
+        )
+    return pattern
+
+
+def pattern_from_plan(presentation: object, size: str) -> CountdownPattern | None:
+    """读取本轮服务端追加的图案推荐，普通布局没有图案准入。"""
+    pattern: CountdownPattern | None = None
+    if isinstance(presentation, dict) and size in COUNTDOWN_LAYOUTS:
+        kind = presentation.get("pattern")
+        value = presentation.get("value")
+        matches_size = (
+            presentation.get("layout") == COUNTDOWN_LAYOUTS.get(size)
+            and presentation.get("component") == COUNTDOWN_COMPONENTS.get(size)
+        )
+        if matches_size and kind in ("bars", "dots") and isinstance(value, dict):
+            path = value.get("path")
+            if isinstance(path, str):
+                pattern = _pattern_with_total(kind, path, presentation.get("totalValue"))
+    return pattern
 
 
 def check_pattern_binding(pattern: CountdownPattern, card_spec: dict) -> None:
     bindings = card_spec.get("dataBindings")
     if not isinstance(bindings, list) or len(bindings) != 1:
-        raise CompactDslConversionError("图案需要一个已授权的单次日期计数绑定。")
+        raise CompactDslConversionError("图案需要一个已授权的日期计数绑定。")
     binding = next(iter(bindings))
     if not isinstance(binding, dict) or binding.get("capabilityId") != "GetDateCounter":
         raise CompactDslConversionError("图案需要已授权的日期计数能力。")
     arguments = binding.get("arguments")
-    if not isinstance(arguments, dict) or arguments.get("repeat") is not None:
-        raise CompactDslConversionError("周期日期计数沿用普通布局。")
+    if not isinstance(arguments, dict):
+        raise CompactDslConversionError("图案缺少有效的日期计数参数。")
+    if arguments.get("repeat") is not None and pattern.fixed_total is not None:
+        raise CompactDslConversionError("周期图案总量必须绑定同一日期计数的 /intervalDays。")
     root = binding.get("writeResultTo")
     if not isinstance(root, str) or root.rstrip("/") + "/days" != pattern.days_path:
         raise CompactDslConversionError("图案必须绑定当前目标对应的数值天数。")
@@ -180,8 +209,6 @@ def check_pattern_binding(pattern: CountdownPattern, card_spec: dict) -> None:
 
 def countdown_prompt(pattern: CountdownPattern, size: str) -> str:
     layout = COUNTDOWN_LAYOUTS.get(size)
-    source_root = A2UIProtocolRegistry.design_prompt_directory(DESIGN_COMPACT_PROFILE_ID)
-    contract = read_prompt(source_root, "countdown_layout", size)
     bindings = {
         "value": {"path": pattern.days_path},
         "relationValue": {"path": pattern.relation_path},
@@ -195,7 +222,8 @@ def countdown_prompt(pattern: CountdownPattern, size: str) -> str:
     ]
     source = "\n".join(json.dumps(row, ensure_ascii=False) for row in template)
     return (
-        f"{contract.strip()}\n\n本轮源组件结构为：\n```jsonl\n{source}\n```\n"
+        "本轮已通过单次图案倒计时准入。\n\n"
+        f"本轮源组件结构为：\n```jsonl\n{source}\n```\n"
         "intervalDays 必须有首帧数据行；尚未取得本轮真实值时填 0，不能复制能力样例作为真实总量。"
     )
 
@@ -330,7 +358,10 @@ def expand_countdown_display(display: ComponentRow, size: str) -> list[Component
 
 def _fill_height_body(pattern: CountdownPattern, index: int, geometry: PatternGeometry) -> str:
     days = "${" + pattern.days_path + "}"
-    total = "${" + pattern.total_path + "}"
+    total = (
+        str(pattern.fixed_total) if pattern.fixed_total is not None
+        else "${" + pattern.total_path + "}"
+    )
     relation = "${" + pattern.relation_path + "}"
     amount = f"({days} * {geometry.rows * geometry.columns} / {total})"
     return (

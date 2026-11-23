@@ -304,6 +304,6 @@ class FinalBusinessContext:
             result = root.children[0]
         elif layout == "W-top-bottom" and len(root.children) in {2, 3}:
             result = root.children[-2]
-        elif layout == "W-countdown-center" and len(root.children) == 3:
-            result = root.children[1]
+        elif layout == "W-countdown-center" and len(root.children) == 1:
+            result = root.children[0]
         return result

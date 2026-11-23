@@ -27,6 +27,10 @@ from services.compact_component_semantics import (
     SHARED_FACT_COMPONENTS,
 )
 from services.compact_composition_planner import compound_duration_bindings
+from services.compact_date_counter_plan import (
+    PRESENTATION,
+    date_counter_label_prefix,
+)
 from services.compact_dsl_a2ui_converter import (
     MODEL_COMPACT_INPUT_COMPONENT_TYPES,
     ComponentRow,
@@ -1672,6 +1676,7 @@ def compact_plan_context(
     plan: dict[str, Any],
     *,
     execution_selected: bool = False,
+    include_plan_payload: bool = True,
 ) -> str:
     """构造第二阶段使用的硬事实与软候选说明。"""
     context_plan = dict(plan)
@@ -1741,7 +1746,10 @@ def compact_plan_context(
         "具体条件不成立才改选合法备选或组件组合。"
     )
     intent_context = _component_intent_context(plan)
-    payload = json.dumps(context_plan, ensure_ascii=False, separators=(",", ":"))
+    plan_payload = ""
+    if include_plan_payload:
+        payload = json.dumps(context_plan, ensure_ascii=False, separators=(",", ":"))
+        plan_payload = f"```json\n{payload}\n```"
     if execution_selected:
         return (
             "# 已接受的 Compact Info Plan\n\n"
@@ -1757,7 +1765,7 @@ def compact_plan_context(
             "落实真实绑定、完整文案与所属动作；标题绑定保留指定标题职责。"
             "核对必要的对象标签、完整单位与全部动作，原字号不变，不能裁切或删信息。"
             "按当前组件和布局合同核算标签、单位及完整内容的容量。\n\n"
-            f"```json\n{payload}\n```"
+            f"{plan_payload}"
         )
     layout_instruction = (
         "本轮两个必要动作使 S-content-dual-action 成为固定布局，不得改选带标题或单动作布局。"
@@ -1809,7 +1817,7 @@ def compact_plan_context(
         "纵排累加真实行数、固定行高和间距，使用当前组件合同而非照抄示例容量。"
         "动作先留足高度，环、状态、标题的总高度不能超出剩余正文；layoutWeight 不会让"
         "文字或环缩小。时间段、日期时间和带长单位的指标使用普通字号或分行，不套用大数字。\n\n"
-        f"```json\n{payload}\n```"
+        f"{plan_payload}"
         f"{intent_context}"
     )
 
@@ -1918,6 +1926,10 @@ def _compact_visible_state(
         if has_separate_progress_readout:
             visible_props.pop("value", None)
         _collect_paths_and_literals(visible_props, visible_paths, visible_literals)
+        if component.component_id in reachable_ids:
+            date_label = date_counter_label_prefix(component)
+            if date_label:
+                visible_literals.append(date_label)
         if component.component_type == "DataDisplay":
             from services.compact_composition_context import small_card_display_text
 
@@ -2901,6 +2913,8 @@ def compact_plan_required_route(
 ) -> dict[str, str] | None:
     """返回已接受 Plan 中可安全锁定的精确单焦点执行路线。"""
     if task_spec.get("size") != "2x2":
+        return None
+    if isinstance(plan.get(PRESENTATION), dict):
         return None
     facts = plan.get("info_required")
     if not isinstance(facts, list) or not facts:

@@ -59,11 +59,7 @@ def test_create_prompt_loads_each_source_as_one_complete_block() -> None:
     assert isinstance(prompts, dict)
     references = prompts.get("create")
     assert isinstance(references, list)
-    countdown_references = prompts.get("countdown_layout")
-    assert countdown_references == [
-        "layouts/2x2.md#s-countdown-pattern",
-        "layouts/2x4.md#w-countdown-pattern",
-    ]
+    assert "countdown_layout" not in prompts
 
     expected_references = []
     for filename in CREATE_SOURCE_ORDER:
@@ -71,9 +67,7 @@ def test_create_prompt_loads_each_source_as_one_complete_block() -> None:
         fragment_names = [name for name, _body in FRAGMENT.findall(content)]
         assert fragment_names
         for name in fragment_names:
-            reference = f"{filename}#{name}"
-            if reference not in countdown_references:
-                expected_references.append(reference)
+            expected_references.append(f"{filename}#{name}")
 
     assert references == expected_references
 
@@ -92,16 +86,26 @@ def test_countdown_layout_prompt_is_conditional_and_size_specific(
 ) -> None:
     prompts = assemble_prompts(DEFAULT_SOURCE, size)
 
+    example_name = "countdown_fewshot_s_pattern" if size == "2x2" else "countdown_fewshot_w_pattern"
     for name, content in prompts.items():
         assert other_layout not in content
-        assert (layout in content) == (name == "countdown_layout")
-    countdown = prompts.get("countdown_layout", "")
+        assert (layout in content) == (name in {"create", example_name})
+    create = prompts.get("create", "")
     component = "SCountdown" if size == "2x2" else "WCountdown"
-    other_component = "WCountdown" if size == "2x2" else "SCountdown"
-    assert f"Layout＋{component}" in countdown
-    assert other_component not in countdown
-    assert "不接受旧根属性" in countdown
-    assert "不提交视觉属性" in countdown
+    assert f"Layout＋{component}" in create
+    assert "自动单次图案的 totalValue 使用 Plan 中创建时剩余天数的固定整数" in create
+    assert "自动周期图案及显式图案的 totalValue 绑定同级 /intervalDays" in create
+    assert "不接受旧根属性" in create
+    assert "不提交 unit、fillMode、视觉属性" in create
+
+    task = TaskSpec(size=size, userQuery="做张倒计时卡", dataModelSchema={"data": {}})
+    prompt = PromptBuilder().build_design_token(
+        task, create, DESIGN_COMPACT_PROFILE_ID, defer_compact_examples=True,
+    )
+    system = prompt[0].get("content", "")
+    assert f"`{layout}` 在本轮服务端明确准入或已接受 Plan 选中时额外开放" in system
+    assert system.count(f"`{layout}`：图案倒计时") == 1
+    assert other_layout not in system
 
 
 def test_info_block_contract_is_noninteractive() -> None:
@@ -371,7 +375,7 @@ def test_two_by_four_layout_prompt_delegates_geometry_to_semantic_templates() ->
     fragments = dict(FRAGMENT.findall(source))
     layouts = fragments.get("w-layouts", "")
 
-    assert list(fragments) == ["w-layouts", "w-countdown-pattern"]
+    assert list(fragments) == ["w-layouts"]
     for removed_budget in (
         "132 + 12 + 132",
         "57 + 12 + 57",
@@ -711,6 +715,9 @@ def test_fewshot_source_is_one_document_per_size(size: str) -> None:
             f"example-v{index:02d}"
             for index in (3, 16, 28, 39, 9, 8, 10, 23, 6, 19, 38)
         )
+    if size == "2x4":
+        expected.append("countdown-number")
+    expected.append("countdown-pattern")
     assert list(fragments) == expected
     manifest = json.loads((DEFAULT_SOURCE / "manifest.yaml").read_text(encoding="utf-8"))
     modules = manifest.get("modules")

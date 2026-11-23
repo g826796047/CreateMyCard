@@ -13,17 +13,16 @@ const highLevelTypes = new Set<string>(HIGH_LEVEL_COMPONENT_TYPES);
 
 test("宽卡居中倒计时保持固定行盒、分离单位和日期绑定", () => {
   const source = [
-    '["root","Layout",{"layout":"W-countdown-center"},["header","countdown","target"]]',
-    '["header","SingleLineTitle",{"title":"距离春节还有"}]',
-    '["countdown","EmphasizedData",{"value":{"path":"/data/days"},"unit":"天"}]',
-    '["target","SecondaryBody",{"items":[{"label":"目标日：","value":{"path":"/data/date"}}]}]',
+    '["root","Layout",{"layout":"W-countdown-center"},["countdown"]]',
+    '["countdown","InfoDisplay",{"label":"距离春节还有","value":{"path":"/data/days"},"unit":"天",'
+      + '"secondaryInfo":{"path":"/data/date"}}]',
     '["/data/days",100]',
     '["/data/date","2027年2月6日"]',
   ].join("\n");
   const { graph } = compileMiniDsl(source, { size: "2x4", previewMode: true });
   for (const [id, font, height] of [
-    ["header_title", 16, 21], ["countdown_value", 56, 56],
-    ["countdown_unit", 16, 21], ["target", 16, 21],
+    ["__layout__countdown__title_title", 16, 21], ["countdown_value", 56, 56],
+    ["countdown_unit", 16, 21], ["__layout__countdown__date", 16, 21],
   ] as const) {
     const styles = graph.getNode(id)?.props.styles as Record<string, unknown>;
     assert.equal(styles.fontSize, font);
@@ -48,11 +47,11 @@ test("宽卡居中倒计时保持固定行盒、分离单位和日期绑定", ()
   assert.equal(unitStyles.lineHeight, undefined);
   assert.equal(unitStyles.margin, undefined);
   assert.equal((root?.props.styles as Record<string, unknown>).itemMargin, 5);
-  assert.deepEqual(root?.children, ["header", "countdown", "target"]);
-  assert.match(JSON.stringify(graph.getNode("target")?.props), /\/data\/date/);
+  assert.deepEqual(root?.children, ["__layout__countdown__title", "countdown", "__layout__countdown__date"]);
+  assert.match(JSON.stringify(graph.getNode("__layout__countdown__date")?.props), /\/data\/date/);
   assert.match(JSON.stringify(graph.getNode("countdown_value")?.props), /\/data\/days/);
-  const titleStyles = graph.getNode("header_title")?.props.styles as Record<string, unknown>;
-  const date = graph.getNode("target");
+  const titleStyles = graph.getNode("__layout__countdown__title_title")?.props.styles as Record<string, unknown>;
+  const date = graph.getNode("__layout__countdown__date");
   assert.equal(date?.type, "Extended.Text");
   assert.deepEqual(date?.children, []);
   assert.equal(titleStyles.fontWeight, 500);
@@ -67,16 +66,20 @@ test("宽卡居中倒计时保持固定行盒、分离单位和日期绑定", ()
     flexShrink: 0,
     fontColor: "#991F4799",
   });
-  const oldSource = source.replace('"layout":"W-countdown-center"',
-    '"layout":"W-top-bottom","variant":"countdown-center"');
-  assert.throws(() => compileMiniDsl(oldSource, { size: "2x4", previewMode: true }), /variant 未登记/);
+  const oldSource = [
+    '["root","Layout",{"layout":"W-countdown-center"},["header","countdown","target"]]',
+    '["header","SingleLineTitle",{"title":"距离春节还有"}]',
+    '["countdown","EmphasizedData",{"value":100,"unit":"天"}]',
+    '["target","SecondaryBody",{"items":[{"value":"2027年2月6日"}]}]',
+  ].join("\n");
+  assert.throws(() => compileMiniDsl(oldSource, { size: "2x4", previewMode: true }), /只允许一个/);
   const withAction = source.replace('"layout":"W-countdown-center"',
     '"layout":"W-countdown-center","onClick":[{"call":"open","args":{}}]');
   assert.throws(
     () => compileMiniDsl(withAction, { size: "2x4", previewMode: true }),
     /根节点仅接受布局和背景属性/,
   );
-  const withFont = source.replace('"title":"距离春节还有"', '"title":"距离春节还有","fontSize":12');
+  const withFont = source.replace('"label":"距离春节还有"', '"label":"距离春节还有","fontSize":12');
   assert.throws(
     () => compileMiniDsl(withFont, { size: "2x4", previewMode: true }),
     /组件样式由布局选择/,

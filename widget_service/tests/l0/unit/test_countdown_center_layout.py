@@ -12,6 +12,7 @@ from services.compact_dsl_a2ui_converter import (
     ComponentRow,
     convert_compact_dsl_to_a2ui,
     parse_compact_dsl_rows,
+    repair_compact_dsl_safe_structure,
 )
 from services.compact_layout_runtime import (
     allowed_layout_ids,
@@ -20,6 +21,7 @@ from services.compact_layout_runtime import (
 )
 from services.compact_plan import build_compact_plan_tool, parse_compact_plan_call
 from services.content_business import BusinessContext, FinalBusinessContext
+from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 from services.post_layout_theme import apply_theme, components, decode, presets
 from services.post_layout_theme_registry import registered_themes
 from services.theme_content_regions import photo_layout_evidence
@@ -29,14 +31,13 @@ from services.theme_style_roles import layout_phase, role
 
 def _rows(days: int = 100) -> list[list]:
     title = "{{ '春节 ' + ${/data/countdown/relationText} }}"
+    date_label = "{{ '目标日：' + ${/data/countdown/targetDateText} }}"
     return [
-        ["root", "Layout", {"layout": "W-countdown-center"},
-         ["header", "countdown", "target"]],
-        ["header", "SingleLineTitle", {"title": title}],
-        ["countdown", "EmphasizedData", {"value": {"path": "/data/countdown/days"}, "unit": "天"}],
-        ["target", "SecondaryBody", {"items": [
-            {"label": "目标日：", "value": {"path": "/data/countdown/targetDateText"}},
-        ]}],
+        ["root", "Layout", {"layout": "W-countdown-center"}, ["countdown"]],
+        ["countdown", "InfoDisplay", {
+            "label": title, "value": {"path": "/data/countdown/days"},
+            "unit": "天", "secondaryInfo": date_label,
+        }],
         ["/data/countdown", {"days": days, "targetDateText": "2027/02/06", "relationText": "还剩"}],
     ]
 
@@ -65,10 +66,10 @@ def test_countdown_conversion_preserves_geometry_and_bindings(days: int) -> None
     for node in nodes:
         by_id[node.get("id")] = node
     root = by_id.get("root")
-    title = by_id.get("header_title")
+    title = by_id.get("__layout__countdown__title_title")
     value = by_id.get("countdown_value")
     unit = by_id.get("countdown_unit")
-    target = by_id.get("target")
+    target = by_id.get("__layout__countdown__date")
     assert all(node is not None for node in (root, title, value, unit, target))
     assert root.get("styles", {}).get("padding") == 12
     assert root.get("itemMargin") == 5
@@ -115,7 +116,9 @@ def test_countdown_conversion_preserves_geometry_and_bindings(days: int) -> None
     assert "目标日：" in json.dumps(target, ensure_ascii=False)
 
 
-@pytest.mark.parametrize("case", ["icon", "font", "unit", "extra-date", "wrong-role", "action"])
+@pytest.mark.parametrize(
+    "case", ["icon", "font", "unit", "extra-date", "wrong-role", "action", "three-slots"],
+)
 def test_countdown_rejects_invalid_roles_and_style_overrides(case: str) -> None:
     rows = _rows()
     if case == "icon":
@@ -123,14 +126,37 @@ def test_countdown_rejects_invalid_roles_and_style_overrides(case: str) -> None:
     elif case == "font":
         rows[1][2]["fontSize"] = 12
     elif case == "unit":
-        rows[2][2].pop("unit")
+        rows[1][2].pop("unit")
     elif case == "extra-date":
-        rows[3][2].get("items").append({"value": "额外事实"})
+        rows[1][2]["secondaryInfo"] = ["2027/02/06", "额外事实"]
     elif case == "wrong-role":
-        rows[3][1] = "TextBlock"
+        rows[1][1] = "DataDisplay"
+    elif case == "action":
+        rows[1][2]["onClick"] = [{"call": "open", "args": {}}]
     else:
-        rows[2][2]["onClick"] = [{"call": "open", "args": {}}]
+        rows[0][3] = ["header", "countdown", "target"]
+        rows[1:2] = [
+            ["header", "SingleLineTitle", {"title": "春节倒计时"}],
+            ["countdown", "EmphasizedData", {"value": 9, "unit": "天"}],
+            ["target", "SecondaryBody", {"items": [{"value": "2027/02/06"}]}],
+        ]
     with pytest.raises(CompactDslConversionError):
+        convert_compact_dsl_to_a2ui(_source(rows), size="2x4")
+
+
+def test_countdown_safe_repair_removes_only_info_display_font_size() -> None:
+    rows = _rows()
+    rows[1][2]["fontSize"] = 30
+    repaired = repair_compact_dsl_safe_structure(_source(rows), size="2x4")
+    assert [json.loads(line) for line in repaired.splitlines()] == _rows()
+    assert repair_compact_dsl_safe_structure(repaired, size="2x4") == repaired
+    assert convert_compact_dsl_to_a2ui(repaired, size="2x4")
+
+
+def test_info_display_cannot_be_used_as_a_standalone_component() -> None:
+    rows = _rows()[1:]
+    rows[0][0] = "root"
+    with pytest.raises(CompactDslConversionError, match="只能作为 W-countdown-center"):
         convert_compact_dsl_to_a2ui(_source(rows), size="2x4")
 
 
@@ -140,8 +166,11 @@ def test_countdown_is_not_available_on_small_cards() -> None:
 
 
 def test_countdown_rejects_old_root_variant() -> None:
-    rows = _rows()
-    rows[0][2] = {"layout": "W-top-bottom", "variant": "countdown-center"}
+    rows = [
+        ["root", "Layout", {"layout": "W-top-bottom", "variant": "countdown-center"}, ["a", "b"]],
+        ["a", "EmphasizedData", {"value": 1, "unit": "天"}],
+        ["b", "SecondaryBody", {"items": [{"value": "2027/02/06"}]}],
+    ]
     with pytest.raises(CompactDslConversionError, match="W-top-bottom.variant 未登记"):
         convert_compact_dsl_to_a2ui(_source(rows), size="2x4")
 
@@ -193,10 +222,10 @@ def test_countdown_date_follows_theme_with_sixty_percent_opacity(theme_id, text_
     layout_nodes = {}
     for node in components(decode(layout)):
         layout_nodes[node.get("id")] = node
-    assert layout_nodes.get("target", {}).get("styles", {}).get("fontColor") == role("primary", 0.6)
-    assert layout_nodes.get("header_title", {}).get("styles", {}).get("fontColor") == (
-        role("secondary")
-    )
+    date = layout_nodes.get("__layout__countdown__date", {})
+    title = layout_nodes.get("__layout__countdown__title_title", {})
+    assert date.get("styles", {}).get("fontColor") == role("primary", 0.6)
+    assert title.get("styles", {}).get("fontColor") == role("secondary")
     overrides = {"text": {"color": text_override}} if text_override else {}
     final = apply_theme(layout, theme, task, overrides)
     assert theme_phase_errors(final, layout=False) == []
@@ -205,10 +234,11 @@ def test_countdown_date_follows_theme_with_sixty_percent_opacity(theme_id, text_
         final_nodes[node.get("id")] = node
     primary = text_override or theme.get("content", {}).get("roles", {}).get("primary")
     assert primary is not None
-    date_styles = final_nodes.get("target", {}).get("styles", {})
+    date_styles = final_nodes.get("__layout__countdown__date", {}).get("styles", {})
     assert date_styles.get("fontColor") == "#99" + primary.removeprefix("#FF")
     assert date_styles.get("fontWeight") == 500
-    assert final_nodes.get("header_title", {}).get("styles", {}).get("fontWeight") == 500
+    themed_title = final_nodes.get("__layout__countdown__title_title", {})
+    assert themed_title.get("styles", {}).get("fontWeight") == 500
     assert final_nodes.get("countdown_unit", {}).get("styles", {}).get("fontWeight") == 700
     assert "/data/countdown/targetDateText" in final
 
@@ -234,6 +264,27 @@ def test_countdown_full_validation_accepts_fixed_height_budget(scope: str | None
             card_spec={"suggestSize": "2x4"}, enforce_model_component_types=True,
             layout_scope="W-top-bottom",
         )
+
+
+def test_processor_repairs_font_size_before_validating_info_display() -> None:
+    rows = _rows()[:2]
+    rows[1][2] = {
+        "label": "春节还有", "value": 100, "unit": "天",
+        "secondaryInfo": "目标日期 2027/02/06", "fontSize": 30,
+    }
+    context = DslProcessingContext(
+        size="2x4",
+        task_spec={"size": "2x4", "appVersion": "11.9.9.342", "dataModelSchema": {"data": {}}},
+        card_spec={"suggestSize": "2x4"},
+        protocol_profile={"version": "v0.9"},
+        layout_scope="W-countdown-center",
+    )
+    result = DesignCompactProcessor().process(_source(rows), context)
+    assert not result.errors, result.errors
+    assert "fontSize" not in result.source_dsl
+    converted = components(decode(result.standard_dsl))
+    value = next(node for node in converted if node.get("id") == "countdown_value")
+    assert value.get("styles", {}).get("fontSize") == 56
 
 
 def test_countdown_enters_online_layout_candidates() -> None:
@@ -305,20 +356,21 @@ def test_countdown_component_variant_cannot_enable_itself_in_an_old_layout() -> 
 
 @pytest.mark.parametrize("area", ["title", "date", "number", "title-lines", "date-lines"])
 def test_countdown_does_not_hide_known_overflow(area: str) -> None:
-    rows = _rows()[:4]
-    rows[1][2]["title"] = "运动会还有"
-    rows[2][2]["value"] = 100
-    rows[3][2]["items"] = [{"value": "目标日：2027年2月6日"}]
+    rows = _rows()[:2]
+    props = {
+        "label": "运动会还有", "value": 100, "unit": "天", "secondaryInfo": "目标日：2027年2月6日",
+    }
+    rows[1][2] = props
     if area == "title":
-        rows[1][2]["title"] = "完整标题" * 20
+        props["label"] = "完整标题" * 20
     elif area == "date":
-        rows[3][2]["items"] = [{"value": "完整目标日期" * 20}]
+        props["secondaryInfo"] = "完整目标日期" * 20
     elif area == "title-lines":
-        rows[1][2]["title"] = "倒计时\n标题"
+        props["label"] = "倒计时\n标题"
     elif area == "date-lines":
-        rows[3][2]["items"] = [{"value": "目标日：\n2027年2月6日"}]
+        props["secondaryInfo"] = "目标日：\n2027年2月6日"
     else:
-        rows[2][2]["value"] = 12345678901234567890
+        props["value"] = 12345678901234567890
     expected = "countdown-center requires one line" if area == "date-lines" else None
     with pytest.raises(CompactDslValidationError, match=expected):
         validate_compact_dsl(
@@ -328,10 +380,10 @@ def test_countdown_does_not_hide_known_overflow(area: str) -> None:
 
 
 def test_countdown_checks_number_and_unit_together() -> None:
-    rows = _rows()[:4]
-    rows[1][2]["title"] = "运动会还有"
-    rows[2][2]["value"] = 12345678
-    rows[3][2]["items"] = [{"value": "2027/02/06"}]
+    rows = _rows()[:2]
+    rows[1][2] = {
+        "label": "运动会还有", "value": 12345678, "unit": "天", "secondaryInfo": "2027/02/06",
+    }
     with pytest.raises(CompactDslValidationError, match="value and unit require"):
         validate_compact_dsl(
             _source(rows), task_spec={"size": "2x4", "dataModelSchema": {"data": {}}},

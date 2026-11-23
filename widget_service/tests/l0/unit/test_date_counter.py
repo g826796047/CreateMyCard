@@ -46,13 +46,13 @@ def test_lunar_conversion_resolves_leap_month_and_supported_years(target, leap, 
 @pytest.mark.parametrize(
     ("target", "today", "repeat", "expected"),
     [
-        ("2027-01-01", "2026-12-31", {"unit": "day"}, "2027-01-01"),
+        ("2027-01-01", "2027-01-01", {"unit": "day"}, "2027-01-01"),
         ("2026-12-30", "2027-01-03", {"unit": "day", "interval": 2.0}, "2027-01-03"),
         ("2026-12-30", "2027-01-04", {"unit": "week", "interval": 2}, "2027-01-13"),
         ("2026-01-31", "2026-02-01", {"unit": "month"}, "2026-02-28"),
         ("2028-01-31", "2028-02-29", {"unit": "month"}, "2028-02-29"),
         ("2026-01-31", "2026-04-01", {"unit": "month", "interval": 3}, "2026-04-30"),
-        ("2026-02-31", "2026-02-01", {"unit": "month"}, "2026-02-28"),
+        ("2026-02-31", "2026-02-28", {"unit": "month"}, "2026-02-28"),
         ("2026-02-31", "2026-03-01", {"unit": "month"}, "2026-03-31"),
         ("2026-01-31", "2026-09-01", {"unit": "month", "interval": 3}, "2026-10-31"),
         ("2024-02-29", "2025-02-28", {"unit": "year"}, "2025-02-28"),
@@ -69,7 +69,9 @@ def test_gregorian_recurrence_keeps_the_original_anchor(target, today, repeat, e
     )
     difference = (expected_date - reference_date).days
     relation = "countdown" if difference else "today"
-    assert result == DateCounterResult(relation, difference, expected_date)
+    assert result.relation == relation
+    assert result.days == difference
+    assert result.target_date == expected_date
 
 
 @pytest.mark.parametrize(
@@ -79,7 +81,6 @@ def test_gregorian_recurrence_keeps_the_original_anchor(target, today, repeat, e
         ("2025-06-01", False, "2025-06-26", "month", 2, "2025-08-23"),
         ("2025-06-01", False, "2025-08-24", "month", 2, "2025-10-21"),
         ("2025-07-30", False, "2025-09-22", "month", 1, "2025-10-20"),
-        ("2025-08-30", False, "2025-09-22", "month", 1, "2025-10-20"),
         ("2025-08-30", False, "2025-10-21", "month", 1, "2025-11-19"),
         ("2025-06-30", False, "2025-07-25", "month", 1, "2025-08-22"),
         ("2025-06-01", True, "2025-07-26", "month", 1, "2025-08-23"),
@@ -102,8 +103,50 @@ def test_lunar_recurrence_uses_lunar_calendar(target, leap, today, unit, interva
         "isLeapMonth": leap,
         "repeat": {"unit": unit, "interval": interval},
     }
-    assert resolve_date_counter(arguments, today=reference_date) == DateCounterResult(
-        "countdown", (expected_date - reference_date).days, expected_date
+    result = resolve_date_counter(arguments, today=reference_date)
+    assert result.relation == "countdown"
+    assert result.days == (expected_date - reference_date).days
+    assert result.target_date == expected_date
+
+
+@pytest.mark.parametrize(
+    ("calendar", "target", "today", "repeat", "previous", "current"),
+    [
+        ("gregorian", "2026-12-30", "2027-01-04", {"unit": "week", "interval": 2},
+         "2026-12-30", "2027-01-13"),
+        ("gregorian", "2026-01-31", "2026-03-01", {"unit": "month"},
+         "2026-02-28", "2026-03-31"),
+        ("gregorian", "2024-02-29", "2028-02-28", {"unit": "year"},
+         "2027-02-28", "2028-02-29"),
+        ("lunar", "2025-06-01", "2025-06-26", {"unit": "year", "interval": 2},
+         "2025-06-25", "2025-07-25"),
+        ("lunar", "2025-06-01", "2025-07-26", {"unit": "month"},
+         "2025-07-25", "2025-08-23"),
+        ("lunar", "2025-06-01", "2025-07-26", {"unit": "month", "interval": 2},
+         "2025-06-25", "2025-08-23"),
+    ],
+)
+def test_repeat_interval_uses_the_actual_previous_occurrence(
+    calendar, target, today, repeat, previous, current,
+):
+    result = resolve_date_counter(
+        {"calendar": calendar, "targetDate": target, "repeat": repeat},
+        today=date.fromisoformat(today),
+    )
+    assert result.target_date == date.fromisoformat(current)
+    assert result.interval_days == (date.fromisoformat(current) - date.fromisoformat(previous)).days
+
+
+@pytest.mark.parametrize(
+    ("calendar", "first_target"),
+    [("gregorian", "2026-02-17"), ("lunar", "2026-01-01")],
+)
+def test_repeat_may_start_today_but_not_in_the_future(calendar, first_target):
+    arguments = {"calendar": calendar, "targetDate": first_target, "repeat": {"unit": "week"}}
+    with pytest.raises(DateCounterError, match="^future_repeat_start$"):
+        resolve_date_counter(arguments, today=date(2026, 2, 16))
+    assert resolve_date_counter(arguments, today=date(2026, 2, 17)) == DateCounterResult(
+        "today", 0, date(2026, 2, 17),
     )
 
 
