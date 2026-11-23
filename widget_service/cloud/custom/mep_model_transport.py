@@ -15,7 +15,7 @@ from app.logger import json_for_log, logger
 from config.config import Settings
 from custom.model_transport import ModelTransportError
 from models.generation import ModelRequestContext
-from services.generation_trace_recorder import trace_record
+from services.observability.generation_trace_recorder import trace_record
 from utils.card_runtime import sts_config
 
 _MODULE = "[MEP Model Transport]"

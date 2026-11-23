@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from services.fusion_ball_expander import fusion_ball_enabled
-from services.post_layout_theme_registry import photo_fallback, registered_themes
+from services.themes.fusion_ball_expander import fusion_ball_enabled
+from services.themes.post_layout_theme_registry import photo_fallback, registered_themes
 
 
 @dataclass(frozen=True)

@@ -5,10 +5,10 @@ import copy
 import pytest
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
 from services.card_validation import validate_card
-from services.theme_style_roles import role
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.theme_style_roles import role
 
 
 def photo_theme(size):

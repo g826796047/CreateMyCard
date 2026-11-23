@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.theme_content_regions import button_ids, photo_layout_evidence
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.theme_content_regions import button_ids, photo_layout_evidence
 
 SPORT_LAYOUT = '\n'.join([
     '["root","Layout",{"layout":"W-content-side-slots"},["main","upper","lower"]]',

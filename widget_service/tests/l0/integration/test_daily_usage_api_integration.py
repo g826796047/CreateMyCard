@@ -17,8 +17,8 @@ from test_daily_usage_routes import final_message, frame_info, payload, run_rout
 from api import routes
 from config.config import get_settings
 from core.errors import ErrorCode
-from services import daily_usage_api
-from services.daily_usage_limiter import DailyUsageError, DailyUsageLimiter
+from services.usage import daily_usage_api
+from services.usage.daily_usage_limiter import DailyUsageError, DailyUsageLimiter
 from start_websocket_server import create_app
 
 pytestmark = pytest.mark.usefixtures("daily_usage_auth")

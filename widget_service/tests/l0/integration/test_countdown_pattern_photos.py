@@ -12,16 +12,16 @@ from test_countdown_pattern_create import ROOT, _context, _source
 from test_photo_asset_delivery import artifact
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.content_business import BusinessContext, FinalBusinessContext
-from services.generation_pipeline import DesignCompactProcessor
-from services.protocol_registry import A2UIProtocolRegistry
-from services.theme_content_regions import photo_layout_evidence
-from services.theme_countdown_pattern import countdown_pattern_evidence
-from services.theme_photo_eligibility import fusion_photo_facts
-from services.theme_photo_matching import eligible_photos
-from services.validator import ArtifactValidator
+from services.card_validation.validator import ArtifactValidator
+from services.generation.generation_pipeline import DesignCompactProcessor
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.content_business import BusinessContext, FinalBusinessContext
+from services.themes.theme_content_regions import photo_layout_evidence
+from services.themes.theme_countdown_pattern import countdown_pattern_evidence
+from services.themes.theme_photo_eligibility import fusion_photo_facts
+from services.themes.theme_photo_matching import eligible_photos
 
 
 def pattern_photos(size=None):

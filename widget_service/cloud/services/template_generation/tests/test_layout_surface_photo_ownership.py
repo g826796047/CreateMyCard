@@ -18,7 +18,7 @@ from services.template_generation.engine.cardplan.photo_theme import (
 )
 from services.template_generation.engine.cardplan.registry import get_cardplan_registry
 from services.template_generation.engine.tersel_converter import Nested2Node
-from services.theme_photo_processing import apply_content_palette
+from services.themes.theme_photo_processing import apply_content_palette
 
 _HERO_IDS = (
     "BatteryOverviewStatusSummaryHero@1",

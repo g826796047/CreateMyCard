@@ -5,12 +5,12 @@ import json
 
 import pytest
 
-from services import compact_high_level_components as high_level
-from services import post_layout_theme as themes
-from services.compact_dsl_a2ui_converter import ComponentRow, convert_compact_dsl_to_a2ui
-from services.compact_high_level_components import _expand_secondary_body
-from services.post_layout_theme_registry import registered_themes
-from services.theme_style_roles import layout_phase
+from services.compact.compact_dsl_a2ui_converter import ComponentRow, convert_compact_dsl_to_a2ui
+from services.compact.components import compact_high_level_components as high_level
+from services.compact.components.compact_high_level_components import _expand_secondary_body
+from services.themes import post_layout_theme as themes
+from services.themes.post_layout_theme_registry import registered_themes
+from services.themes.theme_style_roles import layout_phase
 
 PAIR_CASES = [
     ("SecondaryBody", "2x2"), ("SecondaryBody", "2x4"),

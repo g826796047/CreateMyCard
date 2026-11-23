@@ -17,16 +17,18 @@ from services.card_validation.compact_validation.semantic.bindings import (
     _compact_component_binding_errors,
 )
 from services.card_validation.progress_sources import progress_source_errors
-from services.compact_component_bindings import collect_compact_component_binding_errors
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     convert_compact_dsl_to_a2ui,
 )
-from services.compact_prompt_loader import assemble_prompts
-from services.generation_preflight import GenerationPreflight
-from services.related_output_fields import complete_related_output_fields
-from services.task_spec_builder import TaskSpecBuilder
+from services.compact.components.compact_component_bindings import (
+    collect_compact_component_binding_errors,
+)
+from services.generation.generation_preflight import GenerationPreflight
+from services.generation.related_output_fields import complete_related_output_fields
+from services.generation.task_spec_builder import TaskSpecBuilder
+from services.protocols.compact_prompt_loader import assemble_prompts
 
 
 def _properties():

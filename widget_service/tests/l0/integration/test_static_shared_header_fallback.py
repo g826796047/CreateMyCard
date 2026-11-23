@@ -9,16 +9,19 @@ from config.config import get_settings
 from models.artifact import ArtifactMeta, WidgetArtifact
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
 from services.card_validation.compact_validation.semantic.static_content import static_fact_coverage
-from services.compact_high_level_components import CompactDslConversionError
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.protocol_registry import A2UIProtocolRegistry
-from services.static_content_components import complete_static_text_trial
-from services.static_content_presentation import (
+from services.card_validation.validator import ArtifactValidator
+from services.compact.components.compact_high_level_components import CompactDslConversionError
+from services.compact.static_content.static_content_components import complete_static_text_trial
+from services.compact.static_content.static_content_presentation import (
     static_presentation_candidates,
     trial_static_presentation,
 )
-from services.validator import ArtifactValidator
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 
 
 def _fact(text, role="body", **extra):

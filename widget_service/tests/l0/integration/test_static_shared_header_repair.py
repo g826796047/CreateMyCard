@@ -12,24 +12,26 @@ from api.schemas import GenerateWidgetCardRequest
 from config.config import get_settings
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
-from services.artifact_store import ArtifactStore
+from services.artifacts.artifact_store import ArtifactStore
 from services.card_validation.compact_validation.semantic.static_content import static_group_errors
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_content_policy import (
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.compact.static_content.static_content_presentation import (
+    missing_shared_header_candidate,
+)
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
 )
-from services.generation_pipeline import (
+from services.generation.generation_pipeline import (
     DesignCompactProcessor,
     DslProcessingContext,
     DslProcessingResult,
     QualityIssue,
 )
-from services.protocol_registry import A2UIProtocolRegistry
-from services.static_content_presentation import missing_shared_header_candidate
-from services.theme_style_roles import layout_phase
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes.theme_style_roles import layout_phase
 
 
 @pytest.fixture(autouse=True)

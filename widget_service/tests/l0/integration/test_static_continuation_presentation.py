@@ -11,16 +11,19 @@ from services.card_validation.compact_validation.semantic.static_content import 
     static_fact_coverage,
     static_group_errors,
 )
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.protocol_registry import A2UIProtocolRegistry
-from services.static_content_components import complete_static_text_trial
-from services.static_content_presentation import (
+from services.card_validation.validator import ArtifactValidator
+from services.compact.static_content.static_content_components import complete_static_text_trial
+from services.compact.static_content.static_content_presentation import (
     _trial_continuation,
     static_presentation_candidates,
     trial_static_presentation,
 )
-from services.validator import ArtifactValidator
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 
 
 def _case():
@@ -142,7 +145,10 @@ def test_complete_original_remains_preferred_without_extra_trial(monkeypatch):
     def unexpected(*_args, **_kwargs):
         raise AssertionError("complete original must stay preferred")
 
-    monkeypatch.setattr("services.static_content_presentation._trial_continuation", unexpected)
+    monkeypatch.setattr(
+        "services.compact.static_content.static_content_presentation._trial_continuation",
+        unexpected,
+    )
     trial = trial_static_presentation(plan, _task(plan).get("userQuery"), "2x4")
     assert trial.source == original and trial.attempted == 1 and trial.errors == ()
 

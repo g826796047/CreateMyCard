@@ -9,8 +9,9 @@ import pytest
 from api.routes import _build_plugin_stream_response, _send_websocket_json
 from custom.a2ui_model_client import A2UIModelClient, A2UIModelGenerationError
 from models.service import WidgetWebSocketResultMessage
-from services import operational_logging, post_layout_theme
-from services.operational_logging import exception_summary, service_fingerprints
+from services.observability import operational_logging
+from services.observability.operational_logging import exception_summary, service_fingerprints
+from services.themes import post_layout_theme
 
 
 class CaptureLogger:
@@ -162,8 +163,8 @@ async def test_theme_validation_fallback_is_visible_without_trace(monkeypatch, f
 @pytest.mark.asyncio
 async def test_edit_source_failure_keeps_cause_without_signed_url(monkeypatch):
     from core.errors import ErrorCode
-    from services import widget_edit_service
-    from services.source_artifact_repository import SourceArtifactError
+    from services.artifacts.source_artifact_repository import SourceArtifactError
+    from services.editing import widget_edit_service
 
     capture = CaptureLogger()
     monkeypatch.setattr(widget_edit_service, "logger", capture)

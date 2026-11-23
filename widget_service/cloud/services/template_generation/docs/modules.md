@@ -308,7 +308,7 @@ TaskSpec 数据序列化。旧 Python 诊断链和兼容 TerseDSL 转换器已�
 文件：[../engine/compact_dsl_a2ui_converter.py](../engine/compact_dsl_a2ui_converter.py)
 
 模板内部归档/回转转换器，同时提供 `convert_a2ui_to_compact_dsl()`。生产最终 Processor 使用的是
-[公共 Compact 转换器](../../compact_dsl_a2ui_converter.py)。修改两份实现时必须评估归档闭环和公共 Processor
+[公共 Compact 转换器](../../compact/compact_dsl_a2ui_converter.py)。修改两份实现时必须评估归档闭环和公共 Processor
 是否仍保持等价，不能只验证单向转换。
 
 ### `preview_dataset.py`

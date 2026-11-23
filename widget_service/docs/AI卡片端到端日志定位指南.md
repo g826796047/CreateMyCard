@@ -429,6 +429,6 @@ AgentLoop：在线 Skill、工具调用顺序、停止原因或最终结果
 
 - [云侧方案设计](../../docs/云侧方案设计.md)：系统边界、在线流程、产物交付与日志规范。
 - [微服务请求路由](../cloud/api/routes.py)：会话轮次标识、原始请求与处理阶段日志。
-- [设备能力裁决](../cloud/services/device_capability_resolver.py)：应用依赖检查日志。
-- [卡片生成服务](../cloud/services/widget_generation_service.py)：生成完成与汇总日志。
-- [卡片指令构造](../cloud/services/widget_directive.py)：`AIWidgetStart` 和 `directives` 内容。
+- [设备能力裁决](../cloud/services/capabilities/device_capability_resolver.py)：应用依赖检查日志。
+- [卡片生成服务](../cloud/services/generation/widget_generation_service.py)：生成完成与汇总日志。
+- [卡片指令构造](../cloud/services/requests/widget_directive.py)：`AIWidgetStart` 和 `directives` 内容。

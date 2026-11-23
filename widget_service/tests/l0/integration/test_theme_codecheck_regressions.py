@@ -10,16 +10,16 @@ import pytest
 from test_photo_asset_delivery import artifact as photo_artifact
 
 from config.config import get_settings
-from services import compact_dsl_a2ui_converter as converter
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services import theme_photo_eligibility, theme_texture_eligibility
-from services.compact_high_level_components import (
+from services.compact import compact_dsl_a2ui_converter as converter
+from services.compact.components.compact_high_level_components import (
     CompactDslConversionError,
     _system_palette_color,
 )
 from services.template_generation.engine.cardplan import photo_facts
-from services.theme_style_roles import layout_phase, role
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes import theme_photo_eligibility, theme_texture_eligibility
+from services.themes.theme_style_roles import layout_phase, role
 
 
 def test_photo_main_scope_uses_one_typed_return_for_optional_pair():

@@ -37,7 +37,7 @@ def ids_retry_clock(monkeypatch):
     import time
     from types import SimpleNamespace
 
-    from services import ids_client
+    from services.capabilities import ids_client
 
     clock = SimpleNamespace(now=0.0, sleeps=[])
 
@@ -54,7 +54,7 @@ def ids_retry_clock(monkeypatch):
 @pytest.fixture
 def daily_usage_auth(monkeypatch):
     """每日次数 HTTP 测试使用独立假密钥，不访问真实 STS。"""
-    from services import daily_usage_api
+    from services.usage import daily_usage_api
 
     def load_secret(config_key):
         assert config_key == "hag.osms.sk"
@@ -69,7 +69,7 @@ def isolated_theme_stage(monkeypatch):
     async def theme(artifact, *_args, **_kwargs):
         return artifact
 
-    monkeypatch.setattr("services.post_layout_theme.theme_artifact", theme)
+    monkeypatch.setattr("services.themes.post_layout_theme.theme_artifact", theme)
 
 
 @pytest.fixture

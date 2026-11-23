@@ -12,7 +12,7 @@ from services.card_validation.compact_dsl_validator import (
     _collect_hero_value_errors,
     validate_compact_dsl,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
 
 
 def _fixture(

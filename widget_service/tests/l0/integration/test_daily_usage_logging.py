@@ -11,8 +11,8 @@ from test_daily_usage_routes import OPERATION, payload, run_route
 
 from api import routes
 from config.config import get_settings
-from services import daily_usage_api, daily_usage_limiter
-from services.daily_usage_limiter import DailyUsageError
+from services.usage import daily_usage_api, daily_usage_limiter
+from services.usage.daily_usage_limiter import DailyUsageError
 
 pytestmark = pytest.mark.usefixtures("daily_usage_auth")
 

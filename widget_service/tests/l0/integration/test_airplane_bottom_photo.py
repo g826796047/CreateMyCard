@@ -5,8 +5,8 @@ from test_uniform_photo_eligibility import PATHS, choose, evidence, rejection, s
 from test_wide_photo_focus import focus_sample
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 
 AIRPLANE = "photo-ux-airplane-tarmac-wide"
 

@@ -11,18 +11,18 @@ from api.schemas import GenerateWidgetCardRequest
 from config.config import get_settings
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
-from services import post_layout_theme as themes
-from services.artifact_store import ArtifactStore
+from services.artifacts.artifact_store import ArtifactStore
 from services.card_validation.theme_phase_validator import theme_phase_errors
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.generation_pipeline import (
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.generation.generation_pipeline import (
     DesignCompactProcessor,
     DslProcessingContext,
     DslProcessingResult,
 )
-from services.layout_theme_contract import strip_source_colors, uses_post_layout_theme
-from services.theme_style_roles import in_layout_phase, layout_phase, role
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.themes import post_layout_theme as themes
+from services.themes.layout_theme_contract import strip_source_colors, uses_post_layout_theme
+from services.themes.theme_style_roles import in_layout_phase, layout_phase, role
 
 # 本组验证既有创建、回退或路由合同，静态策略由专项测试覆盖。
 pytestmark = pytest.mark.usefixtures("existing_generation_policy")

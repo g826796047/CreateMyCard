@@ -18,7 +18,7 @@ from services.card_validation.compact_validation.semantic.effective import (
 from services.card_validation.compact_validation.semantic.layout.assets import (
     _collect_asset_color_errors,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
 
 ICON = "resources/device.svg"
 COLOR = "#FF112233"

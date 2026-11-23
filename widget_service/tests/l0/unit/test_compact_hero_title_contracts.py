@@ -5,7 +5,7 @@ import json
 import pytest
 
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
-from services.theme_style_roles import layout_phase
+from services.themes.theme_style_roles import layout_phase
 
 
 def source(hero, title="概览"):
@@ -85,7 +85,7 @@ def test_unknown_title_sample_is_not_guessed():
 
 
 def test_hero_error_uses_existing_recomposition_budget():
-    from services.compact_repair_strategy import CompactRepairStrategyTracker
+    from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
 
     dsl = source(["SingleLineTitle", {"title": "一行标题", "fontSize": 12}])
     with pytest.raises(CompactDslValidationError) as captured:

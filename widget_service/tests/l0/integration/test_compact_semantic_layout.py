@@ -4,12 +4,12 @@ import json
 
 import pytest
 
-from services.asset_url_mapper import AssetUrlMapper
+from services.artifacts.asset_url_mapper import AssetUrlMapper
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
 from services.card_validation.compact_validation.semantic.layout.geometry import (
     _height_budget_components,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     DataRow,
@@ -19,12 +19,12 @@ from services.compact_dsl_a2ui_converter import (
     repair_compact_dsl_binding_paths,
     serialize_compact_dsl_source,
 )
-from services.compact_layout_runtime import match_compact_layout
-from services.compact_plan import (
+from services.compact.layout.compact_layout_runtime import match_compact_layout
+from services.compact.planning.compact_plan import (
     compact_plan_optional_drop_candidate,
     evaluate_compact_plan_coverage,
 )
-from services.compact_repair_strategy import CompactRepairStrategyTracker
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
 
 
 def _source(rows: list[list]) -> str:
@@ -556,8 +556,8 @@ async def test_online_artifact_saves_valid_semantic_source_after_json_repair(
     from core.errors import GenerationStatus
     from custom.a2ui_model_client import A2UIModelClient
     from models.service import ArtifactSaveResult
-    from services.artifact_store import ArtifactStore
-    from services.widget_generation_service import WidgetGenerationService
+    from services.artifacts.artifact_store import ArtifactStore
+    from services.generation.widget_generation_service import WidgetGenerationService
 
     rows = [["root", "Layout", {"layout": "W-four-slots", "linearGradient": {
         "direction": "RightBottom", "colors": [["#FFCBDDFE", 0], ["#FFF1F6FE", 1]],
@@ -586,7 +586,7 @@ async def test_online_artifact_saves_valid_semantic_source_after_json_repair(
         title="设备读数", description="验证语义源保存")
     response = await WidgetGenerationService().generate_widget_card_compact_dsl(request)
     assert response.status == GenerationStatus.SUCCESS
-    from services.layout_theme_contract import strip_source_colors
+    from services.themes.layout_theme_contract import strip_source_colors
 
     assert saved == [serialize_compact_dsl_source(strip_source_colors(valid))]
     assert "__layout__" not in saved[0]

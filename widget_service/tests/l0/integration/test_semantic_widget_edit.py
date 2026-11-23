@@ -13,21 +13,24 @@ from config.config import get_settings
 from core.errors import ErrorCode, GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
 from models.generation import CandidateDataBinding
-from services import widget_edit_contract, widget_edit_prompt, widget_edit_service
-from services.artifact_store import ArtifactStore, ArtifactUploadError
+from services.artifacts.artifact_store import ArtifactStore, ArtifactUploadError
+from services.artifacts.source_artifact_repository import (
+    SourceArtifactLoadResult,
+    SourceArtifactRepository,
+)
 from services.card_validation import ValidationOptions, validate_card
 from services.card_validation.context import ValidationContext
 from services.card_validation.edit_validation import artifact as edit_validation_module
-from services.compact_dsl_interface_retry import run_compact_dsl_with_retry
-from services.source_artifact_repository import SourceArtifactLoadResult, SourceArtifactRepository
-from services.widget_edit_contract import (
+from services.editing import widget_edit_contract, widget_edit_prompt, widget_edit_service
+from services.editing.widget_edit_contract import (
     EditIntent,
     apply_edit_output,
     dump_rows,
     validate_intent,
 )
-from services.widget_edit_utils import source_digest
-from services.widget_generation_service import WidgetGenerationService
+from services.editing.widget_edit_utils import source_digest
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.requests.compact_dsl_interface_retry import run_compact_dsl_with_retry
 
 
 @pytest.fixture
@@ -91,7 +94,7 @@ def _patch(source, identity="title", prop="fontSize", value=18):
     "把整体颜色改成蒂芙尼蓝", "背景换成橙色", "把卡片调小一点",
 ])
 def test_contract_never_matches_query_words(source, query):
-    from services.widget_edit_prompt import intent_prompt
+    from services.editing.widget_edit_prompt import intent_prompt
 
     messages = intent_prompt(source, query, "2x4", None)
     payload = json.loads(messages[1].get("content", "{}"))
@@ -256,7 +259,7 @@ def edit_run(source, monkeypatch):
     monkeypatch.setattr(WidgetGenerationService, "generate_widget_card", forbidden)
     monkeypatch.setattr("services.template_generation.TemplateSourceGenerator.__call__", forbidden)
     monkeypatch.setattr("services.template_generation.TemplateSourceGenerator.__init__", forbidden)
-    monkeypatch.setattr("services.post_layout_theme.theme_artifact", forbidden)
+    monkeypatch.setattr("services.themes.post_layout_theme.theme_artifact", forbidden)
     monkeypatch.setattr(WidgetGenerationService, "_enable_card_template", lambda _self: True)
     return state
 
@@ -691,7 +694,7 @@ async def test_consecutive_edits_keep_previous_changes(edit_run, monkeypatch):
 
 
 def test_relative_static_text_edit_never_replaces_dynamic_expression(source):
-    from services.widget_edit_contract import TextChange
+    from services.editing.widget_edit_contract import TextChange
 
     rows = _rows(source)
     _nodes(rows)[1]["content"] = "{{ ${/data/weather/current/condition} }}"
@@ -744,7 +747,7 @@ def test_authorized_photo_layer_removal_keeps_business_icon(source):
 
 
 def test_style_edits_and_explicit_static_text_replacement(source):
-    from services.widget_edit_contract import TextChange
+    from services.editing.widget_edit_contract import TextChange
 
     intent = _intent(dimensions=["typography", "shape", "text"], textChanges=[TextChange(
         componentId="title", before="睡眠卡片", after="昨夜睡眠",
@@ -834,7 +837,7 @@ async def test_visual_edit_cannot_smuggle_new_data_candidate(edit_run):
 @pytest.mark.parametrize("outcome", ["needs_clarification", "unchanged"])
 def test_edit_normal_outcomes_close_device_wait_without_success(outcome):
     from api.routes import _generation_result_directive
-    from services.widget_directive import WidgetDirectiveState
+    from services.requests.widget_directive import WidgetDirectiveState
 
     state, url = _generation_result_directive({"status": outcome, "artifactUrl": ""})
     assert state == WidgetDirectiveState.FAILURE

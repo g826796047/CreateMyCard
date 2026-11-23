@@ -5,8 +5,8 @@ import json
 import pytest
 
 from custom.a2ui_model_client import A2UIModelClient
-from services import widget_edit_output
-from services.widget_edit_output import normalize_edit_output
+from services.editing import widget_edit_output
+from services.editing.widget_edit_output import normalize_edit_output
 
 
 @pytest.mark.parametrize("prefix,suffix", [

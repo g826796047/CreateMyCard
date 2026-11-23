@@ -5,24 +5,24 @@ import json
 
 import pytest
 
-from services.compact_action_instances import (
+from services.compact.compact_dsl_a2ui_converter import (
+    CompactDslConversionError,
+    convert_compact_dsl_to_a2ui,
+)
+from services.compact.planning.compact_action_instances import (
     action_instance_instruction,
     plan_action_candidates,
     plan_action_handlers,
 )
-from services.compact_dsl_a2ui_converter import (
-    CompactDslConversionError,
-    convert_compact_dsl_to_a2ui,
-)
-from services.compact_plan import (
+from services.compact.planning.compact_plan import (
     build_compact_plan_tool,
     compact_plan_action_ids,
     compact_plan_context,
     compact_plan_coverage_errors,
     parse_compact_plan_call,
 )
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.protocol_registry import A2UIProtocolRegistry
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 
 
 def _path(index: int, name: str) -> str:

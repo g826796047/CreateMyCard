@@ -12,7 +12,6 @@ import tokenize
 from dataclasses import dataclass
 from typing import Any
 
-from services.fusion_ball_expander import FUSION_BALL_CONTENT_ID_PREFIX
 from services.template_generation.engine.a2ui_expression import (
     A2UIExpressionError,
     normalize_tersel_expression,
@@ -27,6 +26,7 @@ from services.template_generation.engine.theme_reference import (
     ThemeReferenceSyntaxError,
     translate_theme_reference_calls,
 )
+from services.themes.fusion_ball_expander import FUSION_BALL_CONTENT_ID_PREFIX
 
 MAX_INPUT_LENGTH = 1_048_576
 MAX_COMPONENTS = 256

@@ -4,8 +4,8 @@ import pytest
 from test_photo_background_fallback import node_by_id
 from test_uniform_photo_eligibility import PATHS, choose, sample
 
-from services import post_layout_theme as themes
-from services import theme_user_preferences as preferences
+from services.themes import post_layout_theme as themes
+from services.themes import theme_user_preferences as preferences
 from theme_preference_samples import preference, reply
 
 

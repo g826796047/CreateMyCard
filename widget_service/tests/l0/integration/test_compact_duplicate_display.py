@@ -9,13 +9,13 @@ from dataclasses import replace
 import pytest
 
 from config.config import get_settings
-from services.compact_dsl_a2ui_converter import parse_compact_dsl_rows
-from services.compact_duplicate_display import (
+from services.compact.compact_dsl_a2ui_converter import parse_compact_dsl_rows
+from services.compact.planning.compact_plan import evaluate_compact_plan_coverage
+from services.compact.repair.compact_duplicate_display import (
     duplicate_display_candidates,
     duplicate_display_feedback,
 )
-from services.compact_plan import evaluate_compact_plan_coverage
-from services.generation_pipeline import (
+from services.generation.generation_pipeline import (
     DesignCompactProcessor,
     DslProcessingContext,
     DslProcessingResult,
@@ -29,7 +29,10 @@ def offline_only(monkeypatch):
         pytest.fail("duplicate display tests must not access network")
 
     monkeypatch.setattr(socket.socket, "connect", forbidden)
-    monkeypatch.setattr("services.generation_pipeline.report_ops_metrics", lambda **_: None)
+    monkeypatch.setattr(
+        "services.generation.generation_pipeline.report_ops_metrics",
+        lambda **_: None,
+    )
     monkeypatch.setattr(get_settings(), "enable_design_compact_deterministic_repair", True)
 
 
@@ -105,7 +108,10 @@ def test_successful_source_never_enters_duplicate_recovery(monkeypatch):
     def forbidden(*_args, **_kwargs):
         pytest.fail("successful source must not produce duplicate candidates")
 
-    monkeypatch.setattr("services.generation_pipeline.duplicate_display_candidates", forbidden)
+    monkeypatch.setattr(
+        "services.generation.generation_pipeline.duplicate_display_candidates",
+        forbidden,
+    )
     assert not DesignCompactProcessor().process(_source(rows), context).errors
 
 

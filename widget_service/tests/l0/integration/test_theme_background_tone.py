@@ -14,11 +14,11 @@ from test_photo_background_fallback import node_by_id
 from test_uniform_photo_eligibility import PATHS, choose, sample
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services import theme_user_preferences as preferences
-from services.protocol_registry import A2UIProtocolRegistry
-from services.validator import ArtifactValidator
+from services.card_validation.validator import ArtifactValidator
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes import theme_user_preferences as preferences
 from theme_preference_samples import preference, reply
 
 TONES = {

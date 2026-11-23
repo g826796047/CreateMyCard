@@ -12,8 +12,11 @@ from services.card_validation.compact_validation.semantic.layout.text_capacity i
     static_plan_capacity_errors,
 )
 from services.card_validation.compact_validation.semantic.static_content import static_fact_coverage
-from services.compact_plan import compact_plan_omitted_facts, parse_compact_plan_call
-from services.generation_content_policy import (
+from services.compact.planning.compact_plan import (
+    compact_plan_omitted_facts,
+    parse_compact_plan_call,
+)
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,

@@ -10,8 +10,8 @@ from api.schemas import CapabilityOverviewRequest
 from app.logger import session_id_context
 from config.config import get_settings
 from models.generation import DeviceContext
-from services.ids_client import IDSClient
-from services.widget_generation_service import WidgetGenerationService
+from services.capabilities.ids_client import IDSClient
+from services.generation.widget_generation_service import WidgetGenerationService
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def remote_ids(monkeypatch, ids_retry_clock):
     response.status_code = 200
     response._content = b'{"nameSpaces": []}'
     request = Mock(return_value=response)
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     return request
 
 

@@ -13,10 +13,10 @@ from test_photo_background_fallback import node_by_id, source
 
 from config.config import get_settings
 from photo_samples.weather import fixture, task
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.protocol_registry import A2UIProtocolRegistry
-from services.validator import ArtifactValidator
+from services.card_validation.validator import ArtifactValidator
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 
 
 @pytest.mark.parametrize("state", ["removed", "disabled", "unregistered"])

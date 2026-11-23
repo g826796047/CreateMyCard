@@ -15,9 +15,8 @@ from core.date_counter import resolve_date_counter
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
 from models.generation import CandidateDataBinding, CountdownPatternPreference
-from services import generation_preflight, post_layout_theme
-from services.artifact_store import ArtifactStore
-from services.countdown_pattern import (
+from services.artifacts.artifact_store import ArtifactStore
+from services.compact.components.countdown_pattern import (
     COUNTDOWN_COMPONENTS,
     COUNTDOWN_LAYOUTS,
     PATTERN_PREFIX,
@@ -26,9 +25,11 @@ from services.countdown_pattern import (
     countdown_prompt,
     paint_pattern,
 )
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.theme_countdown_pattern import countdown_pattern_evidence
-from services.widget_generation_service import WidgetGenerationService
+from services.generation import generation_preflight
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.themes import post_layout_theme
+from services.themes.theme_countdown_pattern import countdown_pattern_evidence
 
 ROOT = "/data/customCounter"
 
@@ -345,7 +346,7 @@ def test_component_structure_and_binding_mismatches_are_rejected(size, kind, mut
 
 @pytest.mark.parametrize("component_type", ["SCountdown", "WCountdown"])
 def test_specialized_display_cannot_escape_pattern_layout(component_type):
-    from services.compact_dsl_a2ui_converter import (
+    from services.compact.compact_dsl_a2ui_converter import (
         CompactDslConversionError,
         convert_compact_dsl_to_a2ui,
     )

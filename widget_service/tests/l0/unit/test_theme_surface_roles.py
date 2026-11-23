@@ -5,10 +5,13 @@ import re
 
 import pytest
 
-from services import post_layout_theme as themes
-from services.compact_component_runtime import component_visual_recipe, load_visual_recipe_contract
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.theme_style_roles import component_roles, layout_phase, resolve_role, role
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.components.compact_component_runtime import (
+    component_visual_recipe,
+    load_visual_recipe_contract,
+)
+from services.themes import post_layout_theme as themes
+from services.themes.theme_style_roles import component_roles, layout_phase, resolve_role, role
 
 
 def surface_source(size):

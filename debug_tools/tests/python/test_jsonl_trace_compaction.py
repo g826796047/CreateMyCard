@@ -8,8 +8,8 @@ from contextvars import copy_context
 
 import pytest
 from debug_tools.batch_testing.trace_parser import TraceImporter
-from services.compact_dsl_a2ui_converter import _strip_optional_genui_fence
-from services.generation_trace_recorder import GenerationTraceRecorder, trace_span
+from services.compact.compact_dsl_a2ui_converter import _strip_optional_genui_fence
+from services.observability.generation_trace_recorder import GenerationTraceRecorder, trace_span
 
 UID = "batch-1234abcd-00001-000"
 VALID = '["root","Column",{},[]]'

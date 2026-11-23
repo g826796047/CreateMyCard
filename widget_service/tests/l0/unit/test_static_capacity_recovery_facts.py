@@ -10,12 +10,12 @@ from services.card_validation.compact_validation.semantic.static_content import 
     static_fact_coverage,
     static_group_errors,
 )
-from services.compact_plan import (
+from services.compact.planning.compact_plan import (
     compact_plan_recovery_facts,
     compact_recovery_plan_errors,
     parse_compact_plan_call,
 )
-from services.generation_content_policy import (
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,

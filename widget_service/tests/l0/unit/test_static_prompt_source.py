@@ -8,11 +8,14 @@ from pathlib import Path
 import pytest
 
 from models.generation import TaskSpec
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.compact_prompt_loader import read_static_prompt
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-from services.prompt_builder import PromptBuilder
-from services.static_prompt_source import STATIC_STAGES, _static_prompts
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.compact_prompt_loader import read_static_prompt
+from services.protocols.static_prompt_source import STATIC_STAGES, _static_prompts
 
 SOURCE = (
     Path(__file__).resolve().parents[3]

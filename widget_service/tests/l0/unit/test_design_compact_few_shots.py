@@ -11,12 +11,12 @@ import pytest
 from config.config import get_settings
 from services.card_validation import ValidationOptions, validate_card, validate_compact_dsl
 from services.card_validation.contrast_validator import _composite, _contrast, _rgba
-from services.compact_component_runtime import load_visual_recipe_contract
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.compact_prompt_loader import assemble_prompts
-from services.compact_semantic_layout import SEMANTIC_LAYOUT_TYPES
-from services.prompt_builder import PromptBuilder
-from services.protocol_registry import A2UIProtocolRegistry
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.components.compact_component_runtime import load_visual_recipe_contract
+from services.compact.layout.compact_semantic_layout import SEMANTIC_LAYOUT_TYPES
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.compact_prompt_loader import assemble_prompts
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 
 PROMPT_SOURCE = (
     Path(__file__).resolve().parents[3]
@@ -212,7 +212,7 @@ def test_few_shot_validates_and_converts(
 ) -> None:
     """检查动态路径、事件、布局门禁和高阶组件展开，而非只检查 JSON。"""
     settings = SimpleNamespace(CONFIG={"fusion_ball_min_prd_version": "1.0"})
-    monkeypatch.setattr("services.fusion_ball_expander.get_settings", lambda: settings)
+    monkeypatch.setattr("services.themes.fusion_ball_expander.get_settings", lambda: settings)
     size = task.get("size")
     assert size in {"2x2", "2x4"}, identifier
 

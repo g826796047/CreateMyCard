@@ -11,8 +11,8 @@ from test_uniform_photo_eligibility import (
 )
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 
 BIRDS = "photo-ux-birds-countdown-square"
 WAVE = "photo-ux-digital-wave-wide"

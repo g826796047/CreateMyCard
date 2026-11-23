@@ -6,8 +6,8 @@ import pytest
 from pydantic import ValidationError
 
 from api.schemas import GenerateWidgetCardRequest
-from services.agent_error_view import agent_error_view
-from services.agent_feedback import request_validation_feedback
+from services.requests.agent_error_view import agent_error_view
+from services.requests.agent_feedback import request_validation_feedback
 
 
 @pytest.mark.parametrize("editing", [False, True])
@@ -87,7 +87,7 @@ def test_data_capability_inputs_feedback_preserves_business_parameters():
     ("candidateEvents", "candidateEventCandidates"),
 ])
 def test_registered_alias_preserves_values_and_does_not_apply_inside_arguments(alias, target):
-    from services.agent_error_view import _extra_field_message
+    from services.requests.agent_error_view import _extra_field_message
 
     message = _extra_field_message("/" + alias)
     assert alias in message and target in message
@@ -170,7 +170,7 @@ def test_data_structure_feedback_preserves_input(value, recognized, has_target):
 
 
 def test_data_inside_call_arguments_is_not_a_top_level_alias():
-    from services.agent_error_view import _extra_field_message
+    from services.requests.agent_error_view import _extra_field_message
 
     message = _extra_field_message("/candidateDataBindings/0/arguments/data")
     assert "迁移" not in message
@@ -189,7 +189,7 @@ def test_data_inside_call_arguments_is_not_a_top_level_alias():
 def test_keyword_feedback_is_top_level_only_and_keeps_request(name, target):
     import copy
 
-    from services.agent_error_view import _extra_field_message
+    from services.requests.agent_error_view import _extra_field_message
 
     arguments = {
         "uid": "test", "device": {"romVersion": "7.0"}, "userQuery": "测试",
@@ -225,7 +225,7 @@ def test_keyword_feedback_is_top_level_only_and_keeps_request(name, target):
     ),
 ])
 def test_ambiguous_keyword_and_unrelated_fields_do_not_guess_target(name, targets):
-    from services.agent_error_view import _extra_field_message
+    from services.requests.agent_error_view import _extra_field_message
 
     message = _extra_field_message("/" + name)
     for target in targets:

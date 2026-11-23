@@ -12,7 +12,7 @@ from models.preflight import (
     GenerationPreflightResult,
     PreflightIssue,
 )
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
 from start_websocket_server import app
 
 _FIELDS = {"message", "retryable", "requiredActions", "agentInstruction", "issues"}

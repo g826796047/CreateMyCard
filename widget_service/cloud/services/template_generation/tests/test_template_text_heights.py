@@ -7,7 +7,7 @@ from collections.abc import Iterator
 
 import pytest
 
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
 from services.template_generation.engine.cardplan.models import TemplateNode, TemplateValue
 from services.template_generation.engine.cardplan.preview_dataset import (
     build_template_preview_cases,

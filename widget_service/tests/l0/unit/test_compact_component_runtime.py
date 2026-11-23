@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from services.compact_component_runtime import (
+from services.compact.components.compact_component_runtime import (
     VISUAL_RECIPE_VERSION,
     CompactComponentRuntimeError,
     component_visual_recipe,

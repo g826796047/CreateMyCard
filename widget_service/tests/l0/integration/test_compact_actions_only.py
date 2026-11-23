@@ -6,15 +6,18 @@ import json
 import pytest
 
 from services.card_validation import CompactDslValidationError, validate_card, validate_compact_dsl
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     convert_compact_dsl_to_a2ui,
     expand_compact_semantic_layout,
     parse_compact_dsl_rows,
 )
-from services.compact_layout_runtime import match_compact_layout
-from services.compact_plan import compact_plan_coverage_errors, parse_compact_plan_call
+from services.compact.layout.compact_layout_runtime import match_compact_layout
+from services.compact.planning.compact_plan import (
+    compact_plan_coverage_errors,
+    parse_compact_plan_call,
+)
 
 
 def _task() -> dict:
@@ -166,8 +169,8 @@ async def test_registered_pure_actions_complete_without_quality_repair(monkeypat
     from config.config import get_settings
     from custom.a2ui_model_client import A2UIModelClient
     from models.service import ArtifactSaveResult
-    from services.artifact_store import ArtifactStore
-    from services.widget_generation_service import WidgetGenerationService
+    from services.artifacts.artifact_store import ArtifactStore
+    from services.generation.widget_generation_service import WidgetGenerationService
 
     task = _task()
     candidates = task.get("eventCandidates")

@@ -13,9 +13,9 @@ from test_uniform_photo_eligibility import PATHS, sample
 from test_wide_photo_focus import focus_sample
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.theme_photo_assets import excluded_foreground_assets
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.theme_photo_assets import excluded_foreground_assets
 
 ICON = "resources/base/media/ic_weather_color.svg"
 MONOCHROME = "resources/base/media/ic_weather_monochrome.svg"

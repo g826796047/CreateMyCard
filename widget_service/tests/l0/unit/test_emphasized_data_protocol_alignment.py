@@ -5,13 +5,13 @@ import json
 import pytest
 
 from services.card_validation import ValidationOptions, validate_card
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     _normalize_component,
     convert_compact_dsl_to_a2ui,
 )
-from services.compact_high_level_components import ComponentRow
-from services.post_layout_theme import apply_theme, foreground_signature, presets
-from services.theme_style_roles import layout_phase
+from services.compact.components.compact_high_level_components import ComponentRow
+from services.themes.post_layout_theme import apply_theme, foreground_signature, presets
+from services.themes.theme_style_roles import layout_phase
 
 
 @pytest.mark.parametrize("size", ["2x2", "2x4"])

@@ -16,21 +16,25 @@ from test_countdown_pattern_photos import (
 )
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.content_business import BusinessContext, FinalBusinessContext, VisibleBusinesses
-from services.countdown_pattern import CountdownPattern
-from services.generation_pipeline import DesignCompactProcessor
-from services.protocol_registry import A2UIProtocolRegistry
-from services.theme_content_regions import photo_layout_evidence
-from services.theme_photo_eligibility import fusion_photo_facts
-from services.theme_photo_matching import (
+from services.card_validation.validator import ArtifactValidator
+from services.compact.components.countdown_pattern import CountdownPattern
+from services.generation.generation_pipeline import DesignCompactProcessor
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.content_business import (
+    BusinessContext,
+    FinalBusinessContext,
+    VisibleBusinesses,
+)
+from services.themes.theme_content_regions import photo_layout_evidence
+from services.themes.theme_photo_eligibility import fusion_photo_facts
+from services.themes.theme_photo_matching import (
     PhotoMatchFacts,
     PhotoScopeFacts,
     eligible_photos,
     photo_reason,
 )
-from services.validator import ArtifactValidator
 
 
 def facts_for(size, kind, days=4, relation="还剩", total=6, root=ROOT, mutation=None):

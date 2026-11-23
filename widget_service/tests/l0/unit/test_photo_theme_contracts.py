@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from services import post_layout_theme as themes
-from services.theme_content_regions import button_ids
+from services.themes import post_layout_theme as themes
+from services.themes.theme_content_regions import button_ids
 
 
 def test_current_subject_and_texture_assets_are_active_and_present():

@@ -3,9 +3,9 @@
 import json
 from types import SimpleNamespace
 
-from services import post_layout_theme as themes
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.theme_style_roles import layout_phase
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.themes import post_layout_theme as themes
+from services.themes.theme_style_roles import layout_phase
 
 
 def expanded(rows, task):

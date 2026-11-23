@@ -2,7 +2,7 @@
 
 import re
 
-from services.post_layout_theme_registry import load_theme_registry
+from services.themes.post_layout_theme_registry import load_theme_registry
 
 
 def _has_explicit_color(query: str) -> bool:

@@ -9,7 +9,7 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from models.generation import TaskSpec
-from services.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
 from services.template_generation.engine.advanced.scope_planner import (
     _template_has_satisfiable_variant,
 )

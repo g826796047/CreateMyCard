@@ -345,7 +345,7 @@ def static_display_groups(
     source: str, *, attribute_objects: bool = False
 ) -> tuple[list[StaticDisplayGroup], list[StaticDisplayGroup]]:
     """从可达的语义树读取对象顺序；标题和共享说明不计为正文对象。"""
-    from services.compact_dsl_a2ui_converter import ComponentRow, parse_compact_dsl_rows
+    from services.compact.compact_dsl_a2ui_converter import ComponentRow, parse_compact_dsl_rows
 
     objects: list[StaticDisplayGroup] = []
     shared: list[StaticDisplayGroup] = []

@@ -12,9 +12,8 @@ from test_wide_photo_focus import focus_sample
 
 from config.config import get_settings
 from models.generation import TaskSpec
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.protocol_registry import A2UIProtocolRegistry
+from services.card_validation.validator import ArtifactValidator
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 from services.template_generation.engine.cardplan.compiler import (
     HybridCompilation,
     _expand_health_metric_generic_template,
@@ -32,17 +31,18 @@ from services.template_generation.engine.cardplan.photo_selection import finaliz
 from services.template_generation.engine.cardplan.photo_theme import collect_photo_style_context
 from services.template_generation.engine.cardplan.registry import get_cardplan_registry
 from services.template_generation.engine.tersel_converter import Nested2Node
-from services.theme_photo_eligibility import fusion_photo_facts
-from services.theme_photo_matching import eligible_photos, photo_reason
-from services.theme_photo_processing import (
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.theme_photo_eligibility import fusion_photo_facts
+from services.themes.theme_photo_matching import eligible_photos, photo_reason
+from services.themes.theme_photo_processing import (
     PhotoStyleContext,
     apply_content_palette,
     apply_template_photo,
     register_photo_asset,
     template_foreground,
 )
-from services.theme_style_roles import is_role
-from services.validator import ArtifactValidator
+from services.themes.theme_style_roles import is_role
 
 
 def generic_metric_source(dual, size):

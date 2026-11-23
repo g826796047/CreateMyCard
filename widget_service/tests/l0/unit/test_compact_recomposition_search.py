@@ -6,9 +6,9 @@ from collections.abc import Iterator
 
 import pytest
 
-from services import compact_outer_recomposition as recomposition
 from services.card_validation import CompactDslValidationError
-from services.compact_dsl_a2ui_converter import ComponentRow, DataRow
+from services.compact.compact_dsl_a2ui_converter import ComponentRow, DataRow
+from services.compact.repair import compact_outer_recomposition as recomposition
 
 
 def _leaves(*, with_action: bool = True) -> list[ComponentRow]:

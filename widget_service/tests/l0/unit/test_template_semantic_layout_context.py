@@ -4,13 +4,13 @@ import json
 
 import pytest
 
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     expand_compact_semantic_layout,
     parse_compact_dsl_rows,
 )
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 
 def _source(component_type: str, size: str, semantic: bool, props: dict) -> str:

@@ -11,11 +11,11 @@ from test_uniform_photo_eligibility import ACTION, PATHS, choose, evidence, reje
 
 from config.config import get_settings
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.capability_registry import CapabilityRegistry
-from services.protocol_registry import A2UIProtocolRegistry
-from services.validator import ArtifactValidator
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.card_validation.validator import ArtifactValidator
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 from theme_preference_samples import preference, reply
 
 A19 = "photo-ux-digital-wave-wide"

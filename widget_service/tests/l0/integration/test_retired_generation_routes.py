@@ -9,16 +9,22 @@ from api.schemas import GenerateWidgetCardRequest
 from config.config import Settings, get_settings
 from core.errors import ErrorCode, GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
-from services.artifact_store import ArtifactStore
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_pipeline import (
+from services.artifacts.artifact_store import ArtifactStore
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.editing.widget_edit_utils import (
+    _components,
+    _load_json,
+    _messages,
+    _same,
+    source_digest,
+)
+from services.generation.generation_pipeline import (
     DslProcessingResult,
     DslProcessorKind,
     QualityIssue,
     get_dsl_processor,
 )
-from services.widget_edit_utils import _components, _load_json, _messages, _same, source_digest
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
 
 
 @pytest.fixture

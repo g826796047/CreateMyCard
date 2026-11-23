@@ -23,9 +23,9 @@ from test_wide_photo_focus import focus_sample
 
 from config.config import get_settings
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.theme_photo_processing import deliver_photo_source, template_foreground
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.theme_photo_processing import deliver_photo_source, template_foreground
 from theme_preference_samples import preference, reply
 
 GROUPS = [

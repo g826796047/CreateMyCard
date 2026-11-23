@@ -16,7 +16,7 @@ from services.card_validation.compact_validation.constants import (
 )
 from services.card_validation.compact_validation.schema import _schema_node_at_path, _schema_type
 from services.card_validation.compact_validation.syntax.expressions import _collect_binding_context
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
 )
 

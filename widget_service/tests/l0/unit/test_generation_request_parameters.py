@@ -11,9 +11,9 @@ from api.schemas import (
     GenerateWidgetCardResponse,
     WidgetCardServiceRequest,
 )
-from services.capability_registry import CapabilityRegistry
-from services.generation_preflight import GenerationPreflight, _closed_argument_schema
-from services.widget_generation_service import WidgetGenerationService
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.generation.generation_preflight import GenerationPreflight, _closed_argument_schema
+from services.generation.widget_generation_service import WidgetGenerationService
 from start_websocket_server import app
 from ws_response_parser import parse_legacy_stream_content
 
@@ -273,7 +273,7 @@ def test_unknown_data_argument_reports_exact_location(name):
             "candidateOutputFields": ["/eventCount"],
         }],
     )
-    from services.edit_request_normalizer import EditRequestNormalizer
+    from services.requests.edit_request_normalizer import EditRequestNormalizer
 
     registry = CapabilityRegistry(version="app-11.7.7.300_rom-7.0")
     result = GenerationPreflight(registry).run(EditRequestNormalizer.normalize_create(request))

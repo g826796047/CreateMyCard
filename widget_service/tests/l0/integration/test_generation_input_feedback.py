@@ -9,15 +9,15 @@ from api.schemas import GenerateWidgetCardRequest
 from config.config import get_settings
 from core.errors import ErrorCode
 from custom.a2ui_model_client import A2UIModelClient
-from services.artifact_store import ArtifactStore
-from services.compact_dsl_interface_retry import run_compact_dsl_with_retry
-from services.generation_input_feedback import (
+from services.artifacts.artifact_store import ArtifactStore
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.requests.compact_dsl_interface_retry import run_compact_dsl_with_retry
+from services.requests.generation_input_feedback import (
     MissingDataInputError,
     MissingDataReportValidationError,
     missing_data_tool,
     parse_missing_data_report,
 )
-from services.widget_generation_service import WidgetGenerationService
 
 QUERY = "做一张卡片显示手机当前电量与充电状态"
 QUOTE = "手机当前电量与充电状态"
@@ -208,8 +208,8 @@ async def test_invalid_report_consumes_plan_budget_without_input_retry_authoriza
 
 @pytest.mark.parametrize("action_only", [False, True])
 def test_empty_data_accepts_static_and_action_plans_without_missing_input_error(action_only):
-    from services.compact_plan import parse_compact_plan_call
-    from services.generation_content_policy import (
+    from services.compact.planning.compact_plan import parse_compact_plan_call
+    from services.generation.generation_content_policy import (
         content_policy_scope,
         resolve_content_policy,
     )

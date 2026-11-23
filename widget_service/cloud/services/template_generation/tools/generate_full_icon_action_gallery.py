@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from models.generation import TaskSpec
-from services.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
 from services.template_generation.engine.cardplan.compiler import (
     _expand_health_metric_generic_template,
     _instantiate_blueprint,

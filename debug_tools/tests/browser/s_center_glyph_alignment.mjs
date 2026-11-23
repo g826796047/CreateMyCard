@@ -20,7 +20,7 @@ const python = String.raw`
 import json, sys
 from pathlib import Path
 sys.path.insert(0, str(Path('widget_service/cloud').resolve()))
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
 samples=[]
 for label, value, unit, subtitle in [
     ('学校秋季运动会开幕倒计时',58,'天','距12月26日'),

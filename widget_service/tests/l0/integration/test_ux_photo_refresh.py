@@ -6,8 +6,8 @@ import pytest
 from test_uniform_photo_eligibility import PATHS, choose, photo, rejection, sample
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 from theme_preference_samples import preference, reply
 
 BIRDS = "photo-ux-birds-countdown-square"

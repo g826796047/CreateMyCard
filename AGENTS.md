@@ -58,7 +58,7 @@ Ruff 和企业 CodeCheck 的执行结果分别报告。
 - `skills/harmony-card-generation-online/`：按照目标链路设计的在线云侧编排 Skill，需随方案持续优化。
 - `skills/harmony-card-generation-offline/`：离线直出 Skill，用于不走云侧微服务时由主 Agent 端到端生成、修复、评审或解释本地 `genui` 与 `cardspec` 产物；只能作为兜底、调试和历史视觉参考，不作为在线链路协议依据。
 - `widget_service/cloud/data/protocol_profiles/design-compact-dsl-fusion/`：Fusion 提示词源文件与运行时布局合同，需与云侧方案和实现同步维护。
-- `widget_service/cloud/services/compact_*.py`：Compact 计划、组合、布局与修复实现；校验逻辑仍按专项方案归入校验模块。
+- `widget_service/cloud/services/compact/`：Compact 计划、组合、布局与修复实现；校验逻辑仍按专项方案归入校验模块。
 - `debug_tools/batch_testing/` 与 `debug_tools/platform/`：批跑后端与调试平台前端；架构和运行口径分别见调试平台技术方案与运行规范。
 - `debug_tools/Datasets/`、`debug_tools/tests/` 与 `widget_service/tests/`：分别存放批跑数据集、调试工具测试和微服务回归测试，按改动影响选择验证范围。
 - `widget_service/cloud/data/capabilities/`：云侧版本化数据、事件与素材能力注册表及版本范围配置；在线链路以此作为能力配置来源。

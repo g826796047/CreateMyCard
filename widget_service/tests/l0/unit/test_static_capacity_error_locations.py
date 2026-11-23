@@ -7,11 +7,14 @@ import socket
 import pytest
 
 from services.card_validation.compact_validation.semantic.layout import text_capacity
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.compact_repair_context import static_component_capacity_contexts
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-from services.static_text_capacity import measure_text, text_spec
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.repair.compact_repair_context import static_component_capacity_contexts
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.compact.static_content.static_text_capacity import measure_text, text_spec
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -140,7 +143,7 @@ def test_stale_numeric_value_and_dynamic_field_do_not_map():
 
 
 def test_other_value_error_during_readout_remeasurement_does_not_map(monkeypatch):
-    from services import static_text_capacity
+    from services.compact.static_content import static_text_capacity
 
     source, plan, issue = numeric_case()
 

@@ -6,9 +6,12 @@ import json
 import pytest
 
 from models.generation import TaskSpec
-from services.compact_repair_context import joint_repair_contract, repair_topology_fingerprint
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.prompt_builder import PromptBuilder
+from services.compact.repair.compact_repair_context import (
+    joint_repair_contract,
+    repair_topology_fingerprint,
+)
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation.prompt_builder import PromptBuilder
 
 
 def _source(identifier: str = "body", columns: int = 1) -> str:

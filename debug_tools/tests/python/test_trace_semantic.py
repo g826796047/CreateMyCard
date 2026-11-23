@@ -11,7 +11,7 @@ from debug_tools.batch_testing.runner import BatchRunManager
 from debug_tools.batch_testing.trace_parser import TraceImporter
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from services.generation_trace_recorder import (
+from services.observability.generation_trace_recorder import (
     GenerationTraceRecorder,
     trace_flow,
     trace_phase,

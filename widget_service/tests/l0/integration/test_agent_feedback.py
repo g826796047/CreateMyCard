@@ -8,8 +8,8 @@ from pydantic import ValidationError
 
 from api.routes import _error_details, _error_explanation
 from api.schemas import GenerateWidgetCardRequest, GenerateWidgetCardResponse
-from services.agent_feedback import request_validation_feedback
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.requests.agent_feedback import request_validation_feedback
 from start_websocket_server import app
 from ws_response_parser import parse_legacy_stream_content
 
@@ -449,7 +449,7 @@ def test_business_object_wrappers_are_correctable_without_rebuilding_transport(w
 
 
 def test_logged_envelope_errors_guide_agent_to_resubmit_business_object(monkeypatch):
-    from services.capability_registry import CapabilityRegistry
+    from services.capabilities.capability_registry import CapabilityRegistry
 
     calls = []
 
@@ -641,7 +641,7 @@ def test_stringified_request_reports_confirmed_inner_issues_without_trace(monkey
 def test_model_recovery_exhaustion_preserves_diagnosis_and_does_not_authorize_retry(monkeypatch):
     from api import routes
     from config.config import get_settings
-    from services.compact_dsl_argument_repair import CompactDslArgumentRepairExhaustedError
+    from services.requests.compact_dsl_argument_repair import CompactDslArgumentRepairExhaustedError
 
     diagnostic = {
         "stage": "requestValidation",
@@ -684,9 +684,9 @@ def test_model_recovery_exhaustion_preserves_diagnosis_and_does_not_authorize_re
 
 def test_preflight_keeps_precise_constraint_and_points_to_agent_business_object():
     from models.preflight import GenerationPreflightError
-    from services.capability_registry import CapabilityRegistry
-    from services.edit_request_normalizer import EditRequestNormalizer
-    from services.generation_preflight import GenerationPreflight
+    from services.capabilities.capability_registry import CapabilityRegistry
+    from services.generation.generation_preflight import GenerationPreflight
+    from services.requests.edit_request_normalizer import EditRequestNormalizer
 
     request = GenerateWidgetCardRequest(
         **_arguments(),

@@ -3,7 +3,7 @@
 import json
 
 from services.card_validation import validate_card
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
 
 
 def _compact_source() -> str:

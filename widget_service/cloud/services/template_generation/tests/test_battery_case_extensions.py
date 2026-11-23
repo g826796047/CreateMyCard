@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 
 from models.generation import EventAction
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 from services.template_generation.controls import TemplateControls
 from services.template_generation.engine import pipeline
 from services.template_generation.engine.advanced.scope_planner import TemplateRouteNotApplicable

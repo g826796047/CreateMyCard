@@ -44,16 +44,16 @@ generate_widget_card_ws
 
 主要代码位置：
 
-- 路由入口：`../widget_service/cloud/api/routes.py`
-- 请求模型：`../widget_service/cloud/api/schemas.py`
-- 生成编排：`../widget_service/cloud/services/widget_generation_service.py`
-- CardSpec：`../widget_service/cloud/services/card_spec_builder.py`
-- TaskSpec：`../widget_service/cloud/services/task_spec_builder.py`
-- Prompt：`../widget_service/cloud/services/prompt_builder.py`
-- 模型客户端：`../widget_service/cloud/custom/a2ui_model_client.py`
-- DSL Processor：`../widget_service/cloud/services/generation_pipeline.py`
-- Artifact 校验：`../widget_service/cloud/services/validator.py`
-- Artifact 保存：`../widget_service/cloud/services/artifact_store.py`
+- 路由入口：`../cloud/api/routes.py`
+- 请求模型：`../cloud/api/schemas.py`
+- 生成编排：`../cloud/services/generation/widget_generation_service.py`
+- CardSpec：`../cloud/services/generation/card_spec_builder.py`
+- TaskSpec：`../cloud/services/generation/task_spec_builder.py`
+- Prompt：`../cloud/services/generation/prompt_builder.py`
+- 模型客户端：`../cloud/custom/a2ui_model_client.py`
+- DSL Processor：`../cloud/services/generation/generation_pipeline.py`
+- Artifact 校验：`../cloud/services/card_validation/validator.py`
+- Artifact 保存：`../cloud/services/artifacts/artifact_store.py`
 
 ## 3. WebSocket 原始请求
 

@@ -6,11 +6,11 @@ from typing import Any
 
 import pytest
 
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.compact_high_level_components import CompactDslConversionError
-from services.layout_theme_contract import layout_only_prompt, strip_source_colors
-from services.post_layout_theme import apply_theme, foreground_signature, presets
-from services.theme_style_roles import layout_phase, native_asset
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.components.compact_high_level_components import CompactDslConversionError
+from services.themes.layout_theme_contract import layout_only_prompt, strip_source_colors
+from services.themes.post_layout_theme import apply_theme, foreground_signature, presets
+from services.themes.theme_style_roles import layout_phase, native_asset
 
 REGISTRY = (
     Path(__file__).resolve().parents[3]

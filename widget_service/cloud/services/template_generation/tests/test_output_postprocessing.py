@@ -8,8 +8,8 @@ import pytest
 
 from config.config import get_settings
 from models.generation import CandidateDataBinding
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.protocol_registry import A2UIProtocolRegistry
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 from services.template_generation.engine.cardplan import preview_dataset
 from services.template_generation.engine.cardplan.compiler import _normalize_template_asset_params
 from services.template_generation.engine.cardplan.registry import CardPlanRegistry

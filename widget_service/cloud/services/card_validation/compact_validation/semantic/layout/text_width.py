@@ -11,13 +11,13 @@ from services.card_validation.compact_validation.text import (
     _non_negative_number,
     _uses_visual_recipe_part,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.compact_region_layout import reference_region_boxes
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.layout.compact_region_layout import reference_region_boxes
 
 
 def _sample_hides_text(value: Any, task_spec: dict[str, Any]) -> bool:
     """仅识别静态 none 或已知字符串样例的相等条件，未知状态继续检查宽度。"""
-    from services.compact_composition_planner import _schema_value
+    from services.compact.planning.compact_composition_planner import _schema_value
 
     if value == "none":
         return True
@@ -55,8 +55,8 @@ def _collect_text_width_budget_errors(
     warnings: list[str] | None = None,
 ) -> None:
     """检查明确的文字容量；自然宽度只用已知祖先内宽作上界。"""
-    from services.compact_composition_context import small_card_display_text
-    from services.compact_composition_planner import _wrapped_lines
+    from services.compact.planning.compact_composition_context import small_card_display_text
+    from services.compact.planning.compact_composition_planner import _wrapped_lines
 
     size = card_spec.get("suggestSize") or task_spec.get("size")
     if size not in {"2x2", "2x4"}:
@@ -167,15 +167,15 @@ def _collect_text_width_budget_errors(
         # 普通文字保持原保守估算；仅固定强调主文字复用规划压力，不冒充端侧测量。
         required = sum(font * (0.5 if character.isascii() else 1) for character in text)
         if _uses_visual_recipe_part(row, "EmphasisText.main"):
-            from services.compact_composition_planner import _text_width
+            from services.compact.planning.compact_composition_planner import _text_width
 
             required = _text_width(text, font)
-        from services.generation_content_policy import current_content_policy
+        from services.generation.generation_content_policy import current_content_policy
 
         marker = props.get("_visualRecipe")
         if current_content_policy().is_static and isinstance(marker, str):
             if marker.startswith("static-content-v1:"):
-                from services.static_text_capacity import text_width
+                from services.compact.static_content.static_text_capacity import text_width
 
                 required = text_width(text, font)
         if available > 0 and required > available + 1e-7:
@@ -251,8 +251,8 @@ def _collect_title_width_errors(
     warnings: list[str] | None, size: str, profile: dict[str, Any] | None,
 ) -> None:
     """只读实际标题展开；其它组件仍使用原几何检查，避免改变既有预算。"""
-    from services.compact_composition_context import small_card_display_text
-    from services.compact_high_level_components import _convert_single_line_title
+    from services.compact.components.compact_high_level_components import _convert_single_line_title
+    from services.compact.planning.compact_composition_context import small_card_display_text
 
     existing_ids = {row.component_id for row in components}
     nodes = []
@@ -319,7 +319,7 @@ def _has_title_only_number(
     from services.card_validation.compact_validation.syntax.expressions import (
         _collect_binding_context,
     )
-    from services.compact_composition_planner import _schema_value
+    from services.compact.planning.compact_composition_planner import _schema_value
 
     paths: list[str] = []
     _collect_binding_context(title.props.get("title"), "title", paths, [])
@@ -349,7 +349,10 @@ def _compound_duration_label_width_error(
     include_regular_text: bool = False,
 ) -> str | None:
     """带标签的多段时长按完整同行压力核算；未知兄弟宽度不猜测。"""
-    from services.compact_composition_planner import _text_width, is_compound_duration_text
+    from services.compact.planning.compact_composition_planner import (
+        _text_width,
+        is_compound_duration_text,
+    )
 
     if (not include_regular_text and not is_compound_duration_text(text)) or row.props.get(
         "layoutWeight"
@@ -408,8 +411,8 @@ def _collect_numeric_readout_width_errors(
     errors: list[str],
 ) -> None:
     """新数值Row核算数字和单位总宽，复用已知显示值及规划文字压力算法。"""
-    from services.compact_composition_context import small_card_display_text
-    from services.compact_composition_planner import _text_width
+    from services.compact.planning.compact_composition_context import small_card_display_text
+    from services.compact.planning.compact_composition_planner import _text_width
 
     for row in components:
         countdown = _uses_visual_recipe_part(row, "EmphasizedData.countdownRow")

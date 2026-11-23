@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from services.fusion_ball_expander import (
+from services.template_generation.engine.tersel_converter import Nested2Node
+from services.themes.fusion_ball_expander import (
     FUSION_BALL_SIZES,
     FusionBallPalette,
     build_fusion_ball_content_id,
     fusion_ball_layout,
     fusion_ball_relative_size,
 )
-from services.template_generation.engine.tersel_converter import Nested2Node
 
 _ROOT_ID = "root"
 _CONTENT_ROOT_ID = "root_1"

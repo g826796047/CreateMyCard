@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from models.generation import TaskSpec
-from services.capability_registry import CapabilityRegistry
+from services.capabilities.capability_registry import CapabilityRegistry
 from services.template_generation.engine.advanced.content_selectors import (
     project_content_component_facts,
 )

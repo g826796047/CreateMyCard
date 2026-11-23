@@ -18,11 +18,11 @@ from test_wide_photo_focus import focus_sample
 
 from config.config import get_settings
 from models.generation import TaskSpec
-from services import content_business as business
-from services import post_layout_theme as themes
-from services import theme_selection_policy as policy
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.prompt_builder import PromptBuilder
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.generation.prompt_builder import PromptBuilder
+from services.themes import content_business as business
+from services.themes import post_layout_theme as themes
+from services.themes import theme_selection_policy as policy
 from theme_preference_samples import preference, reply
 
 

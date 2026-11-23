@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from services.compact_component_runtime import visual_recipe_part
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.components.compact_component_runtime import visual_recipe_part
 
 
 def _styles(part: str, *, size: str = "2x4") -> dict:

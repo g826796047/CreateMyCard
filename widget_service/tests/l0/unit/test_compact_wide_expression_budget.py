@@ -9,7 +9,7 @@ from services.card_validation.compact_validation.constants import _VISUAL_RECIPE
 from services.card_validation.compact_validation.semantic.layout.text_width import (
     _collect_text_width_budget_errors,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
 
 
 def _errors(content: str, schema: dict, *, width: int = 80, size: str = "2x4") -> list[str]:

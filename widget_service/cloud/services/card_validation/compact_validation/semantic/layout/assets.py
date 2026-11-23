@@ -10,8 +10,8 @@ from services.card_validation.compact_validation.semantic.asset_references impor
     model_asset_references,
     task_asset_candidates,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.theme_style_roles import in_layout_phase
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.themes.theme_style_roles import in_layout_phase
 
 
 def _collect_asset_color_errors(

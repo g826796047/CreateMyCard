@@ -4,7 +4,6 @@ from copy import deepcopy
 
 import pytest
 
-from services.post_layout_theme_registry import registered_themes
 from services.template_generation.engine.cardplan.compiler import (
     _apply_theme_content_color,
     _battery_text,
@@ -20,7 +19,8 @@ from services.template_generation.engine.cardplan.photo_theme import (
 )
 from services.template_generation.engine.cardplan.registry import get_cardplan_registry
 from services.template_generation.engine.tersel_converter import Nested2Node
-from services.theme_photo_processing import apply_content_palette
+from services.themes.post_layout_theme_registry import registered_themes
+from services.themes.theme_photo_processing import apply_content_palette
 
 
 def _photo_nodes(content, photo_id):

@@ -37,7 +37,7 @@
 
 ## 修改与加载
 
-加载器为 `cloud/services/compact_prompt_loader.py`，仅依赖标准库，不依赖服务配置或模型客户端。
+加载器为 `cloud/services/protocols/compact_prompt_loader.py`，仅依赖标准库，不依赖服务配置或模型客户端。
 默认配置与协议注册表共用它；按源目录和请求尺寸缓存提示词包，启动或首次使用时读取文件并校验。
 
 ```text

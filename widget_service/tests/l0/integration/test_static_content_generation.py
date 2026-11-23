@@ -12,13 +12,18 @@ from widget_service.tests.static_title_fixtures import titled_plan, titled_rows
 
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
 from services.card_validation.compact_validation.semantic.static_content import static_group_errors
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     convert_compact_dsl_to_a2ui,
 )
-from services.compact_layout_runtime import allowed_layout_ids
-from services.compact_plan import CompactPlanValidationError, parse_compact_plan_call
-from services.generation_content_policy import (
+from services.compact.layout.compact_layout_runtime import allowed_layout_ids
+from services.compact.planning.compact_plan import (
+    CompactPlanValidationError,
+    parse_compact_plan_call,
+)
+from services.compact.static_content.static_content_context import final_static_display_errors
+from services.compact.static_content.static_text_capacity import measure_text, text_spec
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
@@ -27,8 +32,6 @@ from services.generation_content_policy import (
     isolated_content_request,
     resolve_content_policy,
 )
-from services.static_content_context import final_static_display_errors
-from services.static_text_capacity import measure_text, text_spec
 
 SOURCE_ROOT = (
     Path(__file__).resolve().parents[3]
@@ -450,7 +453,7 @@ def test_all_static_fewshots_convert_validate_and_keep_theme_geometry(size, dsl,
     )
     converted = convert_compact_dsl_to_a2ui(dsl, size=size)
     assert not final_static_display_errors(converted, converted)
-    from services.static_content_context import standard_components
+    from services.compact.static_content.static_content_context import standard_components
 
     for identifier, node in standard_components(converted).items():
         if "__static_" in identifier and node.get("component") == "Text":
@@ -489,8 +492,8 @@ async def test_formal_service_uses_static_plan_and_real_processor(
     from config.config import get_settings
     from core.errors import GenerationStatus
     from custom.a2ui_model_client import A2UIModelClient
-    from services.artifact_store import ArtifactStore
-    from services.widget_generation_service import WidgetGenerationService
+    from services.artifacts.artifact_store import ArtifactStore
+    from services.generation.widget_generation_service import WidgetGenerationService
 
     text_values = []
     groups = []
@@ -593,7 +596,7 @@ def test_existing_action_layout_accepts_static_body_and_preserves_action() -> No
         layout_scope=effective_layout_scope("2x2"),
         enforce_model_component_types=True,
     )
-    from services.compact_plan import compact_plan_coverage_errors
+    from services.compact.planning.compact_plan import compact_plan_coverage_errors
 
     assert not compact_plan_coverage_errors(dsl, value, current_task)
     without_action = dsl.replace(json.dumps(handler, ensure_ascii=False), "{}")
@@ -602,11 +605,11 @@ def test_existing_action_layout_accepts_static_body_and_preserves_action() -> No
 
 @pytest.mark.usefixtures("static_policy")
 def test_minimal_should_drop_keeps_must_in_same_component() -> None:
-    from services.compact_plan import (
+    from services.compact.planning.compact_plan import (
         compact_plan_omitted_facts,
         compact_plan_optional_drop_candidate,
     )
-    from services.compact_repair_strategy import CompactRepairStrategyTracker
+    from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
 
     optional = "完整雨具使用说明" * 30
     accepted = plan([fact("带证件"), fact(optional, priority="should")])
@@ -638,7 +641,7 @@ def test_minimal_should_drop_keeps_must_in_same_component() -> None:
     ],
 )
 def test_static_drop_never_authorizes_protected_or_verbatim(extras) -> None:
-    from services.compact_plan import compact_plan_optional_drop_candidate
+    from services.compact.planning.compact_plan import compact_plan_optional_drop_candidate
 
     assert (
         compact_plan_optional_drop_candidate(
@@ -653,11 +656,11 @@ def test_static_drop_never_authorizes_protected_or_verbatim(extras) -> None:
 
 @pytest.mark.usefixtures("static_policy")
 def test_static_drop_uses_lowest_must_after_should_candidates_are_exhausted() -> None:
-    from services.compact_plan import (
+    from services.compact.planning.compact_plan import (
         compact_plan_omitted_facts,
         compact_plan_optional_drop_candidate,
     )
-    from services.compact_repair_strategy import CompactRepairStrategyTracker
+    from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
 
     extra = "乙场完整入场说明" * 30
     facts = [fact("甲场周六19:30"), fact(extra)]
@@ -702,7 +705,7 @@ def test_static_drop_uses_lowest_must_after_should_candidates_are_exhausted() ->
 
 @pytest.mark.usefixtures("static_policy")
 def test_static_drop_keeps_the_last_object() -> None:
-    from services.compact_plan import compact_plan_optional_drop_candidate
+    from services.compact.planning.compact_plan import compact_plan_optional_drop_candidate
 
     accepted = plan([fact("甲场周六19:30")])
     dsl = source("SingleLineList", {"items": [{"text": "甲场", "assist": "周六19:30"}]})
@@ -748,10 +751,10 @@ def test_final_theme_audit_rejects_changed_or_hidden_content(mutation) -> None:
 @pytest.mark.usefixtures("static_policy")
 @pytest.mark.parametrize("family", ["blue", "purple", "warm"])
 def test_real_gradient_theme_keeps_complete_static_content(family) -> None:
-    from services.post_layout_theme import apply_theme
-    from services.post_layout_theme_registry import fallback_theme
-    from services.theme_selection_policy import fusion_candidate_gate
-    from services.theme_style_roles import layout_phase
+    from services.themes.post_layout_theme import apply_theme
+    from services.themes.post_layout_theme_registry import fallback_theme
+    from services.themes.theme_selection_policy import fusion_candidate_gate
+    from services.themes.theme_style_roles import layout_phase
 
     dsl = source("SingleLineList", {"items": [
         {"text": "出发前", "assist": "带证件"}, {"text": "遇雨", "assist": "带雨伞"},
@@ -784,7 +787,7 @@ def test_static_component_shape_does_not_allow_dynamic_or_free_geometry(change) 
 
 @pytest.mark.usefixtures("static_policy")
 def test_missing_static_plan_context_cannot_skip_required_validation() -> None:
-    from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+    from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
     context = DslProcessingContext(
         size="2x2",
@@ -804,7 +807,7 @@ def test_missing_static_plan_context_cannot_skip_required_validation() -> None:
 
 @pytest.mark.usefixtures("static_policy")
 def test_crlf_quotes_keep_offsets_into_original_source() -> None:
-    from services.static_content_context import StaticContentContext
+    from services.compact.static_content.static_content_context import StaticContentContext
 
     original = "说明\r\n活动\r\n预计周六"
     accepted = accept(plan([fact("活动\n预计周六", preserveVerbatim=True)]), original)
@@ -841,7 +844,7 @@ def test_complete_multiline_text_fits_without_changing_content(body) -> None:
         layout_scope=effective_layout_scope("2x4"),
         enforce_model_component_types=True,
     )
-    from services.static_content_context import standard_components
+    from services.compact.static_content.static_content_context import standard_components
 
     converted = convert_compact_dsl_to_a2ui(dsl, size="2x4")
     texts = [
@@ -893,7 +896,7 @@ def test_static_capacity_error_keeps_structured_diagnostic_and_guidance() -> Non
 def test_incomplete_static_recipe_is_rejected_before_enabling(
     monkeypatch, tmp_path, section, key
 ) -> None:
-    from services import static_text_capacity as capacity
+    from services.compact.static_content import static_text_capacity as capacity
 
     value = capacity.static_content_contract()
     fields = value.get(section)
@@ -911,7 +914,7 @@ def test_incomplete_static_recipe_is_rejected_before_enabling(
 
 
 def test_empty_static_prompt_does_not_fall_back_to_dynamic_prompt(tmp_path) -> None:
-    from services.compact_prompt_loader import read_static_prompt
+    from services.protocols.compact_prompt_loader import read_static_prompt
 
     root = tmp_path / "source"
     shutil.copytree(SOURCE_ROOT.parent, root)
@@ -947,8 +950,11 @@ def test_old_body_components_cannot_bypass_static_validation(component) -> None:
 @pytest.mark.usefixtures("static_policy")
 @pytest.mark.parametrize("size", ["2x2", "2x4"])
 def test_static_plan_and_runtime_share_restricted_candidates(size) -> None:
-    from services.compact_plan import build_compact_plan_tool
-    from services.generation_content_policy import static_layout_ids, static_model_components
+    from services.compact.planning.compact_plan import build_compact_plan_tool
+    from services.generation.generation_content_policy import (
+        static_layout_ids,
+        static_model_components,
+    )
 
     tool = build_compact_plan_tool(task(size=size))
     function = tool.get("function")
@@ -1088,7 +1094,7 @@ def test_critical_fragment_too_wide_requires_wider_structure() -> None:
 
 @pytest.mark.usefixtures("static_policy")
 def test_comparison_expands_price_as_complete_rendered_line() -> None:
-    from services.static_content_context import standard_components
+    from services.compact.static_content.static_content_context import standard_components
 
     items = [
         {"primaryText": "甲方案 128元/月"},
@@ -1117,7 +1123,7 @@ def test_shared_note_cannot_hide_long_text_or_replace_body_object() -> None:
             {"id": "shared", "kind": "shared", "factIndexes": [1]},
         ],
     )
-    from services.static_content_components import complete_static_text_trial
+    from services.compact.static_content.static_content_components import complete_static_text_trial
 
     with complete_static_text_trial(), pytest.raises(
         CompactDslValidationError, match="COMPACT_STATIC_TEXT_CAPACITY",
@@ -1162,8 +1168,8 @@ async def test_four_short_objects_deliver_as_titled_rows_without_deleting_items(
     from api.schemas import GenerateWidgetCardRequest
     from config.config import get_settings
     from custom.a2ui_model_client import A2UIModelClient
-    from services.artifact_store import ArtifactStore
-    from services.widget_generation_service import WidgetGenerationService
+    from services.artifacts.artifact_store import ArtifactStore
+    from services.generation.widget_generation_service import WidgetGenerationService
 
     names = ["甲演出", "乙演出", "丙演出", "丁演出"]
     facts = [fact(name + "周六") for name in names]
@@ -1284,7 +1290,7 @@ def test_price_labels_and_values_can_be_layered_without_rewriting_readings():
 
 @pytest.mark.usefixtures("static_policy")
 def test_optional_object_between_core_groups_can_be_omitted_and_reported():
-    from services.compact_plan import compact_plan_omitted_facts
+    from services.compact.planning.compact_plan import compact_plan_omitted_facts
 
     value = plan(
         [fact("甲场19:30"), fact("乙场20:00", priority="should"), fact("丙场21:00")],
@@ -1330,7 +1336,7 @@ def test_dsl_cannot_truncate_accepted_core_even_without_keyword_match(text, visi
 @pytest.mark.usefixtures("static_policy")
 @pytest.mark.parametrize("notes", [["仅展示最相关的两场演出"], []])
 def test_plan_selection_notes_survive_and_feed_delivery_feedback(notes):
-    from services.compact_plan import compact_plan_omitted_facts
+    from services.compact.planning.compact_plan import compact_plan_omitted_facts
 
     value = plan([fact("带证件")])
     value["selectionNotes"] = notes
@@ -1344,7 +1350,7 @@ def test_plan_selection_notes_survive_and_feed_delivery_feedback(notes):
 
 @pytest.mark.usefixtures("static_policy")
 def test_comparison_detail_keeps_complete_text_with_registered_multiline_layout():
-    from services.static_content_context import standard_components
+    from services.compact.static_content.static_content_context import standard_components
 
     trailing = "成人票20元儿童需由成人陪同"
     dsl = source("ComparisonGroup", {"items": [
@@ -1361,7 +1367,7 @@ def test_comparison_detail_keeps_complete_text_with_registered_multiline_layout(
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("static_policy")
 async def test_static_theme_rejects_texture_and_uses_light_background():
-    from services.post_layout_theme import select_theme
+    from services.themes.post_layout_theme import select_theme
 
     seen = []
 
@@ -1390,8 +1396,8 @@ async def test_static_content_reduction_is_delivered_as_degraded(monkeypatch, mo
     from api.schemas import GenerateWidgetCardRequest
     from config.config import get_settings
     from custom.a2ui_model_client import A2UIModelClient
-    from services.artifact_store import ArtifactStore
-    from services.widget_generation_service import WidgetGenerationService
+    from services.artifacts.artifact_store import ArtifactStore
+    from services.generation.widget_generation_service import WidgetGenerationService
 
     text = "周末带证件出门顺便去公园散步"
     value = plan([fact(text)])
@@ -1463,7 +1469,7 @@ async def test_static_content_reduction_is_delivered_as_degraded(monkeypatch, mo
 
 @pytest.mark.usefixtures("static_policy")
 def test_capacity_trial_never_selects_or_rewrites_model_facts():
-    from services.static_content_planning import select_static_plan_content
+    from services.compact.static_content.static_content_planning import select_static_plan_content
 
     names = ["甲演唱会长名称", "乙演唱会长名称", "丙演唱会长名称", "丁演唱会长名称"]
     facts = [fact(name + "周六19:30示例体育场") for name in names]
@@ -1488,7 +1494,9 @@ def test_capacity_trial_never_selects_or_rewrites_model_facts():
 @pytest.mark.usefixtures("static_policy")
 @pytest.mark.parametrize("extra", [{}, {"onClick": [{}]}, {"variant": "unknown"}])
 def test_record_table_normalization_preserves_all_text_and_does_not_hide_invalid_props(extra):
-    from services.static_content_planning import normalize_static_record_table
+    from services.compact.static_content.static_content_planning import (
+        normalize_static_record_table,
+    )
 
     items = []
     for name in ("甲", "乙", "丙", "丁"):
@@ -1506,7 +1514,7 @@ def test_record_table_normalization_preserves_all_text_and_does_not_hide_invalid
 
 @pytest.mark.usefixtures("static_policy")
 def test_pre_accept_title_compaction_keeps_protected_and_verbatim_exceptions():
-    from services.static_content_planning import select_static_plan_content
+    from services.compact.static_content.static_content_planning import select_static_plan_content
 
     text = "Charlie Puth Whatever's Clever世界巡演上海站长标题"
     groups = [{"id": "main", "kind": "object", "factIndexes": [0]}]
@@ -1537,7 +1545,7 @@ def test_pre_accept_title_compaction_keeps_protected_and_verbatim_exceptions():
     ],
 )
 def test_critical_readings_preserve_identifiers_and_do_not_join_term_with_rate(text, expected):
-    from services.static_text_capacity import critical_readings
+    from services.compact.static_content.static_text_capacity import critical_readings
 
     assert critical_readings(text) == expected
 
@@ -1587,7 +1595,7 @@ def test_term_and_decimal_rate_can_be_split_into_attribute_label_and_value():
 
 @pytest.mark.usefixtures("static_policy")
 def test_literal_source_ellipsis_is_not_an_actual_reduction():
-    from services.compact_plan import compact_plan_omitted_facts
+    from services.compact.planning.compact_plan import compact_plan_omitted_facts
 
     text = "备忘：看看下一步…"
     value = plan([fact(text)])
@@ -1604,7 +1612,7 @@ def test_literal_source_ellipsis_is_not_an_actual_reduction():
     ],
 )
 def test_related_claims_and_exceptions_are_selected_together(query, texts):
-    from services.static_content_planning import select_static_plan_content
+    from services.compact.static_content.static_content_planning import select_static_plan_content
 
     facts = [fact(text) for text in texts]
     groups = []
@@ -1619,7 +1627,9 @@ def test_related_claims_and_exceptions_are_selected_together(query, texts):
 
 @pytest.mark.usefixtures("static_policy")
 def test_unenumerated_commute_table_preserves_all_facts_and_reports_capacity_feedback():
-    from services.static_content_presentation import trial_static_presentation
+    from services.compact.static_content.static_content_presentation import (
+        trial_static_presentation,
+    )
 
     value = plan(
         [fact("地铁：含步行换乘42分钟，最稳"), fact("驾车：约15.3公里，平峰28分钟，早高峰55分钟")],
@@ -1638,7 +1648,7 @@ def test_unenumerated_commute_table_preserves_all_facts_and_reports_capacity_fee
 
 @pytest.mark.usefixtures("static_policy")
 def test_static_repeated_failure_has_switch_instruction_then_stops_within_budget():
-    from services.compact_repair_strategy import CompactRepairStrategyTracker
+    from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
 
     tracker = CompactRepairStrategyTracker(static_content=True)
     value = plan([fact("带证件")])
@@ -1674,7 +1684,7 @@ def test_same_group_source_can_support_short_label_but_not_another_objects_claim
 
 @pytest.mark.usefixtures("static_policy")
 def test_program_does_not_select_optional_background_on_behalf_of_model():
-    from services.static_content_planning import select_static_plan_content
+    from services.compact.static_content.static_content_planning import select_static_plan_content
 
     texts = ["交强险：法定强制保险", "背景资料" * 40, "车船税：属于税费，不是保险"]
     facts = [fact(texts[0]), fact(texts[1], priority="should"), fact(texts[2])]
@@ -1691,7 +1701,9 @@ def test_program_does_not_select_optional_background_on_behalf_of_model():
 
 @pytest.mark.usefixtures("static_policy")
 def test_explicit_horizontal_comparison_is_not_changed_into_a_list():
-    from services.static_content_presentation import static_presentation_candidates
+    from services.compact.static_content.static_content_presentation import (
+        static_presentation_candidates,
+    )
 
     value = plan(
         [fact("甲：20元"), fact("乙：30元")],
@@ -1709,7 +1721,7 @@ def test_explicit_horizontal_comparison_is_not_changed_into_a_list():
 
 @pytest.mark.parametrize("exception", ["区域B不适用", "赠品不是主套餐", "访客除外", "仅限成年人"])
 def test_relation_detection_is_independent_of_business_names(exception):
-    from services.static_content_planning import select_static_plan_content
+    from services.compact.static_content.static_content_planning import select_static_plan_content
 
     facts = [fact("主要对象与规则"), fact(exception)]
     groups = [
@@ -1734,10 +1746,10 @@ def test_source_normalization_preserves_validation_exception_for_non_text(invali
 
 @pytest.mark.usefixtures("static_policy")
 def test_no_candidate_is_not_a_plan_rejection(monkeypatch):
-    from services.static_content_presentation import StaticPresentationTrial
+    from services.compact.static_content.static_content_presentation import StaticPresentationTrial
 
     monkeypatch.setattr(
-        "services.static_content_presentation.trial_static_presentation",
+        "services.compact.static_content.static_content_presentation.trial_static_presentation",
         lambda *_args: StaticPresentationTrial(None, 3, ("候选字段超限",)),
     )
     value = plan([fact("核心结论与必要条件")])
@@ -1748,7 +1760,7 @@ def test_no_candidate_is_not_a_plan_rejection(monkeypatch):
 
 @pytest.mark.usefixtures("static_policy")
 def test_summary_instructions_reuse_existing_stages_and_keep_semantic_responsibility():
-    from services.compact_prompt_loader import read_static_prompt
+    from services.protocols.compact_prompt_loader import read_static_prompt
 
     plan_prompt = read_static_prompt(SOURCE_ROOT.parent, "plan", "2x2")
     dsl_prompt = read_static_prompt(SOURCE_ROOT.parent, "dsl", "2x2")
@@ -1765,7 +1777,7 @@ def test_summary_instructions_reuse_existing_stages_and_keep_semantic_responsibi
 
 @pytest.mark.usefixtures("static_policy")
 def test_equal_meaning_summary_does_not_trigger_omission_by_source_string_comparison():
-    from services.compact_plan import compact_plan_omitted_facts
+    from services.compact.planning.compact_plan import compact_plan_omitted_facts
 
     reference = "活动安排在周六晚上七点半开始，参加前需要预约"
     text = "周六19:30开始，须预约"
@@ -1816,8 +1828,11 @@ def test_plan_text_can_be_distributed_in_reordered_display_fields_without_semant
 
 @pytest.mark.usefixtures("static_policy")
 def test_plan_budget_is_loaded_from_shared_contract():
-    from services.compact_prompt_loader import read_static_prompt
-    from services.static_text_capacity import static_capacity_prompt, static_content_contract
+    from services.compact.static_content.static_text_capacity import (
+        static_capacity_prompt,
+        static_content_contract,
+    )
+    from services.protocols.compact_prompt_loader import read_static_prompt
 
     prompt = read_static_prompt(SOURCE_ROOT.parent, "plan", "2x2")
     budget = json.loads(prompt.splitlines()[-1])

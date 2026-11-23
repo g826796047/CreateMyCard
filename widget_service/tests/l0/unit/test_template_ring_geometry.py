@@ -9,10 +9,10 @@ from typing import Any
 
 import pytest
 
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
 )
-from services.generation_pipeline import DslProcessorKind
+from services.generation.generation_pipeline import DslProcessorKind
 from services.template_generation.engine.cardplan.compiler import (
     _compile_ux_layout_shell,
     _instantiate_blueprint,

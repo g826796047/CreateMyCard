@@ -11,11 +11,12 @@ from unittest.mock import AsyncMock
 import pytest
 
 from config.config import get_settings
-from services import compact_component_runtime, fusion_ball_expander
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services import theme_selection_policy as policy
-from services.theme_layout_summary import layout_summary
+from services.compact.components import compact_component_runtime
+from services.themes import fusion_ball_expander
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes import theme_selection_policy as policy
+from services.themes.theme_layout_summary import layout_summary
 
 BASELINE = json.loads((Path(__file__).parents[2] / "fixtures/post_layout_theme_v1_outputs.json")
                       .read_text(encoding="utf-8"))
@@ -337,8 +338,8 @@ def test_invalid_model_choice_keeps_original_gradient_fallback(response):
     ("generic", "/data/healthSport/sleepScore", None),
 ])
 def test_business_mapping_reuses_bindings_and_preserves_route_gate(route, path, expected):
-    from services.compact_dsl_a2ui_converter import ComponentRow
-    from services.content_business import BusinessContext
+    from services.compact.compact_dsl_a2ui_converter import ComponentRow
+    from services.themes.content_business import BusinessContext
 
     task = SimpleNamespace(userQuery="睡眠运动天气会议都只是文字", dataModelSchema={})
     context = BusinessContext(layout_route=route)

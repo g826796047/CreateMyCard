@@ -12,8 +12,8 @@ from test_uniform_photo_eligibility import PATHS, choose, photo, rejection, samp
 from test_wide_photo_focus import focus_sample
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 from theme_preference_samples import preference, reply
 
 ICE = "photo-ux-ice-wide"

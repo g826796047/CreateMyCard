@@ -87,17 +87,20 @@ def register_renderer_conversion_routes(app: FastAPI) -> None:
 
     ensure_cloud_import_path()
 
-    from services.compact_dsl_a2ui_converter import (
+    from services.compact.compact_dsl_a2ui_converter import (
         CompactDslConversionError,
         ComponentRow,
         convert_compact_dsl_to_a2ui,
         parse_compact_dsl_rows,
     )
-    from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-    from services.post_layout_theme import apply_theme
-    from services.post_layout_theme_registry import fallback_theme
-    from services.theme_selection_policy import default_palette_family
-    from services.theme_style_roles import layout_phase
+    from services.generation.generation_content_policy import (
+        STATIC_CONTENT_POLICY,
+        content_policy_scope,
+    )
+    from services.themes.post_layout_theme import apply_theme
+    from services.themes.post_layout_theme_registry import fallback_theme
+    from services.themes.theme_selection_policy import default_palette_family
+    from services.themes.theme_style_roles import layout_phase
 
     @app.post("/debug/renderer/convert", response_model=ConvertResponse)
     def convert_for_preview(request: ConvertRequest) -> ConvertResponse:

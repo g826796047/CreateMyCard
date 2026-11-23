@@ -7,12 +7,12 @@ from typing import Any
 import pytest
 
 from models.generation import CandidateDataBinding, TaskSpec
-from services.generation_pipeline import (
+from services.generation.generation_pipeline import (
     DesignCompactProcessor,
     DslProcessingContext,
     DslProcessorKind,
 )
-from services.protocol_registry import A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 from services.template_generation.engine.pipeline import generate_template_a2ui
 from services.template_generation.source_adapter import prepare_template_source_dsl
 

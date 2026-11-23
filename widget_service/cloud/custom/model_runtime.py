@@ -18,7 +18,7 @@ from custom.mep_model_transport import MepModelTransport
 from custom.model_transport import ModelProvider, ModelTransport, ModelTransportError
 from custom.official_http_client import request_official_http
 from models.generation import ModelRequestContext
-from services.generation_trace_recorder import trace_step
+from services.observability.generation_trace_recorder import trace_step
 from utils.card_runtime import report_ops_metrics
 
 _MODULE = "[Model Runtime]"

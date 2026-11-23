@@ -62,7 +62,7 @@ from services.card_validation.compact_validation.semantic.plan_contracts import 
     collect_secondary_body_context_errors,
 )
 from services.card_validation.compact_validation.syntax.expressions import _collect_binding_context
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     DataRow,
@@ -71,8 +71,11 @@ from services.compact_dsl_a2ui_converter import (
     normalize_mixed_font_text_rows,
     parse_compact_dsl_rows,
 )
-from services.compact_layout_runtime import CompactLayoutRuntimeError, match_compact_layout
-from services.compact_whole_card_click import accepted_whole_card_click
+from services.compact.layout.compact_layout_runtime import (
+    CompactLayoutRuntimeError,
+    match_compact_layout,
+)
+from services.compact.layout.compact_whole_card_click import accepted_whole_card_click
 
 from .context import ComponentRows, ValidationContext
 from .diagnostics import DiagnosticCollector
@@ -96,7 +99,7 @@ def validate_compact_dsl(
     skip_static_group_errors: bool = False,
 ) -> CompactDslValidationResult:
     """Validate expressions, first-frame data, and TaskSpec data boundaries."""
-    from services.countdown_pattern import (
+    from services.compact.components.countdown_pattern import (
         check_pattern_binding,
         pattern_from_source,
         pattern_layout,
@@ -111,7 +114,7 @@ def validate_compact_dsl(
         countdown_root = pattern_layout(original_rows)
         if countdown_root is not None:
             check_pattern_binding(pattern_from_source(countdown_root, original_rows), card_spec)
-        from services.generation_content_policy import current_content_policy
+        from services.generation.generation_content_policy import current_content_policy
 
         if current_content_policy().is_static:
             source_components = [row for row in original_rows if isinstance(row, ComponentRow)]
@@ -121,7 +124,7 @@ def validate_compact_dsl(
         rows = parse_compact_dsl_rows(compact_dsl, size=task_spec.get("size"))
     except CompactDslConversionError as exc:
         raise CompactDslValidationError([str(exc)]) from exc
-    from services.compact_semantic_layout import collect_semantic_layout_warnings
+    from services.compact.layout.compact_semantic_layout import collect_semantic_layout_warnings
 
     warnings = list(collect_semantic_layout_warnings(original_rows))
     components = ComponentRows(row for row in rows if isinstance(row, ComponentRow))
@@ -134,7 +137,7 @@ def validate_compact_dsl(
         task_spec=task_spec,
         card_spec=card_spec,
     )
-    from services.compact_dsl_a2ui_converter import expand_compact_semantic_layout
+    from services.compact.compact_dsl_a2ui_converter import expand_compact_semantic_layout
 
     _expanded_source, context.layout_origins = expand_compact_semantic_layout(
         compact_dsl, size=task_spec.get("size"),
@@ -210,7 +213,7 @@ def validate_compact_dsl(
                 combined_errors.append(record)
         raise _validation_error(combined_errors, context, repair_context)
     original_errors = DiagnosticCollector()
-    from services.generation_content_policy import current_content_policy
+    from services.generation.generation_content_policy import current_content_policy
 
     has_static_group_errors = False
     if current_content_policy().is_static and not skip_static_group_errors:

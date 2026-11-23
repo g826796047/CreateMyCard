@@ -20,12 +20,12 @@ from api.schemas import GenerateWidgetCardRequest
 from config.config import get_settings
 from core.errors import ErrorCode, GenerationStatus
 from models.generation import TaskSpec
-from services.prompt_builder import PromptBuilder
-from services.source_artifact_repository import (
+from services.artifacts.source_artifact_repository import (
     SourceArtifactError,
     SourceArtifactRepository,
 )
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.prompt_builder import PromptBuilder
+from services.generation.widget_generation_service import WidgetGenerationService
 from utils.card_runtime import UploadFileOSMS
 
 
@@ -80,7 +80,7 @@ def editable_artifact_storage(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, "enable_widget_edit", True)
     monkeypatch.setattr(settings, "enable_artifact_download_mock", True)
     monkeypatch.setattr(
-        "services.artifact_store.file_obs",
+        "services.artifacts.artifact_store.file_obs",
         UploadFileOSMS(),
     )
     return tmp_path / "mock_obs"
@@ -147,7 +147,7 @@ async def test_source_artifact_remote_mode_uses_shared_download_utility(
 
     monkeypatch.setattr(settings, "enable_artifact_download_mock", False)
     monkeypatch.setattr(
-        "services.source_artifact_repository.download_file",
+        "services.artifacts.source_artifact_repository.download_file",
         fake_download,
     )
 

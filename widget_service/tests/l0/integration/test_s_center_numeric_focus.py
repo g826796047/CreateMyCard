@@ -7,17 +7,17 @@ import pytest
 
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
 from services.card_validation.api import validate_card
-from services.compact_component_runtime import component_visual_recipe
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     convert_compact_dsl_to_a2ui,
 )
-from services.compact_plan import (
+from services.compact.components.compact_component_runtime import component_visual_recipe
+from services.compact.layout.compact_region_layout import reference_region_boxes
+from services.compact.planning.compact_plan import (
     compact_plan_required_route,
     parse_compact_plan_call,
 )
-from services.compact_region_layout import reference_region_boxes
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 
 def _source(props: dict[str, Any]) -> str:

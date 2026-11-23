@@ -9,9 +9,9 @@ from services.card_validation import CompactDslValidationError, validate_compact
 from services.card_validation.compact_validation.semantic.plan_contracts import (
     collect_plan_contract_errors,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow, convert_compact_dsl_to_a2ui
-from services.generation_pipeline import DesignCompactProcessor
-from services.prompt_builder import PromptBuilder
+from services.compact.compact_dsl_a2ui_converter import ComponentRow, convert_compact_dsl_to_a2ui
+from services.generation.generation_pipeline import DesignCompactProcessor
+from services.generation.prompt_builder import PromptBuilder
 
 SVG = "resources/weather.svg"
 COLOR = "#FF112233"

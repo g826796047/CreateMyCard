@@ -13,19 +13,19 @@ from config.config import get_settings
 from custom.a2ui_model_client import A2UIModelClient
 from models.artifact import WidgetArtifact
 from models.generation import TaskSpec
+from services.artifacts.source_artifact_repository import SourceArtifactRepository
 from services.card_validation.compact_validation.repair_guidance import RepairGuidanceContext
-from services.generation_pipeline import (
+from services.card_validation.validator import ArtifactValidator
+from services.generation.generation_pipeline import (
     DslProcessingContext,
     DslProcessingResult,
     DslProcessorKind,
     QualityIssue,
     get_dsl_processor,
 )
-from services.prompt_builder import PromptBuilder
-from services.protocol_registry import A2UIProtocolRegistry
-from services.retry_controller import RetryController
-from services.source_artifact_repository import SourceArtifactRepository
-from services.validator import ArtifactValidator
+from services.generation.prompt_builder import PromptBuilder
+from services.generation.retry_controller import RetryController
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 
 _OUTPUT_SEPARATOR = "==========================="
 _MODEL_FORMAT = "compact-dsl"

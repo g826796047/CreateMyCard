@@ -9,8 +9,8 @@ from typing import Any
 from services.card_validation.compact_validation.diagnostics import CompactDiagnostic, emit_error
 from services.card_validation.compact_validation.schema import _schema_node_at_path, _schema_type
 from services.card_validation.compact_validation.text import _pure_binding_path
-from services.compact_composition_planner import is_compound_duration_text
-from services.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.planning.compact_composition_planner import is_compound_duration_text
 
 _CALENDAR_TEXT = re.compile(
     r"(?:\d{4}[-/.年]\d{1,2}[-/.月]\d{1,2}日?"

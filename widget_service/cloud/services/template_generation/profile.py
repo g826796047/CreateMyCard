@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Any
 
-from services.protocol_registry import A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 
 TERSEL_PROTOCOL_PROFILE_ID = "terse-dsl-nested-2"
 _PROFILES_ROOT = Path(__file__).resolve().parent / "resources" / "protocol_profiles"

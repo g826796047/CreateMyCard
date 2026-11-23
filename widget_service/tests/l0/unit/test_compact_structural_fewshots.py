@@ -8,10 +8,10 @@ import pytest
 from config.config import get_settings
 from models.generation import TaskSpec
 from services.card_validation import ValidationOptions, validate_card, validate_compact_dsl
-from services.compact_date_counter_plan import PRESENTATION
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.prompt_builder import PromptBuilder
-from services.protocol_registry import DESIGN_COMPACT_PROFILE_ID, A2UIProtocolRegistry
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.planning.compact_date_counter_plan import PRESENTATION
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.protocol_registry import DESIGN_COMPACT_PROFILE_ID, A2UIProtocolRegistry
 
 
 @pytest.mark.parametrize("size", ["2x2", "2x4"])

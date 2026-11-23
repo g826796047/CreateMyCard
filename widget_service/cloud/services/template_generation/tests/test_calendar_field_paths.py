@@ -8,7 +8,7 @@ import pytest
 
 from models.capability import DataCapability, Dependencies
 from models.generation import CandidateDataBinding, EventAction, TaskSpec
-from services.task_spec_builder import TaskSpecBuilder
+from services.generation.task_spec_builder import TaskSpecBuilder
 from services.template_generation.controls import TemplateControls
 from services.template_generation.engine import pipeline
 from services.template_generation.engine.advanced.scope_planner import TemplateRouteNotApplicable

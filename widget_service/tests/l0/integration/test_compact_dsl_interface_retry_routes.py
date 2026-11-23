@@ -18,10 +18,10 @@ from api import routes
 from config.config import get_settings
 from core.errors import ErrorCode, GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient, A2UIModelGenerationError
-from services import artifact_store
-from services.artifact_store import ArtifactStore, ArtifactUploadError
-from services.compact_dsl_argument_repair import compact_dsl_argument_issue_tracker
-from services.widget_generation_service import WidgetGenerationService
+from services.artifacts import artifact_store
+from services.artifacts.artifact_store import ArtifactStore, ArtifactUploadError
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.requests.compact_dsl_argument_repair import compact_dsl_argument_issue_tracker
 from utils.card_runtime import UploadFileOSMS
 from ws_response_parser import parse_legacy_stream_content
 

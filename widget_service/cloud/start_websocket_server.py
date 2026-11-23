@@ -13,8 +13,8 @@ from app.logger import logger
 from app.websocket_metrics import report_websocket_metrics, websocket_metrics
 from config.config import get_settings
 from custom.model_runtime import ModelExecutionRuntime
-from services.daily_usage_api import create_daily_usage_limiter
-from services.operational_logging import log_service_fingerprints
+from services.observability.operational_logging import log_service_fingerprints
+from services.usage.daily_usage_api import create_daily_usage_limiter
 
 _MODULE = "[Main]"
 

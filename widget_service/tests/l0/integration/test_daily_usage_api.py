@@ -16,8 +16,8 @@ from test_daily_usage_limiter import NOW
 
 import start_websocket_server
 from config.config import Settings, get_settings
-from services import daily_usage_api
-from services.daily_usage_limiter import DailyUsageLimiter, DailyUsageRecord
+from services.usage import daily_usage_api
+from services.usage.daily_usage_limiter import DailyUsageLimiter, DailyUsageRecord
 
 pytestmark = pytest.mark.usefixtures("daily_usage_auth")
 

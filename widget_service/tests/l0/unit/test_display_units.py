@@ -9,13 +9,13 @@ from models.generation import CandidateDataBinding
 from services.card_validation import validate_card
 from services.card_validation.diagnostics import Diagnostic
 from services.card_validation.display_unit_rules import repair_repeated_display_units
-from services.generation_pipeline import (
+from services.card_validation.validator import ArtifactValidator
+from services.generation.generation_pipeline import (
     DslProcessingContext,
     QualityIssue,
     StandardA2UIProcessor,
 )
-from services.task_spec_builder import TaskSpecBuilder
-from services.validator import ArtifactValidator
+from services.generation.task_spec_builder import TaskSpecBuilder
 
 
 def _capability(unit_included: bool, unit: str = "%") -> DataCapability:

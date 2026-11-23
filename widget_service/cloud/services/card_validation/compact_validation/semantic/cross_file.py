@@ -17,7 +17,7 @@ from services.card_validation.compact_validation.schema import (
     _schema_type,
     _value_matches_schema_type,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     DataRow,
 )
 

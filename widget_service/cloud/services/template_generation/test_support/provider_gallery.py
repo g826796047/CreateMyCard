@@ -26,7 +26,8 @@ from custom.model_runtime import ModelExecutionRuntime
 from models.artifact import WidgetArtifact
 from models.generation import ModelRequestContext
 from models.service import ArtifactSaveResult
-from services.artifact_store import ArtifactStore
+from services.artifacts.artifact_store import ArtifactStore
+from services.generation.widget_generation_service import WidgetGenerationService
 from services.template_generation import facade
 from services.template_generation.controls import TemplateControls, load_template_controls
 from services.template_generation.test_support.gallery_background import check_gallery_background
@@ -39,7 +40,6 @@ from services.template_generation.test_support.gallery_case_contracts import (
     gallery_display_description,
     three_day_weather_content,
 )
-from services.widget_generation_service import WidgetGenerationService
 
 INPUT_SCHEMA_VERSION = "provider-template-gallery-input/4"
 OUTPUT_SCHEMA_VERSION = "provider-template-gallery-output/2"

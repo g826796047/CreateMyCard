@@ -9,10 +9,10 @@ from test_post_layout_sleep_theme import sleep_layout, sleep_task
 from test_uniform_photo_eligibility import PATHS, choose, sample
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services import theme_user_preferences as preferences
-from services.theme_layout_summary import theme_description
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes import theme_user_preferences as preferences
+from services.themes.theme_layout_summary import theme_description
 from theme_preference_samples import preference, reply
 
 

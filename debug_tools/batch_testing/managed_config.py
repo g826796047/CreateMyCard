@@ -320,7 +320,7 @@ def runtime_values(config: Configuration) -> dict[str, Any]:
             from debug_tools.paths import ensure_cloud_import_path
 
             ensure_cloud_import_path()
-            from services.compact_prompt_loader import assemble_prompts
+            from services.protocols.compact_prompt_loader import assemble_prompts
 
             reference = value.removeprefix("@prompt:")
             prompt_dir, separator, prompt_name = reference.partition("#")

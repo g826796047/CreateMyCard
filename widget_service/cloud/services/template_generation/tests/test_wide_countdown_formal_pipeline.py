@@ -9,7 +9,7 @@ from typing import Any
 
 import pytest
 
-from services.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
 from services.template_generation.engine.advanced.ux_mixed_prompt import (
     UxMixedPromptProjection,
     build_ux_mixed_prompt,

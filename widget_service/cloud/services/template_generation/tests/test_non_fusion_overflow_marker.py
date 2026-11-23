@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from models.generation import CandidateDataBinding, TaskSpec
-from services.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
 from services.template_generation.engine.cardplan.compiler import _serialize_node
 from services.template_generation.engine.cardplan.fusion_ball_background import (
     apply_content_safe_inset,

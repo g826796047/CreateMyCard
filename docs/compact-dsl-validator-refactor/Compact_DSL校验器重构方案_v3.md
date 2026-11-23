@@ -909,11 +909,11 @@ BASE-02 至 BASE-04 分别保留结构冲突、按旧建议修复后出现新错
 | `widget_service/cloud/services/card_validation/compact_dsl_validator.py` | 缩减为兼容入口 |
 | `widget_service/cloud/services/card_validation/compact_validation/` | 承载分类规则、上下文、诊断及 repair_guidance.py 简单建议接口 |
 | `widget_service/cloud/data/validator_rules/compact/repair_hints.json` | 存放具体规则码到静态默认建议的映射 |
-| `widget_service/cloud/services/generation_pipeline.py` | 保存文本来源与可选建议上下文，将诊断适配到现有质量问题结构 |
-| `widget_service/cloud/services/widget_generation_service.py` | 按专用函数实际需要传递已知环境，传递原文诊断并验证业务响应和保存分支兼容 |
+| `widget_service/cloud/services/generation/generation_pipeline.py` | 保存文本来源与可选建议上下文，将诊断适配到现有质量问题结构 |
+| `widget_service/cloud/services/generation/widget_generation_service.py` | 按专用函数实际需要传递已知环境，传递原文诊断并验证业务响应和保存分支兼容 |
 | `widget_service/cloud/repair_compact_dsl.py` | 适配独立修复入口，只注入可验证信息，保持原文和错误数量对应 |
-| `widget_service/cloud/services/prompt_builder.py` | 为模型请求创建副本，统一格式化 Compact 错误说明，保留其他质量问题的载荷 |
-| `widget_service/cloud/services/artifact_store.py` | 修复记录类型标注允许嵌套诊断，序列化及既有字段保持不变 |
+| `widget_service/cloud/services/generation/prompt_builder.py` | 为模型请求创建副本，统一格式化 Compact 错误说明，保留其他质量问题的载荷 |
+| `widget_service/cloud/services/artifacts/artifact_store.py` | 修复记录类型标注允许嵌套诊断，序列化及既有字段保持不变 |
 | `widget_service/cloud/data/protocol_profiles/design-compact-dsl/REPAIR_SYSTEM_PROMPT.md` | 说明如何读取 Compact 分段错误说明，同时保留标准产物校验结构化字段的解释 |
 | `widget_service/tests/` 中相关测试 | 覆盖行为等价、文案解耦、建议接口及修复链路 |
 | 相关模板测试目录 | 验证模板跳过逻辑和已有调用兼容性 |

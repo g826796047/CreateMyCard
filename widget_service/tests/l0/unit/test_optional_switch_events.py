@@ -10,15 +10,18 @@ from jsonschema import Draft202012Validator
 
 from api.schemas import CandidateEventCandidate, GenerateWidgetCardRequest
 from models.capability import EventCapability
-from services.capability_registry import CapabilityRegistry
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.capabilities.event_matching import event_handlers_match
 from services.card_validation import validate_card
-from services.compact_dsl_a2ui_converter import parse_compact_dsl_rows
-from services.compact_high_level_components import ComponentRow
-from services.compact_plan import compact_plan_coverage_errors, parse_compact_plan_call
-from services.event_matching import event_handlers_match
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.generation_preflight import GenerationPreflight
-from services.protocol_registry import A2UIProtocolRegistry
+from services.compact.compact_dsl_a2ui_converter import parse_compact_dsl_rows
+from services.compact.components.compact_high_level_components import ComponentRow
+from services.compact.planning.compact_plan import (
+    compact_plan_coverage_errors,
+    parse_compact_plan_call,
+)
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.generation_preflight import GenerationPreflight
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 from services.template_generation.engine.cardplan.action_labels import parameter_action_label
 
 _ROOT = Path(__file__).resolve().parents[4]
@@ -329,8 +332,8 @@ async def test_registered_optional_switch_completes_service_without_repair(
     from config.config import get_settings
     from custom.a2ui_model_client import A2UIModelClient
     from models.service import ArtifactSaveResult
-    from services.artifact_store import ArtifactStore
-    from services.widget_generation_service import WidgetGenerationService
+    from services.artifacts.artifact_store import ArtifactStore
+    from services.generation.widget_generation_service import WidgetGenerationService
 
     request = _request(event_id, _handler(registry, event_id))
     flashlight = registry.get_event_capability("event.openFlashlight")

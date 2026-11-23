@@ -15,18 +15,18 @@ from custom.a2ui_model_client import A2UIModelClient
 from custom.model_runtime import ModelExecutionRuntime
 from custom.model_transport import ModelTransportError
 from custom.unified_model_client import UnifiedModelClient
-from services import artifact_store
-from services.artifact_store import ArtifactStore, ArtifactUploadError
-from services.compact_dsl_a2ui_converter import _strip_optional_genui_fence
-from services.compact_dsl_interface_retry import run_compact_dsl_with_retry
-from services.generation_pipeline import (
+from services.artifacts import artifact_store
+from services.artifacts.artifact_store import ArtifactStore, ArtifactUploadError
+from services.compact.compact_dsl_a2ui_converter import _strip_optional_genui_fence
+from services.generation.generation_pipeline import (
     DslProcessingResult,
     DslProcessorKind,
     QualityIssue,
     _capture_processing_result,
     get_dsl_processor,
 )
-from services.generation_trace_recorder import (
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.observability.generation_trace_recorder import (
     GenerationTraceRecorder,
     TraceRecord,
     TraceSpan,
@@ -34,7 +34,7 @@ from services.generation_trace_recorder import (
     trace_record,
     trace_span,
 )
-from services.widget_generation_service import WidgetGenerationService
+from services.requests.compact_dsl_interface_retry import run_compact_dsl_with_retry
 
 _UID = "create-ABCDEFGH-00001-002"
 

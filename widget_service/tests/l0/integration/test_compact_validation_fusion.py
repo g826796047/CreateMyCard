@@ -21,11 +21,11 @@ from services.card_validation.compact_validation.semantic.display import (
     _collect_progress_readout_object_errors,
 )
 from services.card_validation.compact_validation.source_locations import SourceLocations
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.compact_layout_runtime import CompactLayoutRuntimeError
-from services.compact_plan import CompactPlanCoverageResult
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.prompt_builder import PromptBuilder
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.layout.compact_layout_runtime import CompactLayoutRuntimeError
+from services.compact.planning.compact_plan import CompactPlanCoverageResult
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.prompt_builder import PromptBuilder
 
 INVALID = "\n".join(['["root","Column",{},["value"]]', '["value","Text",{"content":"body"}]'])
 TALL = "\n".join(
@@ -342,7 +342,7 @@ def test_progress_and_readout_object_error_is_structured(with_hint: bool) -> Non
 
 
 def test_plan_and_compact_errors_keep_distinct_codes(monkeypatch: pytest.MonkeyPatch) -> None:
-    from services import generation_pipeline
+    from services.generation import generation_pipeline
 
     def coverage(*args: object, **kwargs: object) -> CompactPlanCoverageResult:
         assert kwargs.get("allowed_omitted_fact_indexes") == (0,)
@@ -381,7 +381,7 @@ def test_plan_and_compact_errors_keep_distinct_codes(monkeypatch: pytest.MonkeyP
 def test_duplicate_plan_fact_context_reaches_repair_issue(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from services import generation_pipeline
+    from services.generation import generation_pipeline
 
     duplicate_fact = {
         "requirement": "最高心率",

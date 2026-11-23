@@ -6,13 +6,16 @@ import json
 import pytest
 
 from services import card_validation
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-from services.static_content_components import complete_static_text_trial
-from services.static_content_planning import select_static_plan_content
-from services.static_content_presentation import (
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.static_content.static_content_components import complete_static_text_trial
+from services.compact.static_content.static_content_planning import select_static_plan_content
+from services.compact.static_content.static_content_presentation import (
     static_presentation_candidates,
     trial_static_presentation,
+)
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
 )
 
 

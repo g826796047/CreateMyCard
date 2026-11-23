@@ -21,13 +21,13 @@ from debug_tools.end_to_end_debug.backend.debug_agent.upstream_ws_client import 
 from debug_tools.postprocess_plugins.data_analysis.metrics import aggregate, analyze_request
 from jsonschema import Draft202012Validator
 from pydantic import BaseModel, Field
-from services import post_layout_theme
-from services.generation_trace_recorder import (
+from services.observability.generation_trace_recorder import (
     GenerationTraceRecorder,
     trace_flow,
     trace_increment_attempt,
     trace_phase,
 )
+from services.themes import post_layout_theme
 
 UID = "batch-1234abcd-00001-000"
 
@@ -263,8 +263,8 @@ async def test_real_fusion_pipeline_produces_importable_theme_trace(tmp_path, mo
     from api.schemas import GenerateWidgetCardRequest
     from config.config import get_settings
     from custom.a2ui_model_client import A2UIModelClient
-    from services.artifact_store import ArtifactStore
-    from services.widget_generation_service import WidgetGenerationService
+    from services.artifacts.artifact_store import ArtifactStore
+    from services.generation.widget_generation_service import WidgetGenerationService
 
     settings = get_settings()
     monkeypatch.setattr(settings, "enable_static_content_generation_policy", False)

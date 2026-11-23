@@ -3,7 +3,7 @@
 import json
 from types import SimpleNamespace
 
-from services import post_layout_theme_registry as registry
+from services.themes import post_layout_theme_registry as registry
 
 PHOTO_ID = "photo-ux-clouds-weather-square"
 WEATHER_PATH = "/data/weather/current/condition"

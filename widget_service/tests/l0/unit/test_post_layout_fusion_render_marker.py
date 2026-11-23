@@ -5,9 +5,9 @@ import copy
 import pytest
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services.fusion_ball_expander import build_fusion_ball_content_id
-from services.theme_style_roles import role
+from services.themes import post_layout_theme as themes
+from services.themes.fusion_ball_expander import build_fusion_ball_content_id
+from services.themes.theme_style_roles import role
 
 FOREGROUND_ID = build_fusion_ball_content_id("root")
 TASK = {"size": "2x2", "appVersion": "99.0.0", "userQuery": "Sleep"}

@@ -12,18 +12,18 @@ from config.config import get_settings
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
 from models.generation import CompactDslRecoveryFact, CompactDslRetryContext, TaskSpec
-from services.artifact_store import ArtifactStore
-from services.compact_plan import compact_recovery_plan_errors
-from services.generation_content_policy import (
+from services.artifacts.artifact_store import ArtifactStore
+from services.compact.planning.compact_plan import compact_recovery_plan_errors
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
 )
-from services.prompt_builder import (
+from services.generation.prompt_builder import (
     _CAPACITY_RECOVERY_PLAN_INSTRUCTION,
     PromptBuilder,
 )
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
 
 
 @pytest.fixture(autouse=True)

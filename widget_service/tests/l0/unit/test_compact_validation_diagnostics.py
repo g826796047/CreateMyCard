@@ -33,13 +33,13 @@ from services.card_validation.compact_validation.repair_guidance import (
     validate_builders,
 )
 from services.card_validation.compact_validation.source_locations import SourceLocations
-from services.compact_dsl_a2ui_converter import ComponentRow, DataRow
-from services.generation_pipeline import (
+from services.compact.compact_dsl_a2ui_converter import ComponentRow, DataRow
+from services.generation.generation_pipeline import (
     DesignCompactProcessor,
     DslProcessingContext,
     QualityIssue,
 )
-from services.prompt_builder import PromptBuilder
+from services.generation.prompt_builder import PromptBuilder
 
 
 def _diagnostic(**changes: Any) -> CompactDiagnostic:
@@ -463,7 +463,7 @@ def test_data_row_mapping_does_not_reuse_removed_or_rewritten_line() -> None:
 def test_processor_and_prompt_preserve_original_source_and_internal_record(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from services import generation_pipeline
+    from services.generation import generation_pipeline
 
     root = '["root","Column",{"height":"matchParent"},["text"]]'
     text = '["text","EmphasisText",{"mainText":"body","height":200}]'

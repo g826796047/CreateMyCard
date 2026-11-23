@@ -10,13 +10,13 @@ from pathlib import Path
 CLOUD = Path(__file__).resolve().parents[1] / "cloud"
 sys.path.insert(0, str(CLOUD))
 
-from services.compact_dsl_a2ui_converter import (  # noqa: E402
+from services.compact.compact_dsl_a2ui_converter import (  # noqa: E402
     ComponentRow,
     DataRow,
     parse_compact_dsl_rows,
 )
-from services.compact_prompt_loader import FRAGMENT  # noqa: E402
-from services.compact_semantic_layout import GEOMETRY_PROPS  # noqa: E402
+from services.compact.layout.compact_semantic_layout import GEOMETRY_PROPS  # noqa: E402
+from services.protocols.compact_prompt_loader import FRAGMENT  # noqa: E402
 
 
 class Migration:

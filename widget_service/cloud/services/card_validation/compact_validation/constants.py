@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import re
 
-from services.compact_component_runtime import VISUAL_RECIPE_VERSION
+from services.compact.components.compact_component_runtime import VISUAL_RECIPE_VERSION
 
 _EXPRESSION_PATTERN = re.compile("^\\{\\{\\s*(?P<body>.*?)\\s*\\}\\}$")
 

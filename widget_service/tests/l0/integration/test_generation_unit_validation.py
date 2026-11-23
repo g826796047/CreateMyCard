@@ -9,9 +9,9 @@ from api.schemas import GenerateWidgetCardRequest
 from config.config import get_settings
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
-from services.artifact_store import ArtifactStore
-from services.validator import ArtifactValidator
-from services.widget_generation_service import WidgetGenerationService
+from services.artifacts.artifact_store import ArtifactStore
+from services.card_validation.validator import ArtifactValidator
+from services.generation.widget_generation_service import WidgetGenerationService
 
 pytestmark = pytest.mark.usefixtures("existing_generation_policy")
 
@@ -111,7 +111,7 @@ async def test_missing_unit_uses_quality_budget_before_theme(
         return original_units(validator, artifact, capabilities)
 
     monkeypatch.setattr(A2UIModelClient, "generate", generate)
-    monkeypatch.setattr("services.post_layout_theme.theme_artifact", theme)
+    monkeypatch.setattr("services.themes.post_layout_theme.theme_artifact", theme)
     monkeypatch.setattr(ArtifactStore, "save", save)
     monkeypatch.setattr(ArtifactValidator, "validate_display_units", units)
     request = GenerateWidgetCardRequest(

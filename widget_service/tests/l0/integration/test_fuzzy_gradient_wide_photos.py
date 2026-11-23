@@ -4,8 +4,8 @@ import pytest
 from test_uniform_photo_eligibility import choose, rejection
 from test_wide_photo_focus import focus_sample
 
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 
 FUZZY = "photo-ux-pink-sunset-lake-wide"
 GRADIENT = "photo-ux-gradient-wide"

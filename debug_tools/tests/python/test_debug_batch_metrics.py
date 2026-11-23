@@ -396,7 +396,7 @@ def test_retry_snapshot_prefers_current_names_and_does_not_leak_secrets() -> Non
 def test_service_retry_policy_snapshot_reports_settings_without_changing_them():
     from types import SimpleNamespace
 
-    from services.generation_retry_policy import retry_policy_details
+    from services.generation.generation_retry_policy import retry_policy_details
 
     settings = SimpleNamespace(
         enable_photo_background_theme=False,

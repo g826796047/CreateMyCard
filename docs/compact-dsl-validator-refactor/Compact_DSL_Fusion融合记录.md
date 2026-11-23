@@ -156,7 +156,7 @@ original_source、repair_context。绑定修复原文用于位置核对，展开
 | [widget_service/cloud/data/protocol_profiles/design-compact-dsl-fusion/prompt_source/repair.md](../../widget_service/cloud/data/protocol_profiles/design-compact-dsl-fusion/prompt_source/repair.md) | 新提示词包内增加结构化错误及展开结果阅读说明 |
 | [widget_service/cloud/data/validator_rules/compact/repair_hints.json](../../widget_service/cloud/data/validator_rules/compact/repair_hints.json) | 保留可选建议，修正高度建议与固定设计量的冲突 |
 | [widget_service/cloud/repair_compact_dsl.py](../../widget_service/cloud/repair_compact_dsl.py) | 独立修复同时传递布局范围与建议上下文 |
-| [widget_service/cloud/services/artifact_store.py](../../widget_service/cloud/services/artifact_store.py) | 保留支持嵌套诊断的记录类型 |
+| [widget_service/cloud/services/artifact_store.py](../../widget_service/cloud/services/artifacts/artifact_store.py) | 保留支持嵌套诊断的记录类型 |
 | [widget_service/cloud/services/card_validation/compact_dsl_validator.py](../../widget_service/cloud/services/card_validation/compact_dsl_validator.py) | 保留公开入口与主文字辅助兼容导出 |
 | [widget_service/cloud/services/card_validation/compact_validation/__init__.py](../../widget_service/cloud/services/card_validation/compact_validation/__init__.py) | 声明对应职责包，不放置规则或执行流程 |
 | [widget_service/cloud/services/card_validation/compact_validation/api.py](../../widget_service/cloud/services/card_validation/compact_validation/api.py) | 依主线顺序组织原始树与展开树校验 |
@@ -183,9 +183,9 @@ original_source、repair_context。绑定修复原文用于位置核对，展开
 | [widget_service/cloud/services/card_validation/compact_validation/syntax/components.py](../../widget_service/cloud/services/card_validation/compact_validation/syntax/components.py) | 组件结构、点击形状与模型组件白名单 |
 | [widget_service/cloud/services/card_validation/compact_validation/syntax/expressions.py](../../widget_service/cloud/services/card_validation/compact_validation/syntax/expressions.py) | 保留表达式规则与结构化定位 |
 | [widget_service/cloud/services/card_validation/compact_validation/text.py](../../widget_service/cloud/services/card_validation/compact_validation/text.py) | 复用当前文本及视觉标记辅助 |
-| [widget_service/cloud/services/generation_pipeline.py](../../widget_service/cloud/services/generation_pipeline.py) | 叠加诊断分组，保留 Plan 错误码、Trace 与主线参数 |
-| [widget_service/cloud/services/prompt_builder.py](../../widget_service/cloud/services/prompt_builder.py) | 只转换 qualityErrors，保留失败历史及组合恢复上下文 |
-| [widget_service/cloud/services/widget_generation_service.py](../../widget_service/cloud/services/widget_generation_service.py) | 在线入口传递 create/edit 建议上下文 |
+| [widget_service/cloud/services/generation_pipeline.py](../../widget_service/cloud/services/generation/generation_pipeline.py) | 叠加诊断分组，保留 Plan 错误码、Trace 与主线参数 |
+| [widget_service/cloud/services/prompt_builder.py](../../widget_service/cloud/services/generation/prompt_builder.py) | 只转换 qualityErrors，保留失败历史及组合恢复上下文 |
+| [widget_service/cloud/services/widget_generation_service.py](../../widget_service/cloud/services/generation/widget_generation_service.py) | 在线入口传递 create/edit 建议上下文 |
 | [widget_service/tests/fixtures/compact_validation_baseline.json](../../widget_service/tests/fixtures/compact_validation_baseline.json) | 冻结 main 的 87 组实际校验调用与输出 |
 | [widget_service/tests/fixtures/compact_validation_rule_inventory.json](../../widget_service/tests/fixtures/compact_validation_rule_inventory.json) | 登记当前 30 个诊断发布位置与分类 |
 | [widget_service/tests/test_compact_validation_architecture.py](../../widget_service/tests/test_compact_validation_architecture.py) | 检查活动错误码、归属及无旧流程依赖 |
@@ -334,16 +334,16 @@ qualityErrors 在路由判断时仍保留原记录；模型副本可格式化，
 | [widget_service/cloud/services/card_validation/compact_validation/semantic/display.py](../../widget_service/cloud/services/card_validation/compact_validation/semantic/display.py) | 承接多段时长选型和 TextBlock 同项标签识别 |
 | [widget_service/cloud/services/card_validation/compact_validation/semantic/layout/text_width.py](../../widget_service/cloud/services/card_validation/compact_validation/semantic/layout/text_width.py) | 承接完整文案及标签时长同行宽度校验 |
 | [widget_service/cloud/services/card_validation/字段约束与演进记录.md](../../widget_service/cloud/services/card_validation/字段约束与演进记录.md) | 原样合入主线合同说明和字段演进记录 |
-| [widget_service/cloud/services/compact_component_bindings.py](../../widget_service/cloud/services/compact_component_bindings.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
-| [widget_service/cloud/services/compact_composition_context.py](../../widget_service/cloud/services/compact_composition_context.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
-| [widget_service/cloud/services/compact_composition_planner.py](../../widget_service/cloud/services/compact_composition_planner.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
-| [widget_service/cloud/services/compact_high_level_components.py](../../widget_service/cloud/services/compact_high_level_components.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
-| [widget_service/cloud/services/compact_plan.py](../../widget_service/cloud/services/compact_plan.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
-| [widget_service/cloud/services/compact_region_layout.py](../../widget_service/cloud/services/compact_region_layout.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
-| [widget_service/cloud/services/compact_repair_strategy.py](../../widget_service/cloud/services/compact_repair_strategy.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
-| [widget_service/cloud/services/prompt_builder.py](../../widget_service/cloud/services/prompt_builder.py) | 合入主线修复策略和容量开关，保留模型副本格式化 |
-| [widget_service/cloud/services/retry_controller.py](../../widget_service/cloud/services/retry_controller.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
-| [widget_service/cloud/services/widget_generation_service.py](../../widget_service/cloud/services/widget_generation_service.py) | 合入主线重试策略跟踪与兜底，保留可选建议上下文 |
+| [widget_service/cloud/services/compact_component_bindings.py](../../widget_service/cloud/services/compact/components/compact_component_bindings.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
+| [widget_service/cloud/services/compact_composition_context.py](../../widget_service/cloud/services/compact/planning/compact_composition_context.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
+| [widget_service/cloud/services/compact_composition_planner.py](../../widget_service/cloud/services/compact/planning/compact_composition_planner.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
+| [widget_service/cloud/services/compact_high_level_components.py](../../widget_service/cloud/services/compact/components/compact_high_level_components.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
+| [widget_service/cloud/services/compact_plan.py](../../widget_service/cloud/services/compact/planning/compact_plan.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
+| [widget_service/cloud/services/compact_region_layout.py](../../widget_service/cloud/services/compact/layout/compact_region_layout.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
+| [widget_service/cloud/services/compact_repair_strategy.py](../../widget_service/cloud/services/compact/repair/compact_repair_strategy.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
+| [widget_service/cloud/services/prompt_builder.py](../../widget_service/cloud/services/generation/prompt_builder.py) | 合入主线修复策略和容量开关，保留模型副本格式化 |
+| [widget_service/cloud/services/retry_controller.py](../../widget_service/cloud/services/generation/retry_controller.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
+| [widget_service/cloud/services/widget_generation_service.py](../../widget_service/cloud/services/generation/widget_generation_service.py) | 合入主线重试策略跟踪与兜底，保留可选建议上下文 |
 | [widget_service/tests/fixtures/compact_validation_baseline.json](../../widget_service/tests/fixtures/compact_validation_baseline.json) | 以最新主线重放 112 组输入，保留原 87 组期望 |
 | [widget_service/tests/test_compact_component_bindings.py](../../widget_service/tests/test_compact_component_bindings.py) | 原样合入主线组件合同、修复或提示词回归 |
 | [widget_service/tests/test_compact_dsl_a2ui_converter.py](../../widget_service/tests/test_compact_dsl_a2ui_converter.py) | 原样合入主线组件合同、修复或提示词回归 |

@@ -11,7 +11,7 @@ from services.card_validation.compact_validation.diagnostics import (
     CompactDiagnostic,
     emit_error,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     MODEL_COMPACT_INPUT_COMPONENT_TYPES,
     ComponentRow,
 )
@@ -191,7 +191,7 @@ class OnClickShape:
 
 
 def collect_model_component_errors(components: list[ComponentRow]) -> DiagnosticCollector:
-    from services.generation_content_policy import (
+    from services.generation.generation_content_policy import (
         STATIC_COMPONENTS,
         STATIC_SUPPORT_COMPONENTS,
         current_content_policy,

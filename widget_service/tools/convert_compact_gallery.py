@@ -35,7 +35,7 @@ _ensure_local_hostname_resolution()
 CLOUD_ROOT = Path(__file__).resolve().parents[1] / "cloud"
 sys.path.insert(0, str(CLOUD_ROOT))
 
-from services.compact_dsl_a2ui_converter import (  # noqa: E402
+from services.compact.compact_dsl_a2ui_converter import (  # noqa: E402
     CompactDslConversionError,
     convert_compact_dsl_to_a2ui,
 )

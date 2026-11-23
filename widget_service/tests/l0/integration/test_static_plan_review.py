@@ -13,30 +13,30 @@ from config.config import get_settings
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient, A2UIModelGenerationError
 from models.generation import CompactDslRecoveryFact, CompactDslRetryContext, TaskSpec
-from services.artifact_store import ArtifactStore
-from services.compact_plan import (
+from services.artifacts.artifact_store import ArtifactStore
+from services.compact.planning.compact_plan import (
     CompactPlanValidationError,
     parse_compact_plan_call,
     static_fact_source,
 )
-from services.compact_plan_output import (
+from services.compact.planning.compact_plan_output import (
     PLAN_JSON_OUTPUT_INSTRUCTION,
     PLAN_STAGE_OUTPUT_INSTRUCTION,
     REVIEW_JSON_OUTPUT_INSTRUCTION,
 )
-from services.generation_content_policy import (
-    EXISTING_CONTENT_POLICY,
-    STATIC_CONTENT_POLICY,
-    content_policy_scope,
-)
-from services.prompt_builder import PromptBuilder
-from services.static_plan_review import (
+from services.compact.static_content.static_plan_review import (
     StaticPlanReviewError,
     parse_static_plan_review,
     static_plan_unreferenced_source,
     static_review_lost_must_indexes,
 )
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.generation_content_policy import (
+    EXISTING_CONTENT_POLICY,
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
+from services.generation.prompt_builder import PromptBuilder
+from services.generation.widget_generation_service import WidgetGenerationService
 
 
 @pytest.fixture(autouse=True)
@@ -756,7 +756,7 @@ async def test_confirmed_no_candidate_plan_reaches_dsl_after_invalid_optimizatio
     def record(event, **kwargs):
         trace_events.append((event, kwargs))
 
-    monkeypatch.setattr("services.widget_generation_service.trace_record", record)
+    monkeypatch.setattr("services.generation.widget_generation_service.trace_record", record)
     service, calls, saved = _service(monkeypatch, [
         _call(original), _correct(corrected),
     ], dsl_source=dsl)

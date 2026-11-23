@@ -14,13 +14,13 @@ from services.card_validation.compact_validation.diagnostics import (
 from services.card_validation.compact_validation.semantic.layout.overflow_tolerances import (
     layout_overflow_tolerances,
 )
-from services.compact_component_runtime import (
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.components.compact_component_runtime import (
     VISUAL_RECIPE_VERSION,
     text_block_full_width_budget,
     text_block_width_contract,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.compact_region_layout import reference_region_boxes
+from services.compact.layout.compact_region_layout import reference_region_boxes
 
 _CONTAINERS = frozenset({"Row", "Column", "Stack"})
 _UNMODELED = frozenset({"aspectRatio", "borderWidth"})

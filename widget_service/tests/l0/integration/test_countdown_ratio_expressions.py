@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from services.countdown_pattern import (
+from services.compact.components.countdown_pattern import (
     GEOMETRY,
     CountdownPattern,
     pattern_fill_height,

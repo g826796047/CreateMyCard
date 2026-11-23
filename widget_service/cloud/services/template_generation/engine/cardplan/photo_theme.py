@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from services.fusion_ball_expander import build_fusion_ball_content_id
-from services.post_layout_theme_registry import registered_themes
 from services.template_generation.engine.tersel_converter import Nested2Node
-from services.theme_photo_processing import PhotoStyleContext
-from services.theme_style_roles import is_role, role
+from services.themes.fusion_ball_expander import build_fusion_ball_content_id
+from services.themes.post_layout_theme_registry import registered_themes
+from services.themes.theme_photo_processing import PhotoStyleContext
+from services.themes.theme_style_roles import is_role, role
 
 from .models import (
     TemplateNode,
@@ -135,7 +135,7 @@ def apply_photo_background(card: Nested2Node, theme: ThemeDefinition) -> Nested2
             foreground.append(child)
     if template_roots != 1:
         raise ValueError("Photo template requires one direct template_root")
-    from services.post_layout_theme import photo_background
+    from services.themes.post_layout_theme import photo_background
 
     registered = next(
         item for item in registered_themes() if item.get("id") == theme.theme_profile_id

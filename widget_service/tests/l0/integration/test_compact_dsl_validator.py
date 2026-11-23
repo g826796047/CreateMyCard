@@ -8,12 +8,12 @@ from pathlib import Path
 import pytest
 
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
-from services.compact_prompt_loader import assemble_prompts
-from services.generation_pipeline import (
+from services.generation.generation_pipeline import (
     DslProcessingContext,
     DslProcessorKind,
     get_dsl_processor,
 )
+from services.protocols.compact_prompt_loader import assemble_prompts
 
 _DESIGN_PROMPT_SOURCE = (
     Path(__file__).resolve().parents[3]

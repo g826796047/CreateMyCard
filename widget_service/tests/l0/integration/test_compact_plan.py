@@ -5,11 +5,11 @@ import json
 import pytest
 
 from models.generation import TaskSpec
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     MODEL_COMPACT_INPUT_COMPONENT_TYPES,
     CompactDslConversionError,
 )
-from services.compact_plan import (
+from services.compact.planning.compact_plan import (
     CompactPlanValidationError,
     build_compact_plan_tool,
     compact_plan_asset_ids,
@@ -22,8 +22,8 @@ from services.compact_plan import (
     fusion_display_task_spec,
     parse_compact_plan_call,
 )
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 
 def task_spec() -> dict:

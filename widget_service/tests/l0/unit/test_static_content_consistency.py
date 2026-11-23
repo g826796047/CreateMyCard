@@ -12,21 +12,21 @@ from services.card_validation.compact_validation.semantic.static_content import 
     _identity_covered,
     static_group_errors,
 )
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.compact_high_level_components import CompactDslConversionError
-from services.compact_plan import (
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.components.compact_high_level_components import CompactDslConversionError
+from services.compact.planning.compact_plan import (
     CompactPlanValidationError,
     _normalize_static_omissions,
     compact_plan_omitted_facts,
     evaluate_compact_plan_coverage,
     parse_compact_plan_call,
 )
-from services.generation_content_policy import (
+from services.compact.static_content.static_content_context import standard_components
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
 )
-from services.static_content_context import standard_components
 
 
 def fact(text, priority="must", **extras):
@@ -173,7 +173,7 @@ def test_dynamic_header_recipe_is_unchanged():
     with content_policy_scope(EXISTING_CONTENT_POLICY):
         with pytest.raises(CompactDslConversionError):
             convert_compact_dsl_to_a2ui(dsl, size="2x2")
-    from services.compact_component_runtime import component_visual_recipe
+    from services.compact.components.compact_component_runtime import component_visual_recipe
 
     with content_policy_scope(EXISTING_CONTENT_POLICY):
         recipe = component_visual_recipe("SingleLineTitle", size="2x2")
@@ -457,7 +457,7 @@ def test_long_shared_header_without_legal_candidate_preserves_facts_and_feedback
 
 
 def test_line_break_keeps_closing_punctuation_off_new_lines():
-    from services.static_text_capacity import measure_text, text_spec
+    from services.compact.static_content.static_text_capacity import measure_text, text_spec
 
     text = "甲乙丙丁，戊己庚辛；壬癸（说明）"
     capacity = measure_text(text, 50.4, text_spec("detail"))

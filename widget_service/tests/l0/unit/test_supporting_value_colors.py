@@ -5,16 +5,16 @@ import json
 
 import pytest
 
-from services import post_layout_theme as themes
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.compact_high_level_components import (
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.components.compact_high_level_components import (
     ComponentRow,
     _expand_data_display,
     _expand_emphasis_text,
     _expand_info_block,
 )
-from services.post_layout_theme_registry import registered_themes
-from services.theme_style_roles import layout_phase
+from services.themes import post_layout_theme as themes
+from services.themes.post_layout_theme_registry import registered_themes
+from services.themes.theme_style_roles import layout_phase
 
 
 def expand(kind, value, color, size, *, unit=False):

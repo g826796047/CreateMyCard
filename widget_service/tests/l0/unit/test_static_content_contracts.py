@@ -10,17 +10,17 @@ from services.card_validation.compact_validation.semantic.static_content import 
     _fact_covered,
     static_group_errors,
 )
-from services.compact_plan import (
+from services.compact.planning.compact_plan import (
     CompactPlanValidationError,
     build_compact_plan_tool,
     parse_compact_plan_call,
 )
-from services.generation_content_policy import (
+from services.compact.static_content.static_content_presentation import trial_static_presentation
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
 )
-from services.static_content_presentation import trial_static_presentation
 
 
 def fact(text, **extras):
@@ -249,7 +249,7 @@ def test_three_records_title_requires_a_valid_alternative_candidate(
 ):
     from dataclasses import replace
 
-    from services import static_content_planning
+    from services.compact.static_content import static_content_planning
 
     original_select = static_content_planning.select_static_plan_content
 
@@ -332,7 +332,9 @@ def test_static_plan_tool_describes_initial_component_capacity_budget():
 
 
 def test_single_line_identity_candidate_keeps_names_and_complete_values():
-    from services.static_content_presentation import static_presentation_candidates
+    from services.compact.static_content.static_content_presentation import (
+        static_presentation_candidates,
+    )
 
     plan = {
         "info_required": [fact("30GB"), fact("60GB")],
@@ -380,9 +382,9 @@ def test_actions_without_trial_support_do_not_consume_capacity_refinement_budget
     ]}, "comparisonSecondary"),
 ])
 def test_registered_semantic_font_preserves_role_hierarchy(component, props, role):
-    from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-    from services.static_content_context import standard_components
-    from services.static_text_capacity import text_spec
+    from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+    from services.compact.static_content.static_content_context import standard_components
+    from services.compact.static_content.static_text_capacity import text_spec
 
     dsl = source(component, props)
     with content_policy_scope(STATIC_CONTENT_POLICY):
@@ -397,8 +399,8 @@ def test_registered_semantic_font_preserves_role_hierarchy(component, props, rol
 
 @pytest.mark.parametrize("font", [9, 8, 0, 10.5, 13, True, None, "11"])
 def test_static_font_rejects_model_geometry_overrides(font):
-    from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-    from services.compact_high_level_components import CompactDslConversionError
+    from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+    from services.compact.components.compact_high_level_components import CompactDslConversionError
 
     dsl = source("EmphasisText", {"mainText": "完整内容", "fontSize": font})
     with content_policy_scope(STATIC_CONTENT_POLICY):
@@ -407,7 +409,9 @@ def test_static_font_rejects_model_geometry_overrides(font):
 
 
 def test_candidates_try_complete_content_before_optional_omission_without_font_override():
-    from services.static_content_presentation import static_presentation_candidates
+    from services.compact.static_content.static_content_presentation import (
+        static_presentation_candidates,
+    )
 
     plan = {
         "info_required": [fact("核心内容"), fact("补充内容", priority="should")],
@@ -435,7 +439,9 @@ def test_candidates_try_complete_content_before_optional_omission_without_font_o
 
 
 def test_complex_core_content_remains_rejected_without_mutation_or_font_override():
-    from services.static_content_presentation import static_presentation_candidates
+    from services.compact.static_content.static_content_presentation import (
+        static_presentation_candidates,
+    )
 
     facts = []
     groups = []

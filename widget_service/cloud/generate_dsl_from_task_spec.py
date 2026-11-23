@@ -13,14 +13,14 @@ from app.logger import logger
 from config.config import get_settings
 from custom.a2ui_model_client import A2UIModelClient, A2UIModelGenerationError
 from models.generation import TaskSpec
-from services.generation_pipeline import (
+from services.generation.generation_pipeline import (
     DslProcessingContext,
     DslProcessorKind,
     get_dsl_processor,
 )
-from services.post_layout_theme import select_theme
-from services.prompt_builder import PromptBuilder
-from services.protocol_registry import A2UIProtocolRegistry
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes.post_layout_theme import select_theme
 
 _OUTPUT_SEPARATOR = "==========================="
 _MODEL_FORMAT = "compact-dsl"

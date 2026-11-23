@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from models.generation import EventAction, TaskSpec
-from services.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
 from services.template_generation.engine.advanced.ux_mixed_prompt import build_ux_mixed_prompt
 from services.template_generation.engine.cardplan.business_actions import supports_business_action
 from services.template_generation.engine.cardplan.compiler import (

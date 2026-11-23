@@ -5,7 +5,7 @@ import json
 import pytest
 
 from models.generation import TaskSpec
-from services.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
 from services.template_generation.engine.cardplan.compiler import (
     _instantiate_blueprint,
     _serialize_effective_document,

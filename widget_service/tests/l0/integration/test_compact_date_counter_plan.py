@@ -8,8 +8,11 @@ import pytest
 
 from core.date_counter import DateCounterResult
 from models.generation import TaskSpec
-from services.compact_date_counter_plan import PRESENTATION, apply_date_counter_plan
-from services.compact_plan import (
+from services.compact.planning.compact_date_counter_plan import (
+    PRESENTATION,
+    apply_date_counter_plan,
+)
+from services.compact.planning.compact_plan import (
     CompactPlanValidationError,
     build_compact_plan_tool,
     build_compact_recovery_plan,
@@ -18,9 +21,9 @@ from services.compact_plan import (
     evaluate_compact_plan_coverage,
     parse_compact_plan_call,
 )
-from services.compact_repair_context import joint_repair_contract
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.prompt_builder import PromptBuilder
+from services.compact.repair.compact_repair_context import joint_repair_contract
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.prompt_builder import PromptBuilder
 
 _ROOT = "/data/custom/timer"
 _DAYS = f"{_ROOT}/days"

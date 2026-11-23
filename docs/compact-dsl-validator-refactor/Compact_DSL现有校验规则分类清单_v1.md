@@ -1,5 +1,7 @@
 # Compact DSL 现有校验规则分类清单 v1
 
+服务目录调整后，`services/compact/` 下的转换器、组件和布局模块仍为校验提供解析、展开与合同数据；修复候选位于 `services/compact/repair/`。标准产物的服务适配入口位于 `services/card_validation/validator.py`。历次记录中的规则分类、调用顺序和诊断沿用原约定。
+
 2026-11-13：`W-countdown-center` 根据源 DSL 声明匹配，参与 2x4 线上生成和修复的布局选型。
 源合同要求唯一 `InfoDisplay`；组件字段与禁止 children 归语法／组件，唯一直属组件、视觉归属和无动作
 归语义／布局与视觉。 `compact_semantic_layout.py` 展开内部标题、读数、日期，继续复用
@@ -139,12 +141,12 @@ Plan 的来源字段、contentGroups 结构和去重索引映射归 `compact_pla
 父容器未变化而子字号增大仍检查；不复制 Compact 几何规则，不改变首次生成校验。
 
 2026-10-21：`W-top-bottom.details` 允许的直属组件增加 `EventCard`，归属语义／布局合同，
-唯一判定落点仍为 `services/compact_semantic_layout.py`。该变更只放宽已登记父布局的 details 角色；
+唯一判定落点仍为 `services/compact/layout/compact_semantic_layout.py`。该变更只放宽已登记父布局的 details 角色；
 EventCard 的 Props、事件顺序与总高继续由共享组件和容量校验负责，不在语义编译器重复实现，
 不新增错误码，不改变 `InfoBlock` 与 `CardButton` 在该槽位中的禁止边界。
 
 2026-10-20：2×2外层重组结构整理归生成修复编排，落点仍为
-`services/compact_outer_recomposition.py`。候选生成与有限搜索分离，32个实际候选使用显式预算；
+`services/compact/repair/compact_outer_recomposition.py`。候选生成与有限搜索分离，32个实际候选使用显式预算；
 候选顺序、首个合格即采用及原稿回退语义保持不变。Compact规则判定仍委托公共校验入口，
 Plan事实动作覆盖仍委托`compact_plan_coverage_errors`；不新增或迁移语法／语义检查项。
 重组仅返回结果，现有Trace仍由`generation_pipeline.py`记录，本次不调整日志打点。
@@ -472,7 +474,7 @@ item 使用 `layoutWeight:1`、`flexShrink:1` 和 `constraintSize.minWidth:0` �
 Progress 绑定类型归数据绑定，必要动作保留和 W9 动作数量归展示语义。
 后续实施以第 5 节的具体检查项为迁移单位；分类不改变现有触发条件、修复文案或行为。
 
-比例图案倒计时由 `services/countdown_pattern.py` 复用组件语义及有效能力绑定检查。
+比例图案倒计时由 `services/compact/components/countdown_pattern.py` 复用组件语义及有效能力绑定检查。
 `generation_pipeline.py` 区分显式创建偏好与自动 Plan 推荐的准入：显式要求图案，自动仅在使用图案时比对
 已接受 Plan 的尺寸、类型、绑定与总量。模型直写程序节点仍被拒绝。图案源使用唯一 SCountdown/WCountdown：
 组件字段白名单及禁止自带 children 属于语法／组件；布局与组件的尺寸对应属于语义／布局；

@@ -8,17 +8,17 @@ import pytest
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
 from services.card_validation.compact_validation import api
 from services.card_validation.compact_validation.semantic.static_content import static_group_errors
-from services.compact_dsl_a2ui_converter import CompactDslConversionError
-from services.compact_layout_runtime import CompactLayoutRuntimeError
-from services.compact_plan import evaluate_compact_plan_coverage
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_content_policy import (
+from services.compact.compact_dsl_a2ui_converter import CompactDslConversionError
+from services.compact.layout.compact_layout_runtime import CompactLayoutRuntimeError
+from services.compact.planning.compact_plan import evaluate_compact_plan_coverage
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
 )
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.protocol_registry import A2UIProtocolRegistry
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 
 
 @pytest.fixture(autouse=True)

@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from services import compact_dsl_argument_repair as repair
-from services.argument_json_recovery import DECODER, repair_syntax
-from services.capability_registry import CapabilityRegistry
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.requests import compact_dsl_argument_repair as repair
+from services.requests.argument_json_recovery import DECODER, repair_syntax
 
 
 @pytest.fixture
@@ -317,7 +317,7 @@ def test_missing_uri_quote_keeps_invalid_binding_for_preflight(registry):
 
 
 def test_missing_uri_quote_logs_only_repair_count(monkeypatch, registry):
-    from services import event_uri_json_recovery
+    from services.requests import event_uri_json_recovery
 
     logs = []
     monkeypatch.setattr(event_uri_json_recovery.logger, "info", logs.append)
@@ -418,8 +418,8 @@ def test_generation_tool_nested_contract_matches_skill():
 
 def test_skill_event_example_passes_current_preflight(registry):
     from api.schemas import GenerateWidgetCardRequest
-    from services.edit_request_normalizer import EditRequestNormalizer
-    from services.generation_preflight import GenerationPreflight
+    from services.generation.generation_preflight import GenerationPreflight
+    from services.requests.edit_request_normalizer import EditRequestNormalizer
 
     root = Path(__file__).resolve().parents[4]
     example_path = root / "skills/harmony-card-generation-online/references/examples.md"
@@ -441,7 +441,7 @@ def test_conflicting_event_alias_feedback_explains_value_mapping(registry):
     from pydantic import ValidationError
 
     from api.schemas import GenerateWidgetCardRequest
-    from services.agent_feedback import request_validation_feedback
+    from services.requests.agent_feedback import request_validation_feedback
 
     source = _content(registry)
     events = source.get("candidateEventCandidates")

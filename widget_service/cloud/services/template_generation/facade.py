@@ -11,7 +11,7 @@ from models.generation import (
     ModelRequestContext,
     TaskSpec,
 )
-from services.generation_pipeline import DslProcessorKind
+from services.generation.generation_pipeline import DslProcessorKind
 from services.template_generation.binding_dependencies import enrich_template_bindings
 from services.template_generation.engine.pipeline import (
     generate_template_a2ui as generate_template_engine_a2ui,

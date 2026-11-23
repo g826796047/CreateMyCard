@@ -5,13 +5,16 @@ import json
 
 import pytest
 
-from services.compact_plan import CompactPlanValidationError, parse_compact_plan_call
-from services.generation_content_policy import (
+from services.compact.planning.compact_plan import (
+    CompactPlanValidationError,
+    parse_compact_plan_call,
+)
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
 )
-from services.prompt_builder import PLAN_JSON_OUTPUT_INSTRUCTION, PromptBuilder
+from services.generation.prompt_builder import PLAN_JSON_OUTPUT_INSTRUCTION, PromptBuilder
 
 QUERY = "展示星光巡演：2028年10月17日甲馆，10月24日乙馆，11月14日丙馆，11月28日丁馆，均19:00开演。"
 

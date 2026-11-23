@@ -11,21 +11,21 @@ from pydantic import ValidationError
 
 from config.config import get_settings
 from models.generation import TaskSpec
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.fusion_ball_expander import (
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.generation.generation_pipeline import (
+    DslProcessingContext,
+    DslProcessorKind,
+    get_dsl_processor,
+)
+from services.generation.prompt_builder import PromptBuilder
+from services.generation.task_spec_builder import TaskSpecBuilder
+from services.themes.fusion_ball_expander import (
     FUSION_BALL_MIN_PRD_VERSION_CONFIG,
     FusionBallPalette,
     expand_fusion_ball_components,
     fusion_ball_enabled,
     fusion_ball_palette_for_root,
 )
-from services.generation_pipeline import (
-    DslProcessingContext,
-    DslProcessorKind,
-    get_dsl_processor,
-)
-from services.prompt_builder import PromptBuilder
-from services.task_spec_builder import TaskSpecBuilder
 
 _DEFAULT_APP_VERSION = "11.7.5.208"
 

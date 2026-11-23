@@ -7,8 +7,8 @@ import pytest
 
 from config.config import get_settings
 from models.generation import CompactDslRecoveryFact, CompactDslRetryContext, TaskSpec
-from services.prompt_builder import PromptBuilder
-from services.protocol_registry import DESIGN_COMPACT_PROFILE_ID
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.protocol_registry import DESIGN_COMPACT_PROFILE_ID
 
 
 def _task_spec() -> TaskSpec:

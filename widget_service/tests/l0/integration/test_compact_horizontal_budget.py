@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 
-import services.compact_component_runtime as component_runtime
+import services.compact.components.compact_component_runtime as component_runtime
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
 from services.card_validation.compact_validation.diagnostics import DiagnosticCollector
 from services.card_validation.compact_validation.semantic.layout.horizontal import (
     _collect_horizontal_budget_errors,
     _non_blocking_width_overflow_reason,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
     DataRow,
     build_compact_data_model,
@@ -22,8 +22,8 @@ from services.compact_dsl_a2ui_converter import (
     normalize_mixed_font_text_rows,
     parse_compact_dsl_rows,
 )
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.retry_controller import RetryController
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.retry_controller import RetryController
 
 _PROFILE = {"sizes": {"2x4": {"width": 300, "height": 150}}}
 _ASSET = "resources/battery.svg"

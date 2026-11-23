@@ -7,7 +7,7 @@ import pytest
 
 from models.generation import CompactDslRecoveryFact
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
-from services.compact_plan import (
+from services.compact.planning.compact_plan import (
     build_compact_plan_tool,
     build_compact_recovery_plan,
     compact_plan_context,
@@ -16,7 +16,7 @@ from services.compact_plan import (
     compact_recovery_plan_errors,
     parse_compact_plan_call,
 )
-from services.protocol_registry import DESIGN_COMPACT_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import DESIGN_COMPACT_PROFILE_ID, A2UIProtocolRegistry
 
 
 def _selection_task(size: str = "2x2") -> dict:

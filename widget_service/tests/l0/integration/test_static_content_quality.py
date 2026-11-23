@@ -6,22 +6,25 @@ import json
 import pytest
 from widget_service.tests.static_title_fixtures import titled_plan, titled_rows
 
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.compact_plan import CompactPlanValidationError, parse_compact_plan_call
-from services.generation_content_policy import (
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.planning.compact_plan import (
+    CompactPlanValidationError,
+    parse_compact_plan_call,
+)
+from services.compact.static_content.static_content_context import standard_components
+from services.compact.static_content.static_content_presentation import (
+    static_presentation_candidates,
+    trial_static_presentation,
+)
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
 )
-from services.post_layout_theme import apply_theme, foreground_signature
-from services.post_layout_theme_registry import fallback_theme
-from services.static_content_context import standard_components
-from services.static_content_presentation import (
-    static_presentation_candidates,
-    trial_static_presentation,
-)
-from services.theme_selection_policy import default_palette_family
-from services.theme_style_roles import layout_phase
+from services.themes.post_layout_theme import apply_theme, foreground_signature
+from services.themes.post_layout_theme_registry import fallback_theme
+from services.themes.theme_selection_policy import default_palette_family
+from services.themes.theme_style_roles import layout_phase
 
 
 def _fact(text, role=None, **extras):
@@ -158,7 +161,7 @@ def test_long_optional_note_can_be_omitted_without_mutating_accepted_core():
     assert feedback and "省略" in feedback[0]
     assert accepted.get("info_required") == value.get("info_required")
     assert value == before
-    from services.compact_plan import compact_plan_omitted_facts
+    from services.compact.planning.compact_plan import compact_plan_omitted_facts
 
     omitted = compact_plan_omitted_facts(dsl, accepted, {}, ())
     assert len(omitted) == 1
@@ -230,8 +233,8 @@ async def test_plan_refines_within_existing_budget_and_keeps_last_valid_plan(
     from api.schemas import GenerateWidgetCardRequest
     from config.config import get_settings
     from custom.a2ui_model_client import A2UIModelClient
-    from services.artifact_store import ArtifactStore
-    from services.widget_generation_service import WidgetGenerationService
+    from services.artifacts.artifact_store import ArtifactStore
+    from services.generation.widget_generation_service import WidgetGenerationService
 
     value = {
         "info_required": [_fact("带证件", "body")],
@@ -281,7 +284,7 @@ async def test_plan_refines_within_existing_budget_and_keeps_last_valid_plan(
 
     trial_calls = []
     continuation_plans = []
-    from services.prompt_builder import PromptBuilder
+    from services.generation.prompt_builder import PromptBuilder
 
     original_continuation = PromptBuilder.build_compact_dsl_continuation
 
@@ -297,10 +300,13 @@ async def test_plan_refines_within_existing_budget_and_keeps_last_valid_plan(
         return original_continuation(conversation, task, accepted_plan, **kwargs)
 
     monkeypatch.setattr(PromptBuilder, "build_compact_dsl_continuation", continuation)
-    monkeypatch.setattr("services.static_content_presentation.trial_static_presentation", trial)
+    monkeypatch.setattr(
+        "services.compact.static_content.static_content_presentation.trial_static_presentation",
+        trial,
+    )
     monkeypatch.setattr(A2UIModelClient, "generate", generate)
     monkeypatch.setattr(ArtifactStore, "save", save)
-    monkeypatch.setattr("services.post_layout_theme.theme_artifact", theme)
+    monkeypatch.setattr("services.themes.post_layout_theme.theme_artifact", theme)
     settings = get_settings()
     monkeypatch.setattr(settings, "enable_static_content_generation_policy", True)
     monkeypatch.setattr(settings, "enable_a2ui_model_mock", False)

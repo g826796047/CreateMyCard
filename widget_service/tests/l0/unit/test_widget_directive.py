@@ -13,7 +13,7 @@ APP_VERSION = ".".join(("11", "7", "7", "205"))
 if str(CLOUD_ROOT) not in sys.path:
     sys.path.insert(0, str(CLOUD_ROOT))
 
-widget_directive = importlib.import_module("services.widget_directive")
+widget_directive = importlib.import_module("services.requests.widget_directive")
 WidgetDirectiveState = widget_directive.WidgetDirectiveState
 build_widget_directive_response = widget_directive.build_widget_directive_response
 

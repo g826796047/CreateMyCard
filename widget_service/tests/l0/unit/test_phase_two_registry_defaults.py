@@ -11,15 +11,15 @@ from api.schemas import (
 )
 from config.config import Settings, get_settings
 from models.artifact import ArtifactMeta, WidgetArtifact
-from services.capability_registry import CapabilityRegistry
-from services.compact_dsl_argument_repair import _select_capability_registry
-from services.edit_request_normalizer import EditRequestNormalizer
-from services.generation_preflight import GenerationPreflight
-from services.source_artifact_repository import (
+from services.artifacts.source_artifact_repository import (
     SourceArtifactLoadResult,
     SourceArtifactRepository,
 )
-from services.widget_generation_service import WidgetGenerationService
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.generation.generation_preflight import GenerationPreflight
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.requests.compact_dsl_argument_repair import _select_capability_registry
+from services.requests.edit_request_normalizer import EditRequestNormalizer
 
 PHASE_TWO = "app-11.7.7.300_rom-7.0"
 DATE_COUNTER_REGISTRY = "app-11.7.9.300_rom-7.0"

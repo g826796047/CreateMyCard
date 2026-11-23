@@ -14,13 +14,13 @@ from api.schemas import (
     WidgetCardServiceRequest,
 )
 from models.generation import CandidateDataBinding
-from services import compact_dsl_argument_repair as repair
-from services.agent_error_view import agent_error_view
-from services.agent_feedback import request_validation_feedback
-from services.capability_registry import CapabilityRegistry
-from services.edit_request_normalizer import EditRequestNormalizer
-from services.generation_preflight import GenerationPreflight
-from services.widget_generation_service import WidgetGenerationService
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.generation.generation_preflight import GenerationPreflight
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.requests import compact_dsl_argument_repair as repair
+from services.requests.agent_error_view import agent_error_view
+from services.requests.agent_feedback import request_validation_feedback
+from services.requests.edit_request_normalizer import EditRequestNormalizer
 from start_websocket_server import app
 from ws_response_parser import parse_legacy_stream_content
 

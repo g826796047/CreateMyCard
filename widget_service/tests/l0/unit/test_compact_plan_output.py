@@ -4,15 +4,18 @@ import json
 
 import pytest
 
-from services.compact_plan import CompactPlanValidationError, parse_compact_plan_call
-from services.compact_plan_output import (
+from services.compact.planning.compact_plan import (
+    CompactPlanValidationError,
+    parse_compact_plan_call,
+)
+from services.compact.planning.compact_plan_output import (
     PlanDuplicateKeyError,
     decode_plan_json,
     normalize_plan_output,
     normalize_plan_root_arguments,
     plan_output_format_feedback,
 )
-from services.prompt_builder import PromptBuilder
+from services.generation.prompt_builder import PromptBuilder
 
 _DSML = "｜｜DSML｜｜"
 _PREFIX = (
@@ -140,7 +143,10 @@ def test_wrapped_plan_preserves_non_verbatim_text_and_source_warning() -> None:
 
 
 def test_wrapped_plan_keeps_protected_static_text_error() -> None:
-    from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
+    from services.generation.generation_content_policy import (
+        STATIC_CONTENT_POLICY,
+        content_policy_scope,
+    )
 
     arguments = {
         "info_required": [{

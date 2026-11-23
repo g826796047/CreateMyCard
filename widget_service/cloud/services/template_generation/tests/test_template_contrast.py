@@ -5,7 +5,7 @@ import json
 import pytest
 
 from services.card_validation import validate_card
-from services.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
 from services.template_generation.engine.cardplan.compiler import (
     _compile_ux_layout_shell,
     _serialize_node,

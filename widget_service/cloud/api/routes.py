@@ -40,16 +40,24 @@ from models.service import (
     WidgetWebSocketErrorMessage,
     WidgetWebSocketResultMessage,
 )
-from services.agent_error_view import agent_error_view
-from services.agent_feedback import (
+from services.artifacts.artifact_store import ArtifactUploadError
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.generation.generation_retry_policy import retry_policy_details
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.observability.generation_trace_recorder import (
+    trace_increment_retry,
+    trace_observe_attempt,
+    trace_record,
+    trace_span,
+)
+from services.requests.agent_error_view import agent_error_view
+from services.requests.agent_feedback import (
     request_envelope_feedback,
     request_validation_feedback,
     terminal_feedback,
 )
-from services.artifact_store import ArtifactUploadError
-from services.candidate_argument_normalizer import normalize_candidate_arguments
-from services.capability_registry import CapabilityRegistry
-from services.compact_dsl_argument_repair import (
+from services.requests.candidate_argument_normalizer import normalize_candidate_arguments
+from services.requests.compact_dsl_argument_repair import (
     CompactDslArgumentRepairExhaustedError,
     argument_repair_diagnostic,
     compact_dsl_argument_issue_tracker,
@@ -57,21 +65,13 @@ from services.compact_dsl_argument_repair import (
     recover_compact_dsl_content,
     recover_deterministic_content,
 )
-from services.compact_dsl_interface_retry import run_compact_dsl_with_retry
-from services.daily_usage_limiter import DailyUsageError, DailyUsageLimiter, DailyUsageRecord
-from services.generation_input_feedback import MissingDataInputError
-from services.generation_retry_policy import retry_policy_details
-from services.generation_trace_recorder import (
-    trace_increment_retry,
-    trace_observe_attempt,
-    trace_record,
-    trace_span,
-)
-from services.widget_directive import (
+from services.requests.compact_dsl_interface_retry import run_compact_dsl_with_retry
+from services.requests.generation_input_feedback import MissingDataInputError
+from services.requests.widget_directive import (
     WidgetDirectiveState,
     build_widget_directive_response,
 )
-from services.widget_generation_service import WidgetGenerationService
+from services.usage.daily_usage_limiter import DailyUsageError, DailyUsageLimiter, DailyUsageRecord
 from utils.card_runtime import report_ops_metrics
 
 _MODULE = "[WS Router]"

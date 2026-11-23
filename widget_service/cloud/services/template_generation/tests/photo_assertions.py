@@ -9,12 +9,12 @@ from typing import Any
 import pytest
 
 from config.config import get_settings
-from services.fusion_ball_expander import fusion_ball_enabled
-from services.post_layout_theme_registry import photo_fallback, registered_themes
 from services.template_generation.engine import pipeline
 from services.template_generation.engine.cardplan.compiler import HybridCompilation
 from services.template_generation.engine.pipeline import TemplateEngineOutput
-from services.theme_photo_processing import template_foreground
+from services.themes.fusion_ball_expander import fusion_ball_enabled
+from services.themes.post_layout_theme_registry import photo_fallback, registered_themes
+from services.themes.theme_photo_processing import template_foreground
 
 
 @dataclass(frozen=True)

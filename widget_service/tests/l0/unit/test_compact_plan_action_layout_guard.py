@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from services.compact_plan import (
+from services.compact.planning.compact_plan import (
     compact_plan_context,
     parse_compact_plan_call,
 )

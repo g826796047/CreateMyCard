@@ -7,12 +7,15 @@ from pathlib import Path
 import pytest
 
 from api.schemas import GenerateWidgetCardRequest
-from services import compact_dsl_argument_repair as repair
-from services.capability_registry import CapabilityRegistry
+from services.capabilities.capability_registry import CapabilityRegistry
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
-from services.compact_plan import compact_plan_coverage_errors, parse_compact_plan_call
-from services.edit_request_normalizer import EditRequestNormalizer
-from services.generation_preflight import GenerationPreflight
+from services.compact.planning.compact_plan import (
+    compact_plan_coverage_errors,
+    parse_compact_plan_call,
+)
+from services.generation.generation_preflight import GenerationPreflight
+from services.requests import compact_dsl_argument_repair as repair
+from services.requests.edit_request_normalizer import EditRequestNormalizer
 
 CALENDAR_PATH = "/data/calendar/events/0/entityId"
 TEMPLATE_PATH = "/data/calendar/events/i/entityId"

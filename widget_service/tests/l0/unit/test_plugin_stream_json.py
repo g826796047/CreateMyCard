@@ -9,8 +9,8 @@ from api.routes import _build_plugin_stream_response, _send_websocket_json
 from api.schemas import CapabilityOverviewRequest
 from config.config import get_settings
 from models.service import WidgetWebSocketErrorMessage, WidgetWebSocketResultMessage
-from services.ids_client import IDSClient, IDSDeviceCapabilityState
-from services.widget_generation_service import WidgetGenerationService
+from services.capabilities.ids_client import IDSClient, IDSDeviceCapabilityState
+from services.generation.widget_generation_service import WidgetGenerationService
 from ws_response_parser import parse_legacy_stream_content
 
 OPERATIONS = [

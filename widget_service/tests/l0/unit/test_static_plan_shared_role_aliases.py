@@ -5,12 +5,15 @@ import json
 
 import pytest
 
-from services.compact_plan import (
+from services.compact.planning.compact_plan import (
     CompactPlanValidationError,
     build_compact_plan_tool,
     parse_compact_plan_call,
 )
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
 
 
 @pytest.fixture(autouse=True)

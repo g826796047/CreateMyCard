@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     convert_compact_dsl_to_a2ui,
     repair_compact_dsl_safe_structure,
 )

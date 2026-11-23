@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from services.compact_prompt_loader import read_prompt
+from services.protocols.compact_prompt_loader import read_prompt
 
 _logger = logging.getLogger(__name__)
 _FILE_REFERENCE_PREFIX = "@file:"

@@ -5,8 +5,8 @@ import test_semantic_widget_edit as semantic_widget_edit
 from test_semantic_widget_edit import _request
 
 from core.errors import GenerationStatus
-from services.edit_request_normalizer import normalize_source_theme_echo
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.requests.edit_request_normalizer import normalize_source_theme_echo
 
 source_fixture = pytest.fixture(name="source")(semantic_widget_edit.source.__wrapped__)
 theme_edit_run_fixture = pytest.fixture(name="theme_edit_run")(

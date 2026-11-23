@@ -21,20 +21,18 @@ from models.generation import (
     TaskSpec,
 )
 from models.service import ArtifactSaveResult
-from services import widget_generation_service as widget_generation_service_module
-from services.artifact_store import ArtifactStore
+from services.artifacts.artifact_store import ArtifactStore
 from services.card_validation import validate_card
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.fusion_ball_expander import (
-    FUSION_BALL_MIN_PRD_VERSION_CONFIG,
-)
-from services.generation_pipeline import (
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.generation import widget_generation_service as widget_generation_service_module
+from services.generation.generation_pipeline import (
     DslProcessingResult,
     DslProcessorKind,
     GenerationRoutePolicy,
     QualityIssue,
 )
-from services.protocol_registry import (
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.protocols.protocol_registry import (
     A2UI_FORM_PROTOCOL_PROFILE_ID,
     A2UIProtocolRegistry,
 )
@@ -124,7 +122,9 @@ from services.template_generation.engine.tersel_converter import (
 )
 from services.template_generation.profile import read_tersel_protocol_profile
 from services.template_generation.tests.photo_assertions import capture_template_photos
-from services.widget_generation_service import WidgetGenerationService
+from services.themes.fusion_ball_expander import (
+    FUSION_BALL_MIN_PRD_VERSION_CONFIG,
+)
 
 _WEATHER_BODY = (
     'Template("SingleFocusLayout@1",{},Template("WeatherOverviewFull@1",'
@@ -8929,7 +8929,7 @@ async def test_template_quality_failure_obeys_entry_fallback_policy(
         "validate",
         lambda _self, _artifact, _profile: [],
     )
-    monkeypatch.setattr("services.post_layout_theme.theme_artifact", theme)
+    monkeypatch.setattr("services.themes.post_layout_theme.theme_artifact", theme)
     monkeypatch.setattr(ArtifactStore, "save", save)
 
     response = await WidgetGenerationService().generate_widget_card(

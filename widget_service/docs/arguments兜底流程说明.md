@@ -322,7 +322,7 @@ flowchart TD
 ## 10. 相关实现位置
 
 - 路由触发与连续计数：`cloud/api/routes.py`
-- 参数恢复模块：`cloud/services/compact_dsl_argument_repair.py`
+- 参数恢复模块：`cloud/services/requests/compact_dsl_argument_repair.py`
 - 参数恢复 Prompt：
   `cloud/data/protocol_profiles/design-compact-dsl-fusion/prompt_source/argument_repair.md`
 - 配置模型：`cloud/config/config.py`

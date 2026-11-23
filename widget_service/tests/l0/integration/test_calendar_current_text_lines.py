@@ -12,10 +12,10 @@ from test_uniform_photo_eligibility import rejection
 
 from config.config import get_settings
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services.compact_composition_context import small_card_display_text
-from services.display_text import concatenated_display_text
-from services.theme_content_regions import photo_layout_evidence
+from services.compact.components.display_text import concatenated_display_text
+from services.compact.planning.compact_composition_context import small_card_display_text
+from services.themes import post_layout_theme as themes
+from services.themes.theme_content_regions import photo_layout_evidence
 
 CALENDAR_ID = "photo-ux-texture-blue-diamond-square"
 CALENDAR_IDS = {

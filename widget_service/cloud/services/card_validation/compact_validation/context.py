@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from functools import cached_property
 from typing import Any
 
-from services.compact_dsl_a2ui_converter import ComponentRow, DataRow
+from services.compact.compact_dsl_a2ui_converter import ComponentRow, DataRow
 
 
 class ComponentRows(list[ComponentRow]):

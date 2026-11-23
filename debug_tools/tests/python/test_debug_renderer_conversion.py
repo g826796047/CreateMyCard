@@ -10,12 +10,12 @@ from debug_tools.end_to_end_debug.backend.debug_agent.config import DebugSetting
 from debug_tools.end_to_end_debug.backend.server import create_app
 from debug_tools.static_site import create_frontend_app
 from fastapi.testclient import TestClient
-from services import fusion_ball_expander
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.post_layout_theme import apply_theme, components, decode
-from services.post_layout_theme_registry import fallback_theme
-from services.theme_selection_policy import default_palette_family
-from services.theme_style_roles import layout_phase
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.themes import fusion_ball_expander
+from services.themes.post_layout_theme import apply_theme, components, decode
+from services.themes.post_layout_theme_registry import fallback_theme
+from services.themes.theme_selection_policy import default_palette_family
+from services.themes.theme_style_roles import layout_phase
 
 SOURCE = '\n'.join(
     (

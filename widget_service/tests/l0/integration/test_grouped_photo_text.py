@@ -19,11 +19,11 @@ from test_uniform_photo_eligibility import (
     sample,
 )
 
-from services import post_layout_theme as themes
-from services.capability_registry import CapabilityRegistry
-from services.protocol_registry import A2UIProtocolRegistry
-from services.theme_content_regions import body_text_flow_evidence
-from services.validator import ArtifactValidator
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.card_validation.validator import ArtifactValidator
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
+from services.themes.theme_content_regions import body_text_flow_evidence
 
 WEATHER_WIDE = {
     "photo-ux-mountain-sunset-lake-wide",

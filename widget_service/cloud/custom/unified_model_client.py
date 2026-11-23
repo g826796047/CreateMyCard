@@ -10,7 +10,7 @@ from config.config import Settings
 from custom.model_runtime import ModelExecutionRuntime
 from custom.model_transport import ModelBackend, ModelProvider, ModelTransportError
 from models.generation import ModelRequestContext
-from services.generation_trace_recorder import (
+from services.observability.generation_trace_recorder import (
     trace_attempt,
     trace_details,
     trace_increment_retry,
@@ -18,7 +18,7 @@ from services.generation_trace_recorder import (
     trace_record,
     trace_span,
 )
-from services.operational_logging import exception_summary
+from services.observability.operational_logging import exception_summary
 
 _MODULE = "[Unified Model Client]"
 

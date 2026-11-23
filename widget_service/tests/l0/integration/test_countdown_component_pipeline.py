@@ -5,17 +5,19 @@ import json
 import pytest
 from test_countdown_pattern_create import ROOT, _source
 
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     convert_compact_dsl_to_a2ui,
     expand_compact_semantic_layout,
     parse_compact_dsl_rows,
 )
-from services.compact_high_level_components import expand_high_level_component_rows
-from services.compact_plan import _compact_visible_state
-from services.content_business import BusinessContext, FinalBusinessContext
-from services.countdown_pattern import COUNTDOWN_COMPONENTS, PATTERN_PREFIX
+from services.compact.components.compact_high_level_components import (
+    expand_high_level_component_rows,
+)
+from services.compact.components.countdown_pattern import COUNTDOWN_COMPONENTS, PATTERN_PREFIX
+from services.compact.planning.compact_plan import _compact_visible_state
+from services.themes.content_business import BusinessContext, FinalBusinessContext
 
 
 @pytest.mark.parametrize("size", ["2x2", "2x4"])

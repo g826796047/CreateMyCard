@@ -3,7 +3,7 @@
 from fastapi.testclient import TestClient
 
 from api.schemas import GenerateWidgetCardResponse
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
 from start_websocket_server import app
 from ws_response_parser import parse_legacy_stream_content
 

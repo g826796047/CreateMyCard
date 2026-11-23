@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from typing import Any
 
+from services.capabilities.event_matching import event_handlers_match
 from services.card_validation.binding_validator import BindingValidator
-from services.compact_action_instances import (
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.planning.compact_action_instances import (
     event_card_detail_action,
     event_card_item_handlers,
     plan_action_handlers,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.event_matching import event_handlers_match
 
 from ..diagnostics import CompactDiagnostic, emit_error
 

@@ -11,10 +11,10 @@ from test_photo_asset_delivery import artifact
 from test_uniform_photo_eligibility import PATHS, choose, evidence, photo, rejection, sample
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services.capability_registry import CapabilityRegistry
-from services.protocol_registry import A2UIProtocolRegistry
-from services.validator import ArtifactValidator
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.card_validation.validator import ArtifactValidator
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
 
 CASES = json.loads((Path(__file__).parents[2] / "fixtures/photo_weather_q16_q1.json").read_text(
     encoding="utf-8",

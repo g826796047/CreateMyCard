@@ -22,7 +22,7 @@ from services.card_validation.compact_validation.syntax.components import (
     _collect_container_errors,
     _collect_on_click_structure_errors,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     DataRow,

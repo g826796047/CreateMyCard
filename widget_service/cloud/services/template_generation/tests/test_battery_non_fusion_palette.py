@@ -18,7 +18,7 @@ from services.template_generation.tests.test_template_generation import (
     _battery_task,
     _FixedTemplateModel,
 )
-from services.theme_photo_processing import template_foreground
+from services.themes.theme_photo_processing import template_foreground
 
 
 def test_battery_green_palette_matches_earphone_without_changing_layout() -> None:

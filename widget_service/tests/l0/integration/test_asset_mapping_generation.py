@@ -11,12 +11,12 @@ from api.schemas import GenerateWidgetCardRequest
 from config.config import get_settings
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.source_artifact_repository import SourceArtifactRepository
+from services.artifacts.source_artifact_repository import SourceArtifactRepository
+from services.card_validation.validator import ArtifactValidator
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.editing.widget_edit_utils import source_digest
+from services.generation.widget_generation_service import WidgetGenerationService
 from services.template_generation import TemplateSourceGenerator
-from services.validator import ArtifactValidator
-from services.widget_edit_utils import source_digest
-from services.widget_generation_service import WidgetGenerationService
 from utils.card_runtime import UploadFileOSMS
 
 # 本组验证既有创建、回退或路由合同，静态策略由专项测试覆盖。
@@ -114,7 +114,7 @@ def storage(tmp_path, monkeypatch, isolated_theme_stage):
         WidgetGenerationService, "_enable_card_template", staticmethod(lambda: False)
     )
     monkeypatch.setattr(
-        "services.artifact_store.file_obs",
+        "services.artifacts.artifact_store.file_obs",
         UploadFileOSMS(),
     )
     return tmp_path / "mock_obs"
@@ -212,13 +212,13 @@ async def test_edit_and_legacy_url_migration_preserve_source_artifact(
     storage, monkeypatch, source_version
 ):
     # 编辑原卡必须已完成主题；其它素材测试隔离主题，不能把内部角色交给编辑。
-    from services.post_layout_theme import apply_theme, presets
+    from services.themes.post_layout_theme import apply_theme, presets
 
     async def theme(artifact, task, *_args, **_kwargs):
         preset = next(item for item in presets(task) if item.get("id") == "gradient-blue")
         return artifact.model_copy(update={"genui": apply_theme(artifact.genui, preset, task, {})})
 
-    monkeypatch.setattr("services.post_layout_theme.theme_artifact", theme)
+    monkeypatch.setattr("services.themes.post_layout_theme.theme_artifact", theme)
     monkeypatch.setattr(get_settings(), "enable_artifact_validation", False)
     prompts = []
     phases = []

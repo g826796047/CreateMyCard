@@ -10,8 +10,8 @@ from test_photo_icon_exclusion import with_icon
 from test_uniform_photo_eligibility import PATHS, choose, photo, rejection, sample
 from test_wide_photo_focus import focus_sample
 
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 from theme_preference_samples import preference, reply
 
 HOURGLASS = "photo-ux-hourglass-square"

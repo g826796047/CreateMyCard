@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from config.config import Settings
 from models.generation import DeviceContext
-from services.ids_client import IDSClient
+from services.capabilities.ids_client import IDSClient
 
 _PAYLOAD = {
     "nameSpaces": [
@@ -50,9 +50,9 @@ def _query(client):
 def test_time_window_limits_attempts(ids_client, monkeypatch, budget, attempts):
     monkeypatch.setattr(ids_client.settings, "ids_request_retry_budget_seconds", budget)
     request = Mock(side_effect=requests.Timeout("timeout"))
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     log = Mock()
-    monkeypatch.setattr("services.ids_client.logger", log)
+    monkeypatch.setattr("services.capabilities.ids_client.logger", log)
 
     assert _query(ids_client).installed_apps == set()
     assert request.call_count == attempts
@@ -78,9 +78,9 @@ def test_retry_recovers_and_preserves_query(ids_client, monkeypatch, failure):
     success = Mock(status_code=200, content=b"payload")
     success.json.return_value = _PAYLOAD
     request = Mock(side_effect=[failure, success])
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     log = Mock()
-    monkeypatch.setattr("services.ids_client.logger", log)
+    monkeypatch.setattr("services.capabilities.ids_client.logger", log)
 
     assert _query(ids_client).installed_apps == {"com.example.weather"}
     assert request.call_count == 2
@@ -102,21 +102,21 @@ def test_retry_recovers_and_preserves_query(ids_client, monkeypatch, failure):
 @pytest.mark.parametrize("status", [400, 401, 403, 404, 422])
 def test_permanent_http_error_does_not_retry(ids_client, monkeypatch, status):
     request = Mock(return_value=_response(status))
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     assert _query(ids_client).installed_apps == set()
     assert request.call_count == 1
 
 
 def test_invalid_url_does_not_retry(ids_client, monkeypatch):
     request = Mock(side_effect=requests.exceptions.InvalidURL("bad url"))
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     assert _query(ids_client).installed_apps == set()
     assert request.call_count == 1
 
 
 def test_success_does_not_retry(ids_client, monkeypatch):
     request = Mock(return_value=_response())
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     assert _query(ids_client).installed_apps == set()
     assert request.call_count == 1
 
@@ -124,7 +124,7 @@ def test_success_does_not_retry(ids_client, monkeypatch):
 def test_mock_failure_does_not_query_remote(ids_client, monkeypatch):
     monkeypatch.setattr(ids_client.settings, "enable_ids_mock", True)
     request = Mock()
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     assert _query(ids_client).installed_apps == set()
     request.assert_not_called()
     ids_client.build_ids_sign.assert_not_called()
@@ -133,7 +133,7 @@ def test_mock_failure_does_not_query_remote(ids_client, monkeypatch):
 def test_placeholder_url_does_not_query_remote(ids_client, monkeypatch):
     monkeypatch.setattr(ids_client.settings, "ids_query_url", "http://{{ip}}/query")
     request = Mock()
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     assert _query(ids_client).installed_apps == set()
     request.assert_not_called()
 
@@ -185,7 +185,7 @@ def test_exponential_delays(
     monkeypatch.setattr(ids_client.settings, "ids_request_retry_initial_delay_seconds", initial)
     monkeypatch.setattr(ids_client.settings, "ids_request_retry_backoff_multiplier", multiplier)
     request = Mock(side_effect=requests.Timeout("timeout"))
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     assert _query(ids_client).installed_apps == set()
     assert ids_retry_clock.sleeps == expected
     assert request.call_count == len(expected) + 1
@@ -210,7 +210,7 @@ def test_inflight_last_request_can_finish_after_deadline(
             b'"values":[{"data":{"bundleName":"app"}}]}]}'
         ))
 
-    monkeypatch.setattr("services.ids_client.requests.request", send)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", send)
     state = _query(ids_client)
     assert attempts == [0.0, 8.5]
     assert ids_retry_clock.now == 11.5
@@ -224,7 +224,7 @@ def test_request_time_consumes_budget(ids_client, ids_retry_clock, monkeypatch):
         raise requests.Timeout("deadline reached")
 
     request = Mock(side_effect=send)
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     assert _query(ids_client).installed_apps == set()
     request.assert_called_once()
     assert ids_retry_clock.sleeps == []
@@ -239,7 +239,7 @@ def test_no_request_after_sleep_or_signature_exhausts_window(
         return "sign"
 
     if overrun_stage == "sleep":
-        monkeypatch.setattr("services.ids_client.time.sleep", overrun)
+        monkeypatch.setattr("services.capabilities.ids_client.time.sleep", overrun)
     else:
         monkeypatch.setattr(ids_client, "build_ids_sign", Mock(side_effect=["first", "second"]))
         original_sign = ids_client.build_ids_sign
@@ -251,6 +251,6 @@ def test_no_request_after_sleep_or_signature_exhausts_window(
 
         monkeypatch.setattr(ids_client, "build_ids_sign", sign)
     request = Mock(side_effect=requests.Timeout("timeout"))
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     assert _query(ids_client).installed_apps == set()
     request.assert_called_once()

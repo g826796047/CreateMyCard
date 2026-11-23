@@ -8,11 +8,11 @@ from test_uniform_photo_eligibility import ACTION, PATHS, choose, evidence, phot
 from test_wide_photo_focus import focus_sample
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
 from services.template_generation.engine.cardplan.photo_facts import template_photo_facts
-from services.theme_body_regions import body_region_evidence
-from services.theme_photo_eligibility import fusion_photo_facts
-from services.theme_photo_matching import photo_reason
+from services.themes import post_layout_theme as themes
+from services.themes.theme_body_regions import body_region_evidence
+from services.themes.theme_photo_eligibility import fusion_photo_facts
+from services.themes.theme_photo_matching import photo_reason
 
 SUNSETS = ("photo-ux-mountain-sunset-lake-square", "photo-ux-pink-sunset-lake-square")
 CLOUD = "photo-ux-cumulus-blue-square"

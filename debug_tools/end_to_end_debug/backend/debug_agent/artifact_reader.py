@@ -13,7 +13,7 @@ from debug_tools.paths import WIDGET_SERVICE_ROOT
 from .schemas import ArtifactPreview
 
 if TYPE_CHECKING:
-    from services.source_artifact_repository import SourceArtifactRepository
+    from services.artifacts.source_artifact_repository import SourceArtifactRepository
 
 
 class ArtifactReader:
@@ -114,7 +114,7 @@ def _list_value(value: dict[str, Any], key: str) -> list[Any]:
 
 def _source_repository_module() -> Any:
     module_names = (
-        "services.source_artifact_repository",
+        "services.artifacts.source_artifact_repository",
     )
     last_error: ImportError | None = None
     original_sys_path = list(sys.path)

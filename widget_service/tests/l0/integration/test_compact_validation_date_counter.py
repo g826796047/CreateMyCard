@@ -7,7 +7,7 @@ import pytest
 
 from services.card_validation.compact_validation.api import validate_compact_dsl
 from services.card_validation.compact_validation.diagnostics import CompactDslValidationError
-from services.generation_pipeline import DesignCompactProcessor
+from services.generation.generation_pipeline import DesignCompactProcessor
 
 _ROOT = "/data/customCounter"
 _RELATION = "${/data/customCounter/relationText}"

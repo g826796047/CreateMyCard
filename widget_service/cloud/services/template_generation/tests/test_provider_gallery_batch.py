@@ -12,8 +12,8 @@ import pytest
 from api.schemas import GenerateWidgetCardResponse
 from core.errors import GenerationStatus
 from models.artifact import WidgetArtifact
-from services.artifact_store import ArtifactStore
-from services.capability_registry import CapabilityRegistry
+from services.artifacts.artifact_store import ArtifactStore
+from services.capabilities.capability_registry import CapabilityRegistry
 from services.template_generation.controls import TemplateControls
 from services.template_generation.test_support import provider_gallery
 from services.template_generation.test_support.provider_gallery import (

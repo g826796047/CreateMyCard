@@ -29,7 +29,7 @@ from services.card_validation.compact_validation.text import (
     _static_text_fragments,
     _uses_visual_recipe_part,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
 )
 
@@ -606,8 +606,8 @@ def _collect_compound_duration_component_errors(
     components: list[ComponentRow], task_spec: dict[str, Any], errors: list[str],
 ) -> None:
     """只兜底有明确样值的文本/数值选型错误，不改变组件内部字号。"""
-    from services.compact_composition_context import _literal_display_sample
-    from services.compact_composition_planner import is_compound_duration_text
+    from services.compact.planning.compact_composition_context import _literal_display_sample
+    from services.compact.planning.compact_composition_planner import is_compound_duration_text
 
     for component in components:
         if component.component_type != "EmphasizedData":

@@ -5,9 +5,9 @@ import json
 import pytest
 
 from models.generation import TaskSpec
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.prompt_builder import REPAIR_SYSTEM_PROMPT, PromptBuilder
-from services.protocol_registry import DESIGN_COMPACT_PROFILE_ID
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation.prompt_builder import REPAIR_SYSTEM_PROMPT, PromptBuilder
+from services.protocols.protocol_registry import DESIGN_COMPACT_PROFILE_ID
 
 
 def _repair_feedback(messages: list[dict[str, str]]) -> dict:

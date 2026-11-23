@@ -19,17 +19,17 @@ from repair_compact_dsl import (
     CompactDslRepairError,
     _repair_compact_dsl_source,
 )
-from services import widget_generation_service
-from services.artifact_store import ArtifactStore, RepairArtifactRecord
-from services.asset_url_mapper import AssetUrlMapper
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_pipeline import (
+from services.artifacts.artifact_store import ArtifactStore, RepairArtifactRecord
+from services.artifacts.asset_url_mapper import AssetUrlMapper
+from services.card_validation.validator import ArtifactValidator
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation import widget_generation_service
+from services.generation.generation_pipeline import (
     DslProcessingContext,
     DslProcessorKind,
     get_dsl_processor,
 )
-from services.validator import ArtifactValidator
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
 
 INVALID = "\n".join(
     [

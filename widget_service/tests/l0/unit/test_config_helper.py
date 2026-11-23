@@ -7,8 +7,8 @@ import pytest
 from cloud.config.config import Settings
 from cloud.config.config_helper import ConfigHelper
 
-from services import widget_generation_service as service_module
-from services.compact_prompt_loader import read_prompt
+from services.generation import widget_generation_service as service_module
+from services.protocols.compact_prompt_loader import read_prompt
 
 
 def _force_default_config(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

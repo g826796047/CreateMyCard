@@ -2,13 +2,15 @@
 
 import pytest
 
-import services.compact_component_runtime as component_runtime
-import services.compact_composition_context as composition_context
+import services.compact.components.compact_component_runtime as component_runtime
+import services.compact.planning.compact_composition_context as composition_context
 from models.generation import TaskSpec
-from services.compact_component_runtime import text_block_width_contract
-from services.compact_composition_context import compact_text_block_capacity_context
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.prompt_builder import PromptBuilder
+from services.compact.components.compact_component_runtime import text_block_width_contract
+from services.compact.planning.compact_composition_context import (
+    compact_text_block_capacity_context,
+)
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation.prompt_builder import PromptBuilder
 
 
 @pytest.mark.parametrize(

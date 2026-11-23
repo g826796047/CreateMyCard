@@ -4,16 +4,16 @@ import copy
 
 import pytest
 
-from services import post_layout_theme as themes
-from services.asset_url_mapper import AssetUrlMapper
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.compact_high_level_components import (
+from services.artifacts.asset_url_mapper import AssetUrlMapper
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.components.compact_high_level_components import (
     CompactDslConversionError,
     ComponentRow,
     apply_system_component_colors,
 )
-from services.post_layout_theme_registry import registered_themes
-from services.theme_style_roles import layout_phase
+from services.themes import post_layout_theme as themes
+from services.themes.post_layout_theme_registry import registered_themes
+from services.themes.theme_style_roles import layout_phase
 
 FALLBACK = "resources/base/media/ic_fallback_light.svg"
 URL = "https://hagres-drcn.dbankcdn.com/assets/fallback.svg?version=1"

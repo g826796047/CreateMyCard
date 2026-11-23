@@ -6,6 +6,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from services.capabilities.event_matching import event_handlers_match
 from services.card_validation.compact_validation.constants import _EXPRESSION_PATTERN
 from services.card_validation.compact_validation.semantic.asset_references import (
     model_asset_references,
@@ -13,16 +14,18 @@ from services.card_validation.compact_validation.semantic.asset_references impor
 from services.card_validation.compact_validation.syntax.expressions import (
     _collect_binding_context,
 )
-from services.compact_action_instances import event_card_item_handlers, plan_action_handlers
-from services.compact_component_semantics import CORE_INFORMATION_COMPONENT_TYPES
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.compact_plan import (
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.components.compact_component_semantics import CORE_INFORMATION_COMPONENT_TYPES
+from services.compact.layout.compact_whole_card_click import accepted_whole_card_click
+from services.compact.planning.compact_action_instances import (
+    event_card_item_handlers,
+    plan_action_handlers,
+)
+from services.compact.planning.compact_plan import (
     _compact_fact_coverage_result,
     _compact_visible_state,
     compact_plan_overflow_action_ids,
 )
-from services.compact_whole_card_click import accepted_whole_card_click
-from services.event_matching import event_handlers_match
 
 _BUTTON_COMPONENT_TYPES = frozenset({"PillButton", "CircleButton", "CardButton"})
 
@@ -31,7 +34,10 @@ def collect_hero_slot_errors(
     source_components: list[ComponentRow] | None, errors: list[str],
 ) -> None:
     """按正式 Region 角色检查主槽，不把其它分区的核心内容借给该槽。"""
-    from services.generation_content_policy import STATIC_COMPONENTS, current_content_policy
+    from services.generation.generation_content_policy import (
+        STATIC_COMPONENTS,
+        current_content_policy,
+    )
 
     if source_components is None:
         return
@@ -290,7 +296,10 @@ def collect_secondary_body_context_errors(
     errors: list[str],
 ) -> None:
     """阻止新生成的 SecondaryBody 在整卡没有核心信息时独立承担内容。"""
-    from services.generation_content_policy import STATIC_COMPONENTS, current_content_policy
+    from services.generation.generation_content_policy import (
+        STATIC_COMPONENTS,
+        current_content_policy,
+    )
 
     core_types = CORE_INFORMATION_COMPONENT_TYPES
     if current_content_policy().is_static:

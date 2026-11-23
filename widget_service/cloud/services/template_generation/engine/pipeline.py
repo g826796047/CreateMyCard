@@ -10,7 +10,6 @@ from typing import Any
 from app.logger import json_for_log, logger
 from models.generation import CandidateDataBinding, TaskSpec
 from services.card_validation.base import expression_references
-from services.post_layout_theme_registry import registered_themes
 from services.template_generation.controls import load_template_controls
 from services.template_generation.engine.advanced.content_selectors import (
     apply_content_selectors,
@@ -90,6 +89,7 @@ from services.template_generation.profile import (
     TERSEL_PROTOCOL_PROFILE_ID,
     read_tersel_protocol_profile,
 )
+from services.themes.post_layout_theme_registry import registered_themes
 
 _MODULE = "[Template Generation]"
 _MAX_BODY_REPAIRS = 2

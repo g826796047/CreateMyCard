@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 
 def assert_template_compact_processing(

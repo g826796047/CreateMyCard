@@ -65,13 +65,13 @@ generate_widget_card_compact_dsl_ws
 
 主要代码位置：
 
-- 路由入口：`../widget_service/cloud/api/routes.py`
-- 生成编排：`../widget_service/cloud/services/widget_generation_service.py`
-- 路由策略和 Processor：`../widget_service/cloud/services/generation_pipeline.py`
-- Design Compact 转换器：`../widget_service/cloud/services/compact_dsl_a2ui_converter.py`
-- Prompt：`../widget_service/cloud/services/prompt_builder.py`
-- Artifact 校验：`../widget_service/cloud/services/validator.py`
-- Artifact 保存：`../widget_service/cloud/services/artifact_store.py`
+- 路由入口：`../cloud/api/routes.py`
+- 生成编排：`../cloud/services/generation/widget_generation_service.py`
+- 路由策略和 Processor：`../cloud/services/generation/generation_pipeline.py`
+- Design Compact 转换器：`../cloud/services/compact/compact_dsl_a2ui_converter.py`
+- Prompt：`../cloud/services/generation/prompt_builder.py`
+- Artifact 校验：`../cloud/services/card_validation/validator.py`
+- Artifact 保存：`../cloud/services/artifacts/artifact_store.py`
 
 ## 2.1 参数兜底后的接口级重试
 

@@ -3,8 +3,8 @@ import json
 
 import pytest
 
-from services.compact_list_review import review_list_plan, second_member_targets
-from services.compact_plan import CompactPlanValidationResult
+from services.compact.planning.compact_list_review import review_list_plan, second_member_targets
+from services.compact.planning.compact_plan import CompactPlanValidationResult
 
 
 def field(index, name):

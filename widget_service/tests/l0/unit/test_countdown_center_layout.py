@@ -6,27 +6,27 @@ import pytest
 
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
 from services.card_validation.theme_phase_validator import theme_phase_errors
-from services.compact_component_runtime import visual_recipe_part
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     convert_compact_dsl_to_a2ui,
     parse_compact_dsl_rows,
     repair_compact_dsl_safe_structure,
 )
-from services.compact_layout_runtime import (
+from services.compact.components.compact_component_runtime import visual_recipe_part
+from services.compact.layout.compact_layout_runtime import (
     allowed_layout_ids,
     load_layout_contract,
     match_compact_layout,
 )
-from services.compact_plan import build_compact_plan_tool, parse_compact_plan_call
-from services.content_business import BusinessContext, FinalBusinessContext
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.post_layout_theme import apply_theme, components, decode, presets
-from services.post_layout_theme_registry import registered_themes
-from services.theme_content_regions import photo_layout_evidence
-from services.theme_photo_eligibility import fusion_photo_facts, photo_content_reason
-from services.theme_style_roles import layout_phase, role
+from services.compact.planning.compact_plan import build_compact_plan_tool, parse_compact_plan_call
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.themes.content_business import BusinessContext, FinalBusinessContext
+from services.themes.post_layout_theme import apply_theme, components, decode, presets
+from services.themes.post_layout_theme_registry import registered_themes
+from services.themes.theme_content_regions import photo_layout_evidence
+from services.themes.theme_photo_eligibility import fusion_photo_facts, photo_content_reason
+from services.themes.theme_style_roles import layout_phase, role
 
 
 def _rows(days: int = 100) -> list[list]:

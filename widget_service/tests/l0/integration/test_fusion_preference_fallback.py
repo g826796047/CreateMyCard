@@ -13,10 +13,10 @@ from test_post_layout_sleep_theme import ACTION, sleep_layout, sleep_task
 from test_uniform_photo_eligibility import PATHS, sample
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services.capability_registry import CapabilityRegistry
-from services.protocol_registry import A2UIProtocolRegistry
-from services.validator import ArtifactValidator
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.card_validation.validator import ArtifactValidator
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
 from theme_preference_samples import preference, reply
 
 QUERY = "使用融球，其余配色与排除条件按我的要求"

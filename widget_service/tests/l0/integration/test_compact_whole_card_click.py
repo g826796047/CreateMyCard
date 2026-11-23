@@ -11,18 +11,21 @@ from config.config import get_settings
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
 from models.generation import CardSpec, TaskSpec
-from services.artifact_store import ArtifactStore
+from services.artifacts.artifact_store import ArtifactStore
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
-from services.compact_plan import (
+from services.compact.layout.compact_whole_card_click import (
+    accepted_whole_card_click,
+    select_whole_card_click,
+)
+from services.compact.planning.compact_plan import (
     CompactPlanValidationError,
     compact_plan_context,
     parse_compact_plan_call,
 )
-from services.compact_repair_context import joint_repair_contract
-from services.compact_whole_card_click import accepted_whole_card_click, select_whole_card_click
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.generation_preflight import GenerationPreflight
-from services.widget_generation_service import WidgetGenerationService
+from services.compact.repair.compact_repair_context import joint_repair_contract
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.generation_preflight import GenerationPreflight
+from services.generation.widget_generation_service import WidgetGenerationService
 
 # 本组验证既有创建、回退或路由合同，静态策略由专项测试覆盖。
 pytestmark = pytest.mark.usefixtures("existing_generation_policy")

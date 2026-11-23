@@ -3,7 +3,7 @@
 import pytest
 
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
-from services.protocol_registry import A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 from services.template_generation.engine.cardplan.compiler import (
     _estimate_height,
     _instantiate_blueprint,

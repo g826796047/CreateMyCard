@@ -22,15 +22,15 @@ from services.card_validation import (
 from services.card_validation.edit_validation import structure as edit_structure_validator
 from services.card_validation.edit_validation import styles as edit_style_validator
 from services.card_validation.edit_validation.artifact import validate_edit_artifact
-from services.widget_edit_contract import (
+from services.editing.widget_edit_contract import (
     apply_edit_output,
     dump_rows,
     edit_contract,
     validate_edit_source_structure,
     validate_intent,
 )
-from services.widget_edit_utils import source_digest
-from services.widget_generation_service import WidgetGenerationService
+from services.editing.widget_edit_utils import source_digest
+from services.generation.widget_generation_service import WidgetGenerationService
 
 edit_run_fixture = pytest.fixture(name="edit_run")(semantic_widget_edit.edit_run.__wrapped__)
 source_fixture = pytest.fixture(name="source")(semantic_widget_edit.source.__wrapped__)

@@ -114,11 +114,11 @@
 | 1 | [docs/云侧方案设计.md](../../docs/云侧方案设计.md) | 同步已批准的分类、诊断、建议及兼容约定。 |
 | 6 | [widget_service/cloud/data/protocol_profiles/design-compact-dsl/REPAIR_SYSTEM_PROMPT.md](../../widget_service/cloud/data/protocol_profiles/design-compact-dsl/REPAIR_SYSTEM_PROMPT.md) | 解释模型接收的规则、位置、事实、约束及可选建议。 |
 | 6 | [widget_service/cloud/repair_compact_dsl.py](../../widget_service/cloud/repair_compact_dsl.py) | 独立修复入口接收可选建议上下文。 |
-| 6 | [widget_service/cloud/services/artifact_store.py](../../widget_service/cloud/services/artifact_store.py) | 修复记录允许嵌套诊断类型，保留序列化行为。 |
+| 6 | [widget_service/cloud/services/artifact_store.py](../../widget_service/cloud/services/artifacts/artifact_store.py) | 修复记录允许嵌套诊断类型，保留序列化行为。 |
 | 5 | [widget_service/cloud/services/card_validation/compact_dsl_validator.py](../../widget_service/cloud/services/card_validation/compact_dsl_validator.py) | 保留公开兼容导出及既有辅助函数导入。 |
-| 6 | [widget_service/cloud/services/generation_pipeline.py](../../widget_service/cloud/services/generation_pipeline.py) | 保留原始文本、适配诊断分组并保持旧字符串出口。 |
-| 6 | [widget_service/cloud/services/prompt_builder.py](../../widget_service/cloud/services/prompt_builder.py) | 仅在模型请求副本中组织 Compact 错误说明。 |
-| 6 | [widget_service/cloud/services/widget_generation_service.py](../../widget_service/cloud/services/widget_generation_service.py) | 注入有可信来源的创建／编辑条件。 |
+| 6 | [widget_service/cloud/services/generation_pipeline.py](../../widget_service/cloud/services/generation/generation_pipeline.py) | 保留原始文本、适配诊断分组并保持旧字符串出口。 |
+| 6 | [widget_service/cloud/services/prompt_builder.py](../../widget_service/cloud/services/generation/prompt_builder.py) | 仅在模型请求副本中组织 Compact 错误说明。 |
+| 6 | [widget_service/cloud/services/widget_generation_service.py](../../widget_service/cloud/services/generation/widget_generation_service.py) | 注入有可信来源的创建／编辑条件。 |
 | 6 | [widget_service/tests/test_service_units.py](../../widget_service/tests/test_service_units.py) | 同步一处模型说明断言，保留外层 stage/code。 |
 | 7 | [docs/compact-dsl-validator-refactor/Compact_DSL重构实施与验证记录.md](../../docs/compact-dsl-validator-refactor/Compact_DSL重构实施与验证记录.md) | 记录基线、已知失败、验收证据及逐文件清单。 |
 | 2 | [widget_service/cloud/data/validator_rules/compact/repair_hints.json](../../widget_service/cloud/data/validator_rules/compact/repair_hints.json) | 按具体规则码配置四项通用修复建议。 |

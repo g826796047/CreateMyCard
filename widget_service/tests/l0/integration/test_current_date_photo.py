@@ -4,9 +4,9 @@ import pytest
 from test_uniform_photo_eligibility import BLUE, choose, evidence, rejection, sample
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services.compact_high_level_components import ComponentRow
-from services.theme_texture_eligibility import visible_business
+from services.compact.components.compact_high_level_components import ComponentRow
+from services.themes import post_layout_theme as themes
+from services.themes.theme_texture_eligibility import visible_business
 
 DATE = "/data/currentTime/currentDate"
 WEEKDAY = "/data/currentTime/dayOfWeek"

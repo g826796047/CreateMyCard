@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from models.generation import CandidateDataBinding, EventAction, TaskSpec
-from services.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
 from services.template_generation.engine.advanced.ux_mixed_prompt import build_ux_mixed_prompt
 from services.template_generation.engine.cardplan.compiler import compile_ux_layout_card
 from services.template_generation.engine.cardplan.preview_dataset import (

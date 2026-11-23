@@ -11,10 +11,10 @@ from services.card_validation.compact_validation.constants import _VISUAL_RECIPE
 from services.card_validation.compact_validation.semantic.display import (
     _paired_recipe_label_context,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_pipeline import DesignCompactProcessor
-from services.prompt_builder import PromptBuilder
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation.generation_pipeline import DesignCompactProcessor
+from services.generation.prompt_builder import PromptBuilder
 
 
 def _source(component: str, props: dict) -> str:

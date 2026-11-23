@@ -8,21 +8,21 @@ from types import SimpleNamespace
 import pytest
 
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
     expand_compact_semantic_layout,
     parse_compact_dsl_rows,
 )
-from services.compact_layout_runtime import (
+from services.compact.layout.compact_layout_runtime import (
     LAYOUT_CONTRACT_VERSION,
     CompactLayoutRuntimeError,
     layout_ids_for_size,
     load_layout_contract,
     match_compact_layout,
 )
-from services.compact_prompt_loader import assemble_prompts
-from services.compact_semantic_layout import collect_semantic_layout_warnings
-from services.prompt_builder import PromptBuilder
+from services.compact.layout.compact_semantic_layout import collect_semantic_layout_warnings
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.compact_prompt_loader import assemble_prompts
 
 PROMPT_SOURCE = (
     Path(__file__).resolve().parents[3]

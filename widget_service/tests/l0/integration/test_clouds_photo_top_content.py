@@ -15,8 +15,8 @@ from test_uniform_photo_eligibility import (
 )
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 
 CLOUDS = "photo-ux-clouds-weather-square"
 ICON = "resources/base/media/drop_1.svg"

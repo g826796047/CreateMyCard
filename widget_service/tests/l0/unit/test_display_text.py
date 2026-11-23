@@ -2,7 +2,7 @@
 
 import pytest
 
-from services.display_text import concatenated_display_text, current_display_text
+from services.compact.components.display_text import concatenated_display_text, current_display_text
 
 
 @pytest.mark.parametrize("condition,expected", [(True, "Battery 80%"), (False, "Offline")])

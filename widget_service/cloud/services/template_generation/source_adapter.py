@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from services.generation_pipeline import DslProcessorKind
+from services.generation.generation_pipeline import DslProcessorKind
 from services.template_generation.engine.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     convert_a2ui_to_compact_dsl,

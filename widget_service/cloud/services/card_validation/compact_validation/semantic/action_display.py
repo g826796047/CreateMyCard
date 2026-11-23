@@ -7,12 +7,12 @@ import copy
 import json
 from typing import Any
 
-from services.compact_dsl_a2ui_converter import (
+from services.capabilities.event_matching import event_handlers_match
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     parse_compact_dsl_rows,
 )
-from services.event_matching import event_handlers_match
 
 _BUTTON_TYPES = frozenset({"PillButton", "CircleButton", "CardButton"})
 _LIST_TYPES = frozenset({"List", "Grid", "ForEach", "Repeat", "RecordList", "SummaryList"})

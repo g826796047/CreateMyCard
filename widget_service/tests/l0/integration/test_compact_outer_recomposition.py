@@ -5,13 +5,13 @@ import json
 
 import pytest
 
-from services.compact_dsl_a2ui_converter import ComponentRow, parse_compact_dsl_rows
-from services.compact_outer_recomposition import (
+from services.compact.compact_dsl_a2ui_converter import ComponentRow, parse_compact_dsl_rows
+from services.compact.repair.compact_outer_recomposition import (
     _paragraph,
     _reflow_items,
     _wrap_complete_value_rows,
 )
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 
 @pytest.mark.parametrize("legacy_role", [None, "supporting", "body", "metadata"])

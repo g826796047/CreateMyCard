@@ -22,7 +22,7 @@ from app.logger import logger
 from config.config import Settings
 from custom.model_transport import ModelTransportError
 from models.generation import ModelRequestContext
-from services.generation_trace_recorder import trace_record
+from services.observability.generation_trace_recorder import trace_record
 from utils.card_runtime import report_ops_metrics
 
 _MODULE = "[DeepSeek Official HTTP]"

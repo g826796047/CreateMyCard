@@ -1,6 +1,6 @@
 """仅供测试的构图，不向运行注册表添加已删除的图片。"""
 
-from services.post_layout_theme_registry import registered_themes
+from services.themes.post_layout_theme_registry import registered_themes
 
 
 def protected_photo():

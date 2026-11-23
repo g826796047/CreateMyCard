@@ -8,9 +8,9 @@ from test_semantic_widget_edit import _intent, _nodes, _patch, _request, _rows
 
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient, A2UIModelGenerationError
-from services.widget_edit_contract import apply_edit_output
-from services.widget_edit_utils import source_digest
-from services.widget_generation_service import WidgetGenerationService
+from services.editing.widget_edit_contract import apply_edit_output
+from services.editing.widget_edit_utils import source_digest
+from services.generation.widget_generation_service import WidgetGenerationService
 
 edit_run_fixture = pytest.fixture(name="edit_run")(semantic_widget_edit.edit_run.__wrapped__)
 source_fixture = pytest.fixture(name="source")(semantic_widget_edit.source.__wrapped__)
@@ -152,7 +152,7 @@ async def test_recovered_layout_passes_full_delivery_validation(edit_run, source
 
 @pytest.mark.parametrize("dynamic", [False, True])
 def test_omitted_protected_styles_restore_only_static_values(source, dynamic):
-    from services.widget_edit_contract import dump_rows
+    from services.editing.widget_edit_contract import dump_rows
 
     original_rows = _rows(source)
     if dynamic:
@@ -174,7 +174,7 @@ def test_omitted_protected_styles_restore_only_static_values(source, dynamic):
 
 
 def test_authorized_background_removal_is_not_undone_by_recovery(source):
-    from services.widget_edit_contract import dump_rows, validate_intent
+    from services.editing.widget_edit_contract import dump_rows, validate_intent
 
     original_rows = _rows(source)
     _nodes(original_rows)[0].get("styles", {})["backgroundImage"] = "original-background"

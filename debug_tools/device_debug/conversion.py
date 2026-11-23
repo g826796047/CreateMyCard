@@ -46,9 +46,12 @@ def convert(source: str, input_format: str = "auto", size: str = "2x2") -> Conve
         raise ValueError("输入内容与选择的格式不匹配")
     if compact:
         ensure_cloud_import_path()
-        from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-        from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-        from services.protocol_registry import A2UIProtocolRegistry
+        from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+        from services.generation.generation_content_policy import (
+            STATIC_CONTENT_POLICY,
+            content_policy_scope,
+        )
+        from services.protocols.protocol_registry import A2UIProtocolRegistry
 
         profile = A2UIProtocolRegistry.read_design_protocol_profile("design-compact-dsl")
         normalized = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)

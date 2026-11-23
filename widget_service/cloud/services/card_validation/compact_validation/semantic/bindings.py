@@ -17,9 +17,11 @@ from services.card_validation.compact_validation.schema import (
     _schema_type,
 )
 from services.card_validation.compact_validation.text import _pure_binding_path
-from services.compact_component_bindings import collect_compact_component_binding_errors
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
+)
+from services.compact.components.compact_component_bindings import (
+    collect_compact_component_binding_errors,
 )
 
 

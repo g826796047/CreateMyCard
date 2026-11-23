@@ -13,14 +13,14 @@ from custom.a2ui_model_client import A2UIModelClient, A2UIModelGenerationError
 from custom.model_transport import ModelTransportError
 from custom.unified_model_client import UnifiedModelClient
 from models.generation import ModelRequestContext
-from services import widget_generation_service as service_module
-from services.artifact_store import ArtifactStore
-from services.asset_url_mapper import AssetUrlMapper
-from services.generation_pipeline import DslProcessingResult, QualityIssue
+from services.artifacts.artifact_store import ArtifactStore
+from services.artifacts.asset_url_mapper import AssetUrlMapper
+from services.generation import widget_generation_service as service_module
+from services.generation.generation_pipeline import DslProcessingResult, QualityIssue
+from services.generation.widget_generation_service import WidgetGenerationService
 from services.template_generation import TemplateSourceGenerator
 from services.template_generation.engine.pipeline import TemplateRouteNotApplicable
 from services.template_generation.model_client import TemplateModelClient
-from services.widget_generation_service import WidgetGenerationService
 
 
 @pytest.mark.asyncio
@@ -187,7 +187,7 @@ async def test_template_attempt_falls_back_to_fresh_fusion(
     monkeypatch.setattr(AssetUrlMapper, "rewrite_standard", rewrite)
     monkeypatch.setattr(service_module.ArtifactValidator, "validate", validate)
     monkeypatch.setattr(service_module.ArtifactValidator, "validate_layout", validate)
-    monkeypatch.setattr("services.post_layout_theme.theme_artifact", theme)
+    monkeypatch.setattr("services.themes.post_layout_theme.theme_artifact", theme)
     monkeypatch.setattr(service_module, "trace_record", trace_record)
     monkeypatch.setattr(ArtifactStore, "save", save)
     # 本测试使用占位 DSL，序列化由独立测试覆盖，这里只验证路线和上下文隔离。

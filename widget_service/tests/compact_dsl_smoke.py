@@ -14,8 +14,11 @@ import requests
 from debug_tools.batch_testing.runner import invoke_generate
 
 from config.config import get_settings
+from services.artifacts.source_artifact_repository import (
+    SourceArtifactRepository,
+    calculate_artifact_digest,
+)
 from services.card_validation import ValidationOptions, validate_card
-from services.source_artifact_repository import SourceArtifactRepository, calculate_artifact_digest
 
 SERVICE = Path(__file__).resolve().parents[1]
 HOST = "127.0.0.1"

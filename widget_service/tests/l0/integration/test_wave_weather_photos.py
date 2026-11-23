@@ -9,8 +9,8 @@ from test_uniform_photo_eligibility import PATHS, choose, rejection, sample
 from test_weather_body_regions import weather_regions
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
 
 SQUARE = "photo-ux-mountain-sunset-lake-square"
 WIDE = "photo-ux-mountain-sunset-lake-wide"

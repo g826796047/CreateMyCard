@@ -537,7 +537,7 @@ failed       系统异常、模型失败、OBS 失败等工程失败
 位置：
 
 ```text
-cloud/services/widget_generation_service.py
+cloud/services/generation/widget_generation_service.py
 ```
 
 签名：
@@ -554,7 +554,7 @@ get_widget_capability_overview(
 
 ```python
 from api.schemas import CapabilityOverviewRequest
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
 
 service = WidgetGenerationService()
 response = service.get_widget_capability_overview(
@@ -704,7 +704,7 @@ _build_artifact(...) -> WidgetArtifact
 位置：
 
 ```text
-cloud/services/capability_registry.py
+cloud/services/capabilities/capability_registry.py
 ```
 
 ### 5.2 IDSClient
@@ -712,7 +712,7 @@ cloud/services/capability_registry.py
 位置：
 
 ```text
-cloud/services/ids_client.py
+cloud/services/capabilities/ids_client.py
 ```
 
 用途：封装 IDS mock/真实远程数据源选择、已安装应用查询和响应解析，输出稳定的 `IDSDeviceCapabilityState`。`enable_ids_mock` 默认开启；开启时只读 mock，关闭时忽略 mock 并只查真实远程 IDS，任一路径失败都返回空 IDS 结果且不跨数据源回退。`DeviceCapabilityResolver` 不直接读取 IDS 文件。
@@ -782,7 +782,7 @@ get_asset_capability(asset_id: str) -> AssetCapability | None
 位置：
 
 ```text
-cloud/services/protocol_registry.py
+cloud/services/protocols/protocol_registry.py
 ```
 
 构造：
@@ -814,7 +814,7 @@ data/protocol_profiles/{profile_id}/data-binding.md
 位置：
 
 ```text
-cloud/services/device_capability_resolver.py
+cloud/services/capabilities/device_capability_resolver.py
 ```
 
 签名：
@@ -962,7 +962,7 @@ ids_request_retry_backoff_multiplier: 2.0
 位置：
 
 ```text
-cloud/services/card_spec_builder.py
+cloud/services/generation/card_spec_builder.py
 ```
 
 签名：
@@ -996,7 +996,7 @@ build(
 位置：
 
 ```text
-cloud/services/task_spec_builder.py
+cloud/services/generation/task_spec_builder.py
 ```
 
 签名：
@@ -1077,7 +1077,7 @@ assetCandidates
 位置：
 
 ```text
-cloud/services/prompt_builder.py
+cloud/services/generation/prompt_builder.py
 ```
 
 签名：
@@ -1167,7 +1167,7 @@ WIDGET_SERVICE_ENABLE_A2UI_MODEL_MOCK=true
 位置：
 
 ```text
-cloud/services/validator.py
+cloud/services/card_validation/validator.py
 ```
 
 签名：
@@ -1202,7 +1202,7 @@ CardSpec 必填字段、suggestSize、dataBindings 和 writeResultTo 合法
 位置：
 
 ```text
-cloud/services/retry_controller.py
+cloud/services/generation/retry_controller.py
 ```
 
 签名：
@@ -1239,7 +1239,7 @@ repairAttempted 是否执行过修复
 位置：
 
 ```text
-cloud/services/artifact_store.py
+cloud/services/artifacts/artifact_store.py
 ```
 
 签名：
@@ -1273,7 +1273,7 @@ Replace this method with the team's OBS uploader.
 位置：
 
 ```text
-cloud/services/source_artifact_repository.py
+cloud/services/artifacts/source_artifact_repository.py
 ```
 
 用途：在 edit 模式下读取 `widget-artifact-v2` 并解析具名代码块。repository 不校验 URL 的协议、host、端口、query、fragment 或对象前缀；`enable_artifact_download_mock=true` 时从 URL path 提取文件名并只读取本地 mock OBS，默认为该模式且缺文件不回退网络；关闭后将原始 URL 交给 `utils/download_file_from_url.py` 的公共 `download_file` 方法。两种模式仍限制文件大小和超时，远程模式不跟随重定向，也不记录完整 URL。
@@ -1283,7 +1283,7 @@ cloud/services/source_artifact_repository.py
 位置：
 
 ```text
-cloud/services/response_planner.py
+cloud/services/generation/response_planner.py
 ```
 
 签名：
@@ -1506,7 +1506,7 @@ logger.info(
 位置：
 
 ```text
-cloud/services/json_loader.py
+cloud/services/protocols/json_loader.py
 ```
 
 签名：

@@ -4,7 +4,7 @@ import copy
 
 import pytest
 
-from services.event_matching import event_handlers_match
+from services.capabilities.event_matching import event_handlers_match
 
 
 def _handler(flag: object = 0) -> dict:
@@ -62,8 +62,8 @@ def test_non_switch_flags_keep_exact_semantics() -> None:
 @pytest.mark.parametrize("flag", [0, 1])
 def test_registered_switch_schema_and_preflight_accept_both_flags(name: str, flag: int) -> None:
     from api.schemas import GenerateWidgetCardRequest
-    from services.capability_registry import CapabilityRegistry
-    from services.generation_preflight import GenerationPreflight
+    from services.capabilities.capability_registry import CapabilityRegistry
+    from services.generation.generation_preflight import GenerationPreflight
 
     registry = CapabilityRegistry(version="app-11.7.7.300_rom-7.0")
     capability = registry.get_event_capability(name)

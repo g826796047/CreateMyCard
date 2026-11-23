@@ -6,15 +6,15 @@ from pathlib import Path
 
 import pytest
 
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ComponentRow,
     convert_compact_dsl_to_a2ui,
     parse_compact_dsl_rows,
     serialize_compact_dsl_source,
 )
-from services.compact_layout_runtime import match_compact_layout
-from services.compact_semantic_layout import SMALL_CHILD_ROLES
+from services.compact.layout.compact_layout_runtime import match_compact_layout
+from services.compact.layout.compact_semantic_layout import SMALL_CHILD_ROLES
 
 SOURCE = Path(__file__).parents[3] / (
     "cloud/data/protocol_profiles/design-compact-dsl-fusion/prompt_source/fewshots/2x2.md"

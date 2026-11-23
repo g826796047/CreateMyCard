@@ -7,7 +7,7 @@ import test_semantic_widget_edit as semantic_widget_edit
 from test_semantic_widget_edit import _intent, _nodes, _request, _rows
 
 from core.errors import GenerationStatus
-from services.widget_edit_contract import (
+from services.editing.widget_edit_contract import (
     ChildrenOrder,
     apply_children_orders,
     apply_edit_output,
@@ -15,8 +15,8 @@ from services.widget_edit_contract import (
     validate_edit_diff,
     validate_intent,
 )
-from services.widget_edit_utils import source_digest
-from services.widget_generation_service import WidgetGenerationService
+from services.editing.widget_edit_utils import source_digest
+from services.generation.widget_generation_service import WidgetGenerationService
 
 edit_run_fixture = pytest.fixture(name="edit_run")(semantic_widget_edit.edit_run.__wrapped__)
 source_fixture = pytest.fixture(name="source")(semantic_widget_edit.source.__wrapped__)

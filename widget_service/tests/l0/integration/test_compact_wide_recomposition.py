@@ -6,16 +6,20 @@ from dataclasses import replace
 import pytest
 
 from config.config import get_settings
-from services import compact_wide_recomposition as search
 from services.card_validation import CompactDslValidationError
-from services.compact_dsl_a2ui_converter import ComponentRow, DataRow, parse_compact_dsl_rows
-from services.compact_repair_simplification import (
+from services.compact.compact_dsl_a2ui_converter import (
+    ComponentRow,
+    DataRow,
+    parse_compact_dsl_rows,
+)
+from services.compact.repair import compact_wide_recomposition as search
+from services.compact.repair.compact_repair_simplification import (
     _merge_supporting,
     _secondary_options,
     binding_paths,
     serialize_rows,
 )
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 
 def _case() -> tuple[str, DslProcessingContext]:
@@ -92,7 +96,7 @@ def test_disabled_success_and_template_paths_never_search(monkeypatch) -> None:
     monkeypatch.setattr(get_settings(), "enable_design_compact_deterministic_repair", True)
     accepted = DesignCompactProcessor().process(source, context)
     assert not accepted.errors
-    monkeypatch.setattr("services.generation_pipeline.recompose_wide_card", unexpected)
+    monkeypatch.setattr("services.generation.generation_pipeline.recompose_wide_card", unexpected)
     unchanged = DesignCompactProcessor().process(accepted.source_dsl, context)
     assert unchanged.source_dsl == accepted.source_dsl
     DesignCompactProcessor().process(source, replace(context, size="2x2"))

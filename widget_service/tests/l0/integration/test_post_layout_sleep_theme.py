@@ -9,12 +9,12 @@ import pytest
 
 from config.config import get_settings
 from models.generation import TaskSpec
-from services import post_layout_theme as themes
-from services import theme_selection_policy as policy
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.prompt_builder import PromptBuilder
-from services.theme_content_regions import photo_layout_evidence
-from services.theme_style_roles import layout_phase
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.generation.prompt_builder import PromptBuilder
+from services.themes import post_layout_theme as themes
+from services.themes import theme_selection_policy as policy
+from services.themes.theme_content_regions import photo_layout_evidence
+from services.themes.theme_style_roles import layout_phase
 from theme_preference_samples import preference, reply
 
 QUERY = "生成一个提醒按时睡觉的卡片，监测睡眠状况，显示睡眠时长，并可快速设置闹钟提醒"

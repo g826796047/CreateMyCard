@@ -9,11 +9,14 @@ from services.card_validation.compact_validation.semantic.static_content import 
     static_fact_coverage,
     static_group_errors,
 )
-from services.compact_high_level_components import CompactDslConversionError
-from services.compact_plan import compact_plan_omitted_facts
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.static_content_components import complete_static_text_trial
+from services.compact.components.compact_high_level_components import CompactDslConversionError
+from services.compact.planning.compact_plan import compact_plan_omitted_facts
+from services.compact.static_content.static_content_components import complete_static_text_trial
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 
 @pytest.fixture(autouse=True)

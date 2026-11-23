@@ -9,15 +9,15 @@ import json
 import pytest
 
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
-from services.compact_component_bindings import (
-    COMPACT_COMPONENT_BINDING_CONTRACTS,
-    collect_compact_component_binding_errors,
-)
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     MODEL_COMPACT_INPUT_COMPONENT_TYPES,
     CompactDslConversionError,
     convert_compact_dsl_to_a2ui,
     repair_compact_dsl_binding_paths,
+)
+from services.compact.components.compact_component_bindings import (
+    COMPACT_COMPONENT_BINDING_CONTRACTS,
+    collect_compact_component_binding_errors,
 )
 
 

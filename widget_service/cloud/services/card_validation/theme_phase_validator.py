@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from services.theme_style_roles import COLOR_FIELDS, is_role
+from services.themes.theme_style_roles import COLOR_FIELDS, is_role
 
 
 def theme_phase_errors(source: str, *, layout: bool) -> list[str]:

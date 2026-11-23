@@ -7,7 +7,7 @@ from unittest.mock import Mock
 import pytest
 
 from api import routes
-from services.widget_directive import WidgetDirectiveState
+from services.requests.widget_directive import WidgetDirectiveState
 
 
 @pytest.mark.parametrize("state", list(WidgetDirectiveState))

@@ -9,15 +9,17 @@ from api.schemas import GenerateWidgetCardRequest
 from config.config import get_settings
 from core.errors import ErrorCode, GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
-from services.artifact_store import ArtifactStore
-from services.compact_repair_strategy import compact_capacity_recovery_failure_category
-from services.generation_pipeline import (
+from services.artifacts.artifact_store import ArtifactStore
+from services.compact.repair.compact_repair_strategy import (
+    compact_capacity_recovery_failure_category,
+)
+from services.generation.generation_pipeline import (
     DslProcessingResult,
     DslProcessorKind,
     QualityIssue,
     get_dsl_processor,
 )
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
 
 # 本组验证既有创建、回退或路由合同，静态策略由专项测试覆盖。
 pytestmark = pytest.mark.usefixtures("existing_generation_policy")
@@ -170,7 +172,7 @@ async def test_service_passes_warning_evidence_to_interface_retry_context(
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("isolated_theme_stage")
 async def test_static_service_recovery_preserves_unapproved_missing_must(monkeypatch):
-    from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+    from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
 
     settings = get_settings()
     for name, value in {

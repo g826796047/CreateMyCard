@@ -91,7 +91,7 @@ from models.service import (
     WidgetWebSocketErrorMessage,
     WidgetWebSocketResultMessage,
 )
-from services.artifact_store import ArtifactStore, RepairArtifactRecord
+from services.artifacts.artifact_store import ArtifactStore, RepairArtifactRecord
 from custom.a2ui_model_client import (
     A2UIModelClient,
     A2UIModelGenerationError,
@@ -102,30 +102,30 @@ from custom.a2ui_model_client import (
 from custom.mep_model_transport import MepModelTransport, PredictEventDecoder
 from custom.model_transport import ModelTransportError
 from custom.model_runtime import ModelExecutionRuntime, _generate_with_llmclient
-from services.card_spec_builder import CardSpecBuilder
+from services.generation.card_spec_builder import CardSpecBuilder
 from services.card_validation import validate_card as validate_card_api
 from services.card_validation.rule_registry import RuleRegistry
-from services.capability_registry import CapabilityRegistry
-from services.compact_dsl_argument_repair import (
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.requests.compact_dsl_argument_repair import (
     ConsecutiveArgumentIssueTracker,
     _build_repair_prompt,
 )
-from services.device_capability_resolver import DeviceCapabilityResolver
-from services.edit_request_normalizer import EditRequestNormalizer
-from services.generation_pipeline import (
+from services.capabilities.device_capability_resolver import DeviceCapabilityResolver
+from services.requests.edit_request_normalizer import EditRequestNormalizer
+from services.generation.generation_pipeline import (
     DslProcessingResult,
     DslProcessorKind,
     QualityIssue,
     get_dsl_processor,
 )
-from services.ids_client import IDSClient, IDSDeviceCapabilityState
-from services.prompt_builder import PromptBuilder
-from services.protocol_registry import A2UIProtocolRegistry
-from services.response_planner import ResponsePlanner
-from services.retry_controller import RetryController
-from services.task_spec_builder import TaskSpecBuilder
-from services.validator import ArtifactValidator
-from services.widget_generation_service import WidgetGenerationService
+from services.capabilities.ids_client import IDSClient, IDSDeviceCapabilityState
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.generation.response_planner import ResponsePlanner
+from services.generation.retry_controller import RetryController
+from services.generation.task_spec_builder import TaskSpecBuilder
+from services.card_validation.validator import ArtifactValidator
+from services.generation.widget_generation_service import WidgetGenerationService
 from utils.card_runtime import sts_config
 from utils.download_file_from_url import download_file
 from utils.file import delete_file, save_txt_file
@@ -335,7 +335,7 @@ def test_json_for_log_uses_standard_json_syntax():
 def test_generation_summary_contains_required_observability_fields(monkeypatch):
     messages: list[str] = []
     monkeypatch.setattr(
-        "services.widget_generation_service.logger",
+        "services.generation.widget_generation_service.logger",
         type("CapturedLogger", (), {"info": staticmethod(messages.append)})(),
     )
     request = GenerateWidgetCardRequest(
@@ -571,7 +571,7 @@ def test_ids_query_builds_structured_request_and_signature(monkeypatch):
     monkeypatch.setattr(client.settings, "ids_access_key", "access")
     log_messages: list[str] = []
     monkeypatch.setattr(
-        "services.ids_client.logger",
+        "services.capabilities.ids_client.logger",
         type("CapturedLogger", (), {"info": staticmethod(log_messages.append)})(),
     )
     secret_key = sts_config.get_sts_config("ids.secret.key")
@@ -687,7 +687,7 @@ def test_ids_mock_enabled_returns_empty_state_when_read_fails(tmp_path, monkeypa
     def fail_remote(*_args, **_kwargs):
         raise AssertionError("IDS remote path must not be used while mock is enabled")
 
-    monkeypatch.setattr("services.ids_client.load_json", fail_read)
+    monkeypatch.setattr("services.capabilities.ids_client.load_json", fail_read)
     monkeypatch.setattr(client, "build_installed_apps_query", fail_remote)
     monkeypatch.setattr(client, "_query_remote_ids", fail_remote)
 
@@ -734,7 +734,7 @@ def test_ids_mock_disabled_ignores_existing_file_and_queries_remote(
     client = IDSClient(mock_response_path=mock_path)
     monkeypatch.setattr(client.settings, "enable_ids_mock", False)
     monkeypatch.setattr(client.settings, "ids_query_url", "http://ids.local/query")
-    monkeypatch.setattr("services.ids_client.requests.request", fake_request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", fake_request)
 
     state = client.get_device_capability_state(_device(), "ids-remote-unit-1")
 
@@ -2153,7 +2153,7 @@ def test_ids_installation_filter_scope_can_be_reconfigured(monkeypatch):
 def test_dependency_filter_logs_one_json_result(monkeypatch):
     log_messages: list[str] = []
     monkeypatch.setattr(
-        "services.device_capability_resolver.logger",
+        "services.capabilities.device_capability_resolver.logger",
         type("CapturedLogger", (), {"info": staticmethod(log_messages.append)})(),
     )
     registry = CapabilityRegistry(version=REGISTRY_VERSION_7)
@@ -2236,7 +2236,7 @@ def test_dependency_filter_logs_one_json_result(monkeypatch):
 def test_dependency_filter_log_marks_installed_data_capability_package(monkeypatch):
     log_messages: list[str] = []
     monkeypatch.setattr(
-        "services.device_capability_resolver.logger",
+        "services.capabilities.device_capability_resolver.logger",
         type("CapturedLogger", (), {"info": staticmethod(log_messages.append)})(),
     )
     registry = CapabilityRegistry(version=REGISTRY_VERSION_7)
@@ -2339,7 +2339,7 @@ def test_task_spec_builder_synthesizes_missing_sample_values_once_per_capability
 ):
     warnings: list[str] = []
     monkeypatch.setattr(
-        "services.task_spec_builder.logger",
+        "services.generation.task_spec_builder.logger",
         type("CapturedLogger", (), {"warning": staticmethod(warnings.append)})(),
     )
     capability = DataCapability(
@@ -4611,7 +4611,7 @@ async def test_artifact_store_returns_structured_save_result(tmp_path, monkeypat
     monkeypatch.setattr(get_settings(), "artifact_base_url", "https://obs.mock.local/widget")
     monkeypatch.setattr(get_settings(), "enable_sensitive_log_fields", True)
     monkeypatch.setattr(
-        "services.artifact_store.file_obs",
+        "services.artifacts.artifact_store.file_obs",
         UploadFileOSMS(),
     )
     artifact = WidgetArtifact(
@@ -4881,7 +4881,8 @@ def test_artifact_validator_rejects_legacy_component_shape():
 
 def test_card_validation_is_exposed_as_in_process_api():
     reporter = validate_card_api(dsl_text="not-json")
-    validator_source = (CLOUD_ROOT / "services" / "validator.py").read_text(encoding="utf-8")
+    validator_path = CLOUD_ROOT / "services" / "card_validation" / "validator.py"
+    validator_source = validator_path.read_text(encoding="utf-8")
 
     assert reporter.has_code("DSL_JSON_PARSE_FAILED")
     assert "services.card_validation" in validator_source

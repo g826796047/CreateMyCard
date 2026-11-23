@@ -16,7 +16,7 @@ import websockets
 
 from app.logger import json_for_log, logger
 from config.config import get_settings
-from services.generation_trace_recorder import trace_record
+from services.observability.generation_trace_recorder import trace_record
 from utils.card_runtime import report_ops_metrics
 
 _MODULE = "[LLMClient]"

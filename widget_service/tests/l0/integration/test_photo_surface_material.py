@@ -8,9 +8,9 @@ from test_photo_background_fallback import node_by_id, photo_theme, source
 
 from photo_samples.common import expanded
 from photo_samples.music import earphone_sample
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.theme_style_roles import role
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.theme_style_roles import role
 
 
 @pytest.mark.parametrize("size", ["2x2", "2x4"])

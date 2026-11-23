@@ -8,14 +8,14 @@ from test_semantic_widget_edit import _intent, _nodes, _patch, _request, _rows
 
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
-from services.widget_edit_contract import (
+from services.editing.widget_edit_contract import (
     EditExpectation,
     apply_edit_output,
     dump_rows,
     validate_intent,
 )
-from services.widget_edit_utils import source_digest
-from services.widget_generation_service import WidgetGenerationService
+from services.editing.widget_edit_utils import source_digest
+from services.generation.widget_generation_service import WidgetGenerationService
 
 edit_run_fixture = pytest.fixture(name="edit_run")(semantic_widget_edit.edit_run.__wrapped__)
 source_fixture = pytest.fixture(name="source")(semantic_widget_edit.source.__wrapped__)

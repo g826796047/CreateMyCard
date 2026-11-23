@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from services.static_text_capacity import TextCapacity, measure_text
+from services.compact.static_content.static_text_capacity import TextCapacity, measure_text
 
 from ...diagnostics import CompactDiagnostic
 
@@ -31,8 +31,8 @@ def static_plan_capacity_errors(plan: dict[str, Any], size: str) -> list[str]:
 def static_plan_candidate_preserves_required_content(plan: dict[str, Any], size: str) -> bool:
     """已归一化 Plan 的实际候选须独立通过原合同；偏好不等同于最终承载组件。"""
     from services.card_validation import CompactDslValidationError, validate_compact_dsl
-    from services.compact_high_level_components import CompactDslConversionError
-    from services.generation_content_policy import current_content_policy
+    from services.compact.components.compact_high_level_components import CompactDslConversionError
+    from services.generation.generation_content_policy import current_content_policy
 
     from ..static_content import static_fact_coverage, static_group_errors
 

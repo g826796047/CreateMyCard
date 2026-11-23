@@ -8,10 +8,16 @@ import pytest
 from widget_service.tests.static_title_fixtures import titled_rows
 
 from services.card_validation.compact_validation.semantic.static_content import static_group_errors
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.compact_plan import compact_plan_omitted_facts, compact_plan_optional_drop_candidate
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.planning.compact_plan import (
+    compact_plan_omitted_facts,
+    compact_plan_optional_drop_candidate,
+)
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
 
 
 @pytest.fixture(autouse=True)

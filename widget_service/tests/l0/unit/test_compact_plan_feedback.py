@@ -5,14 +5,17 @@ import json
 
 import pytest
 
-from services.compact_plan import CompactPlanValidationError, parse_compact_plan_call
-from services.compact_plan_feedback import static_plan_repair_feedback
-from services.generation_content_policy import (
+from services.compact.planning.compact_plan import (
+    CompactPlanValidationError,
+    parse_compact_plan_call,
+)
+from services.compact.planning.compact_plan_feedback import static_plan_repair_feedback
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
 )
-from services.prompt_builder import PromptBuilder
+from services.generation.prompt_builder import PromptBuilder
 
 
 def _fact(index: int, **overrides) -> dict:

@@ -12,12 +12,12 @@ from services.card_validation import (
     validate_card,
     validate_compact_dsl,
 )
-from services.generation_pipeline import (
+from services.generation.generation_pipeline import (
     DslProcessingContext,
     DslProcessorKind,
     get_dsl_processor,
 )
-from services.protocol_registry import A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 from services.template_generation.engine.cardplan.compiler import (
     _instantiate_blueprint,
     _serialize_node,

@@ -8,11 +8,11 @@ from pydantic import ValidationError
 
 from api.routes import _normalize_payload
 from api.schemas import GenerateWidgetCardRequest
-from services import candidate_argument_normalizer as normalizer
-from services.agent_error_view import agent_error_view
-from services.agent_feedback import request_validation_feedback
-from services.capability_registry import CapabilityRegistry
-from services.generation_preflight import GenerationPreflight
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.generation.generation_preflight import GenerationPreflight
+from services.requests import candidate_argument_normalizer as normalizer
+from services.requests.agent_error_view import agent_error_view
+from services.requests.agent_feedback import request_validation_feedback
 
 DATA = {
     "capabilityId": "ViewWeather",

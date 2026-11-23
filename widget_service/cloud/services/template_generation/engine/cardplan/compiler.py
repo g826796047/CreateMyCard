@@ -12,7 +12,6 @@ from typing import Any, Literal
 from jsonschema import Draft202012Validator
 
 from models.generation import TaskSpec
-from services.fusion_ball_expander import FUSION_BALL_SIZES
 from services.template_generation.engine.a2ui_expression import (
     A2UIExpressionError,
     normalize_tersel_expression,
@@ -59,7 +58,8 @@ from services.template_generation.engine.tersel_converter import (
     convert_tersel_to_a2ui,
     serialize_task_spec_data,
 )
-from services.theme_photo_processing import PhotoStyleContext
+from services.themes.fusion_ball_expander import FUSION_BALL_SIZES
+from services.themes.theme_photo_processing import PhotoStyleContext
 
 from .action_labels import LABEL_ACTION_TEMPLATES, validate_action_label
 from .business_actions import supports_business_action

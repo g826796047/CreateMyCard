@@ -5,9 +5,9 @@ import json
 import pytest
 
 from models.generation import ModelRequestContext
-from services import compact_dsl_argument_repair as repair
-from services.argument_json_recovery import DECODER, extract_fragments, repair_syntax
-from services.capability_registry import CapabilityRegistry
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.requests import compact_dsl_argument_repair as repair
+from services.requests.argument_json_recovery import DECODER, extract_fragments, repair_syntax
 
 
 def _content():

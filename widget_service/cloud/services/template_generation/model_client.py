@@ -15,7 +15,7 @@ from custom.model_runtime import ModelExecutionRuntime
 from custom.model_transport import ModelTransportError
 from custom.unified_model_client import UnifiedModelClient
 from models.generation import ModelRequestContext
-from services.generation_trace_recorder import trace_increment_retry, trace_record
+from services.observability.generation_trace_recorder import trace_increment_retry, trace_record
 
 
 class TemplateModelUnavailable(RuntimeError):

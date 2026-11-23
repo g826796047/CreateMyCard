@@ -8,10 +8,10 @@ from pydantic import ValidationError
 from api.schemas import CapabilityOverviewRequest, DataCapabilitySchemasRequest
 from config.config import get_settings
 from models.capability import AssetCapability
-from services.capability_registry import CapabilityRegistry
-from services.ids_client import IDSClient, IDSDeviceCapabilityState
-from services.task_spec_builder import TaskSpecBuilder
-from services.widget_generation_service import WidgetGenerationService
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.capabilities.ids_client import IDSClient, IDSDeviceCapabilityState
+from services.generation.task_spec_builder import TaskSpecBuilder
+from services.generation.widget_generation_service import WidgetGenerationService
 
 CURRENT_REGISTRY = "app-11.7.7.300_rom-7.0"
 

@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from services.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UI_FORM_PROTOCOL_PROFILE_ID, A2UIProtocolRegistry
 from services.template_generation.engine.cardplan import preview_dataset
 from services.template_generation.engine.cardplan.compiler import _instantiate_blueprint
 from services.template_generation.engine.cardplan.preview_dataset import (

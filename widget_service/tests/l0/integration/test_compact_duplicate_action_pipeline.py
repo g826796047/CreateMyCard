@@ -10,16 +10,16 @@ import pytest
 
 from config.config import get_settings
 from models.generation import TaskSpec
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
     parse_compact_dsl_rows,
     serialize_compact_dsl_source,
 )
-from services.compact_plan import evaluate_compact_plan_coverage
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.prompt_builder import PromptBuilder
-from services.protocol_registry import DESIGN_COMPACT_PROFILE_ID
+from services.compact.planning.compact_plan import evaluate_compact_plan_coverage
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.protocol_registry import DESIGN_COMPACT_PROFILE_ID
 
 _URI = "{{ 'weather://details?city=' + ${/data/location/cityCode} }}"
 _HANDLER = {
@@ -34,7 +34,10 @@ def offline_only(monkeypatch):
         pytest.fail("duplicate action tests must not access network")
 
     monkeypatch.setattr(socket.socket, "connect", forbidden)
-    monkeypatch.setattr("services.generation_pipeline.report_ops_metrics", lambda **_: None)
+    monkeypatch.setattr(
+        "services.generation.generation_pipeline.report_ops_metrics",
+        lambda **_: None,
+    )
     monkeypatch.setattr(get_settings(), "enable_design_compact_deterministic_repair", True)
 
 

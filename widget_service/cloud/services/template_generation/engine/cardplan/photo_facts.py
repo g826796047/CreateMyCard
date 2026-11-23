@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import json
 
-from services.compact_high_level_components import ComponentRow
-from services.content_business import BusinessContext
-from services.theme_body_regions import body_region_evidence
-from services.theme_content_regions import body_text_flow_evidence, top_content_evidence
-from services.theme_photo_eligibility import _fully_centered
-from services.theme_photo_matching import PhotoMatchFacts, PhotoScopeFacts
-from services.theme_texture_eligibility import holiday_countdown
+from services.compact.components.compact_high_level_components import ComponentRow
+from services.themes.content_business import BusinessContext
+from services.themes.theme_body_regions import body_region_evidence
+from services.themes.theme_content_regions import body_text_flow_evidence, top_content_evidence
+from services.themes.theme_photo_eligibility import _fully_centered
+from services.themes.theme_photo_matching import PhotoMatchFacts, PhotoScopeFacts
+from services.themes.theme_texture_eligibility import holiday_countdown
 
 from .photo_theme import normalize_photo_styles
 

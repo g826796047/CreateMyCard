@@ -24,14 +24,14 @@ from custom.model_transport import (
 )
 from custom.unified_model_client import UnifiedModelClient
 from models.generation import ModelRequestContext
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     ThemeMode,
     convert_compact_dsl_to_a2ui,
 )
-from services.generation_trace_recorder import trace_record, trace_step
-from services.operational_logging import exception_summary
-from services.protocol_registry import (
+from services.observability.generation_trace_recorder import trace_record, trace_step
+from services.observability.operational_logging import exception_summary
+from services.protocols.protocol_registry import (
     DESIGN_COMPACT_PROFILE_ID,
     A2UIProtocolRegistry,
 )
@@ -165,7 +165,10 @@ class A2UIModelClient:
         try:
             profile_format = (protocol_profile or {}).get("format", "")
             planning = (protocol_profile or {}).get("id") == "compact-info-plan"
-            from services.layout_theme_contract import layout_only_prompt, uses_post_layout_theme
+            from services.themes.layout_theme_contract import (
+                layout_only_prompt,
+                uses_post_layout_theme,
+            )
 
             fusion_layout = uses_post_layout_theme(self.operation_name)
             if fusion_layout and ("compact" in profile_format or planning):

@@ -10,6 +10,10 @@ from typing import Any
 import pytest
 
 from models.artifact import ArtifactMeta, WidgetArtifact
+from services.artifacts.source_artifact_repository import (
+    SourceArtifactLoadResult,
+    SourceArtifactRepository,
+)
 from services.card_validation import CompactDslValidationError, validate_compact_dsl
 from services.card_validation.compact_validation.diagnostics import DiagnosticCollector
 from services.card_validation.compact_validation.semantic.effective import (
@@ -21,16 +25,15 @@ from services.card_validation.compact_validation.semantic.layout.assets import (
 from services.card_validation.compact_validation.semantic.numeric_display import (
     _collect_numeric_component_errors,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
     convert_compact_dsl_to_a2ui,
     parse_compact_dsl_rows,
 )
-from services.compact_prompt_loader import assemble_prompts
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
-from services.prompt_builder import PromptBuilder
-from services.protocol_registry import A2UIProtocolRegistry
-from services.source_artifact_repository import SourceArtifactLoadResult, SourceArtifactRepository
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.compact_prompt_loader import assemble_prompts
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 
 PROMPT_SOURCE = (
     Path(__file__).parents[3]

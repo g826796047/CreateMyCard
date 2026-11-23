@@ -10,9 +10,9 @@ from unittest.mock import AsyncMock
 import pytest
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.theme_content_regions import photo_layout_evidence
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.theme_content_regions import photo_layout_evidence
 from theme_photo_samples import protected_photo
 
 

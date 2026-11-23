@@ -8,21 +8,24 @@ import pytest
 from widget_service.tests.static_title_fixtures import titled_plan
 
 from services.card_validation import validate_compact_dsl
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     parse_compact_dsl_rows,
 )
-from services.compact_plan import CompactPlanValidationError, parse_compact_plan_call
-from services.generation_content_policy import (
+from services.compact.planning.compact_plan import (
+    CompactPlanValidationError,
+    parse_compact_plan_call,
+)
+from services.compact.static_content.static_content_presentation import (
+    static_presentation_candidates,
+    trial_static_presentation,
+)
+from services.generation.generation_content_policy import (
     EXISTING_CONTENT_POLICY,
     STATIC_CONTENT_POLICY,
     content_policy_scope,
 )
-from services.prompt_builder import PromptBuilder
-from services.static_content_presentation import (
-    static_presentation_candidates,
-    trial_static_presentation,
-)
+from services.generation.prompt_builder import PromptBuilder
 
 
 def _fact(text, **extras):
@@ -85,7 +88,7 @@ def test_invalid_component_props_keep_conversion_exception(props):
 @pytest.mark.parametrize("property_name", ["width", "height", "alignItems"])
 @pytest.mark.parametrize("value", [[], {}])
 def test_non_string_alias_values_are_left_for_contract_validation(property_name, value):
-    from services.compact_dsl_a2ui_converter import _repair_legacy_component_props
+    from services.compact.compact_dsl_a2ui_converter import _repair_legacy_component_props
 
     props = {property_name: value}
     baseline = copy.deepcopy(props)
@@ -273,8 +276,8 @@ async def test_wrong_stage_output_recovers_via_existing_candidates_without_extra
     from config.config import get_settings
     from core.errors import GenerationStatus
     from custom.a2ui_model_client import A2UIModelClient
-    from services.artifact_store import ArtifactStore
-    from services.widget_generation_service import WidgetGenerationService
+    from services.artifacts.artifact_store import ArtifactStore
+    from services.generation.widget_generation_service import WidgetGenerationService
 
     plan = titled_plan(_plan([_fact("甲：完整说明"), _fact("乙：完整说明")]))
     raw = json.dumps({"name": "submit_card_plan", "arguments": plan}, ensure_ascii=False)

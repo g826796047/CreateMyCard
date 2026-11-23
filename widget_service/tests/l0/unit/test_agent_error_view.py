@@ -4,7 +4,7 @@ import copy
 
 import pytest
 
-from services.agent_error_view import agent_error_view
+from services.requests.agent_error_view import agent_error_view
 
 _FIELDS = {"message", "retryable", "requiredActions", "agentInstruction", "issues"}
 

@@ -9,12 +9,12 @@ from typing import Any
 from app.logger import json_for_log, logger
 from config.config import get_settings
 from models.generation import TaskSpec
-from services.generation_trace_recorder import trace_record
-from services.post_layout_theme_registry import load_theme_registry
-from services.theme_photo_assets import excluded_foreground_assets
-from services.theme_photo_matching import eligible_photos, select_equivalent_photo
-from services.theme_photo_processing import apply_template_photo
-from services.theme_user_preferences import prioritize_candidates
+from services.observability.generation_trace_recorder import trace_record
+from services.themes.post_layout_theme_registry import load_theme_registry
+from services.themes.theme_photo_assets import excluded_foreground_assets
+from services.themes.theme_photo_matching import eligible_photos, select_equivalent_photo
+from services.themes.theme_photo_processing import apply_template_photo
+from services.themes.theme_user_preferences import prioritize_candidates
 
 from .compiler import HybridCompilation
 from .models import HybridBodyContract

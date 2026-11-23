@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 
-from services.theme_style_roles import in_layout_phase
+from services.themes.theme_style_roles import in_layout_phase
 
 from .aesthetic_baseline_validator import AestheticBaselineValidator
 from .asset_validator import AssetValidator

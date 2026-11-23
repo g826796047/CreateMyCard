@@ -12,12 +12,15 @@ from test_photo_background_fallback import node_by_id, source
 from config.config import get_settings
 from models.artifact import ArtifactMeta, WidgetArtifact
 from photo_samples.weather import fixture, task
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.protocol_registry import A2UIProtocolRegistry
-from services.source_artifact_repository import SourceArtifactLoadResult, SourceArtifactRepository
-from services.theme_layout_summary import theme_description
-from services.validator import ArtifactValidator
+from services.artifacts.source_artifact_repository import (
+    SourceArtifactLoadResult,
+    SourceArtifactRepository,
+)
+from services.card_validation.validator import ArtifactValidator
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.theme_layout_summary import theme_description
 
 PHOTO_ID = "photo-ux-mountain-sunset-lake-square"
 ADDRESS = "https://hagres-drcn.dbankcdn.com/assets/theme-test.jpg?version=1"
@@ -247,7 +250,10 @@ def test_non_theme_candidates_do_not_load_theme_registry(monkeypatch, identity):
     def forbidden(*_args, **_kwargs):
         pytest.fail("普通素材恢复不应依赖主题配置")
 
-    monkeypatch.setattr("services.source_artifact_repository.registered_themes", forbidden)
+    monkeypatch.setattr(
+        "services.artifacts.source_artifact_repository.registered_themes",
+        forbidden,
+    )
     original = artifact()
     original.taskSpec["assetCandidates"] = [{"id": identity, "src": ICON}]
     loaded = SourceArtifactLoadResult(

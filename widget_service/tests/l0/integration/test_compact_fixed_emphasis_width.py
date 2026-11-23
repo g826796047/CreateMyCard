@@ -13,12 +13,15 @@ from services.card_validation import validate_compact_dsl
 from services.card_validation.compact_validation.semantic.layout.text_width import (
     _collect_text_width_budget_errors,
 )
-from services.compact_component_runtime import visual_recipe_part
-from services.compact_composition_planner import _text_width
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.compact_repair_strategy import CompactRepairStrategyTracker
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.components.compact_component_runtime import visual_recipe_part
+from services.compact.planning.compact_composition_planner import _text_width
+from services.compact.repair.compact_repair_strategy import CompactRepairStrategyTracker
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 _HANDLER = {"call": "clickToDeeplink", "args": {"intentName": "Settings", "uri": "status"}}
 
@@ -91,7 +94,10 @@ def _case():
 
 @pytest.fixture(autouse=True)
 def _offline_metrics(monkeypatch):
-    monkeypatch.setattr("services.generation_pipeline.report_ops_metrics", lambda **_: None)
+    monkeypatch.setattr(
+        "services.generation.generation_pipeline.report_ops_metrics",
+        lambda **_: None,
+    )
     monkeypatch.setattr(get_settings(), "enable_design_compact_deterministic_repair", True)
 
 

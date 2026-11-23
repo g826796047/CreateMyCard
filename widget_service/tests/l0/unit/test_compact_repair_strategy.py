@@ -4,7 +4,7 @@ import copy
 
 import pytest
 
-from services.compact_repair_strategy import (
+from services.compact.repair.compact_repair_strategy import (
     CompactRepairStrategyTracker,
     compact_capacity_recovery_failure_category,
 )

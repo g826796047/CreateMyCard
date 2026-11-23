@@ -9,7 +9,11 @@ import pytest
 
 from config.config import get_settings
 from core.errors import ErrorCode
-from services.daily_usage_limiter import DailyUsageError, DailyUsageLimiter, DailyUsageSnapshot
+from services.usage.daily_usage_limiter import (
+    DailyUsageError,
+    DailyUsageLimiter,
+    DailyUsageSnapshot,
+)
 
 NOW = datetime(2026, 10, 22, 15, 59, tzinfo=UTC)
 

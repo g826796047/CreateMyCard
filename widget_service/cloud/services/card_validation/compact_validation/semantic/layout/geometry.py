@@ -13,10 +13,10 @@ from services.card_validation.compact_validation.diagnostics import (
     emit_error,
 )
 from services.card_validation.compact_validation.text import _format_vp, _non_negative_number
-from services.compact_component_runtime import visual_recipe_part
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.compact_reference_canvas import reference_dimension
-from services.compact_region_layout import reference_region_boxes
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.components.compact_component_runtime import visual_recipe_part
+from services.compact.layout.compact_reference_canvas import reference_dimension
+from services.compact.layout.compact_region_layout import reference_region_boxes
 
 
 def _height_budget_components(

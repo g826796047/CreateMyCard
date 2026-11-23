@@ -12,12 +12,12 @@ from core.date_counter import DateCounterResult
 from core.errors import ErrorCode
 from custom.a2ui_model_client import A2UIModelClient
 from models.preflight import GenerationPreflightError
-from services import generation_preflight
-from services.capability_registry import CapabilityRegistry
-from services.compact_dsl_interface_retry import run_compact_dsl_with_retry
-from services.edit_request_normalizer import EditRequestNormalizer
-from services.generation_preflight import GenerationPreflight
-from services.widget_generation_service import WidgetGenerationService
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.generation import generation_preflight
+from services.generation.generation_preflight import GenerationPreflight
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.requests.compact_dsl_interface_retry import run_compact_dsl_with_retry
+from services.requests.edit_request_normalizer import EditRequestNormalizer
 
 REGISTRY_VERSION = "app-11.7.7.300_rom-7.0"
 DATE_COUNTER_REGISTRY_VERSION = "app-11.7.9.300_rom-7.0"

@@ -12,11 +12,14 @@ from core.errors import ErrorCode, GenerationStatus
 from custom.a2ui_model_client import A2UIModelGenerationError
 from models.artifact import ArtifactMeta, WidgetArtifact
 from models.generation import CompactDslRecoveryFact, CompactDslRetryContext, ModelRequestContext
-from services import artifact_store
-from services.artifact_store import ArtifactStore, ArtifactUploadError
-from services.compact_dsl_interface_retry import run_compact_dsl_with_retry
-from services.generation_content_policy import STATIC_CONTENT_POLICY, content_policy_scope
-from services.response_planner import ResponsePlanner, merge_static_recovery_omissions
+from services.artifacts import artifact_store
+from services.artifacts.artifact_store import ArtifactStore, ArtifactUploadError
+from services.generation.generation_content_policy import (
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
+from services.generation.response_planner import ResponsePlanner, merge_static_recovery_omissions
+from services.requests.compact_dsl_interface_retry import run_compact_dsl_with_retry
 
 
 def make_request(**overrides) -> GenerateWidgetCardRequest:

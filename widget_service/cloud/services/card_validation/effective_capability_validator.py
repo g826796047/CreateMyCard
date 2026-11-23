@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from services.event_matching import event_handlers_match
+from services.capabilities.event_matching import event_handlers_match
 
 from .base import (
     BaseValidator,

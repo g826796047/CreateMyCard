@@ -8,7 +8,7 @@ from typing import Literal
 import pytest
 
 from models.generation import TaskSpec
-from services.protocol_registry import A2UIProtocolRegistry
+from services.protocols.protocol_registry import A2UIProtocolRegistry
 from services.template_generation.engine.cardplan.compiler import compile_ux_layout_card
 from services.template_generation.engine.cardplan.models import HybridBodyContract, HybridLimits
 from services.template_generation.engine.cardplan.registry import CardPlanRegistry

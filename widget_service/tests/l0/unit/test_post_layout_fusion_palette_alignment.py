@@ -8,9 +8,9 @@ from unittest.mock import AsyncMock
 import pytest
 
 from config.config import get_settings
-from services import post_layout_theme as themes
-from services.post_layout_theme_registry import registered_themes
-from services.theme_style_roles import role
+from services.themes import post_layout_theme as themes
+from services.themes.post_layout_theme_registry import registered_themes
+from services.themes.theme_style_roles import role
 
 # The approved cb5904d2 palette is copied, not a live dependency on template changes.
 APPROVED_BACKGROUNDS = {

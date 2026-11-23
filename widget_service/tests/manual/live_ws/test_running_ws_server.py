@@ -16,8 +16,8 @@ CLOUD_ROOT = PROJECT_ROOT / "cloud"
 if str(CLOUD_ROOT) not in sys.path:
     sys.path.insert(0, str(CLOUD_ROOT))
 
+from services.artifacts.source_artifact_repository import SourceArtifactRepository
 from services.card_validation import ValidationOptions, validate_card
-from services.source_artifact_repository import SourceArtifactRepository
 from ws_response_parser import parse_legacy_stream_content
 
 SERVER_HOST = os.getenv("WIDGET_SERVICE_TEST_HOST", socket.gethostbyname("localhost"))

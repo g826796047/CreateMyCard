@@ -10,7 +10,7 @@ from services.card_validation import (
     CompactDslValidationError,
     validate_compact_dsl,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     _strip_optional_genui_fence,
     convert_compact_dsl_to_a2ui,
@@ -19,7 +19,7 @@ from services.compact_dsl_a2ui_converter import (
     repair_compact_dsl_binding_paths,
     repair_compact_dsl_safe_structure,
 )
-from services.compact_high_level_components import (
+from services.compact.components.compact_high_level_components import (
     ComponentRow,
     validate_single_line_title_layout,
 )

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from services.compact_prompt_loader import FRAGMENT, read_prompt
+from services.protocols.compact_prompt_loader import FRAGMENT, read_prompt
 
 SOURCE = (
     Path(__file__).resolve().parents[3]
@@ -15,7 +15,7 @@ SOURCE = (
 
 @pytest.mark.parametrize("size", ["2x2", "2x4"])
 def test_merged_contract_separates_theme_and_visible_fact_ownership(size: str) -> None:
-    from services.layout_theme_contract import layout_only_prompt
+    from services.themes.layout_theme_contract import layout_only_prompt
 
     source = read_prompt(SOURCE, "create", size=size)
     messages = layout_only_prompt([{"role": "system", "content": source}])

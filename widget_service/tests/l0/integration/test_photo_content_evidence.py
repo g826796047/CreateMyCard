@@ -6,8 +6,8 @@ import pytest
 from test_uniform_photo_eligibility import PURPLE, choose, evidence, rejection, sample
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services.theme_content_regions import body_text_flow_evidence
+from services.themes import post_layout_theme as themes
+from services.themes.theme_content_regions import body_text_flow_evidence
 
 
 def sleep_peer_pair():

@@ -10,13 +10,13 @@ from api.schemas import GenerateWidgetCardRequest
 from config.config import get_settings
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
-from services.artifact_store import ArtifactStore
-from services.generation_pipeline import (
+from services.artifacts.artifact_store import ArtifactStore
+from services.generation.generation_pipeline import (
     DslProcessingResult,
     DslProcessorKind,
     get_dsl_processor,
 )
-from services.widget_generation_service import WidgetGenerationService
+from services.generation.widget_generation_service import WidgetGenerationService
 
 # 本组验证既有创建、回退或路由合同，静态策略由专项测试覆盖。
 pytestmark = pytest.mark.usefixtures("existing_generation_policy")

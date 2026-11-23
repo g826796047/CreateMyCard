@@ -7,10 +7,10 @@ import pytest
 from services.card_validation.compact_validation.semantic.display import (
     _collect_semantic_text_errors,
 )
-from services.compact_component_runtime import visual_recipe_part
-from services.compact_dsl_a2ui_converter import ComponentRow
-from services.compact_plan import parse_compact_plan_call
-from services.generation_pipeline import DesignCompactProcessor, DslProcessingContext
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.components.compact_component_runtime import visual_recipe_part
+from services.compact.planning.compact_plan import parse_compact_plan_call
+from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 
 def _count(*, badge: bool = True, content=None) -> ComponentRow:

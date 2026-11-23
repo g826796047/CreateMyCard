@@ -52,19 +52,19 @@ DeepSeekPlatformClient = importlib.import_module(
 ).DeepSeekPlatformClient
 task_logger = importlib.import_module("app.logger").task_logger
 DeviceContext = importlib.import_module("models.generation").DeviceContext
-IDSClient = importlib.import_module("services.ids_client").IDSClient
+IDSClient = importlib.import_module("services.capabilities.ids_client").IDSClient
 IDSDeviceCapabilityState = importlib.import_module(
-    "services.ids_client"
+    "services.capabilities.ids_client"
 ).IDSDeviceCapabilityState
 ArtifactSaveResult = importlib.import_module("models.service").ArtifactSaveResult
-ArtifactStore = importlib.import_module("services.artifact_store").ArtifactStore
+ArtifactStore = importlib.import_module("services.artifacts.artifact_store").ArtifactStore
 Settings = importlib.import_module("config.config").Settings
 get_settings = importlib.import_module("config.config").get_settings
 WidgetGenerationService = importlib.import_module(
-    "services.widget_generation_service"
+    "services.generation.widget_generation_service"
 ).WidgetGenerationService
 compact_dsl_argument_issue_tracker = importlib.import_module(
-    "services.compact_dsl_argument_repair"
+    "services.requests.compact_dsl_argument_repair"
 ).compact_dsl_argument_issue_tracker
 
 
@@ -494,7 +494,7 @@ def test_overview_logs_do_not_include_user_or_device_identifiers(monkeypatch):
     captured_logger = CapturedLogger()
     monkeypatch.setattr(importlib.import_module("api.routes"), "logger", captured_logger)
     monkeypatch.setattr(
-        importlib.import_module("services.widget_generation_service"),
+        importlib.import_module("services.generation.widget_generation_service"),
         "logger",
         captured_logger,
     )

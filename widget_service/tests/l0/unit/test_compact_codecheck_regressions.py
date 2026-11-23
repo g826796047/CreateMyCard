@@ -8,10 +8,10 @@ from dataclasses import replace
 
 import pytest
 
-from services.compact_dsl_a2ui_converter import VISUAL_RECIPE_VERSION, _single_body_slot
-from services.compact_high_level_components import ComponentRow
-from services.compact_outer_recomposition import _single_attribute
-from services.compact_plan import _anchor_plan_errors
+from services.compact.compact_dsl_a2ui_converter import VISUAL_RECIPE_VERSION, _single_body_slot
+from services.compact.components.compact_high_level_components import ComponentRow
+from services.compact.planning.compact_plan import _anchor_plan_errors
+from services.compact.repair.compact_outer_recomposition import _single_attribute
 
 
 @pytest.fixture
@@ -187,10 +187,10 @@ def _lexical_shadowing(source: str) -> list[tuple[int, str, tuple[str, ...]]]:
 
 
 @pytest.mark.parametrize("module_name", [
-    "services.compact_dsl_a2ui_converter",
-    "services.compact_high_level_components",
-    "services.countdown_pattern",
-    "services.theme_countdown_pattern",
+    "services.compact.compact_dsl_a2ui_converter",
+    "services.compact.components.compact_high_level_components",
+    "services.compact.components.countdown_pattern",
+    "services.themes.theme_countdown_pattern",
 ])
 def test_countdown_compilation_has_no_lexical_name_shadowing(module_name):
     module = importlib.import_module(module_name)

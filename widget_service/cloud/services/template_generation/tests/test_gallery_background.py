@@ -7,7 +7,7 @@ import copy
 import pytest
 
 from services.template_generation.test_support import gallery_background as background
-from services.theme_photo_processing import apply_photo_fallback, photo_background
+from services.themes.theme_photo_processing import apply_photo_fallback, photo_background
 
 
 @pytest.fixture(autouse=True)

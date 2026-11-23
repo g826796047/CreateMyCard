@@ -92,7 +92,7 @@ The service follows `docs/AGENTS.md`:
 - If MEP ends a Design request with `6241/Early stop due to aborted` after emitting a non-empty candidate, the
   candidate continues through the strict Design converter and validation flow. Empty output and non-Design requests
   remain model failures.
-- 创建与修复提示词由 `services/protocol_registry.py` 读取，Fusion 按
+- 创建与修复提示词由 `services/protocols/protocol_registry.py` 读取，Fusion 按
   `data/protocol_profiles/design-compact-dsl-fusion/prompt_source/manifest.yaml` 装配；模板使用自身内部资源。
   公开二次编辑使用 `semantic-widget-edit/` 的独立提示词。旧整卡重生成编辑分支仍保留，
   其兼容提示词资源不随本次清理删除。旧独立提示词配置及文件路径别名不再生效，

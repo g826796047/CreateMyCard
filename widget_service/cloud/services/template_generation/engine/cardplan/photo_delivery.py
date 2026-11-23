@@ -1,8 +1,8 @@
 """模板内部图片交付；复用地址映射器，只读共享主题配置。"""
 
-from services.post_layout_theme_registry import load_theme_registry, registered_themes
-from services.theme_photo_processing import deliver_photo_source as deliver_registered_photo
-from services.theme_photo_processing import register_photo_asset as register_photo_asset
+from services.themes.post_layout_theme_registry import load_theme_registry, registered_themes
+from services.themes.theme_photo_processing import deliver_photo_source as deliver_registered_photo
+from services.themes.theme_photo_processing import register_photo_asset as register_photo_asset
 
 PHOTO_BACKGROUND_ID = "__post_theme_base"
 

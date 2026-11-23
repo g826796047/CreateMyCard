@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from services.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
 
 _ICON_COMPONENTS = frozenset(
     {

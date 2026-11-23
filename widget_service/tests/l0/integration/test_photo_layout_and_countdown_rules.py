@@ -12,9 +12,12 @@ from test_autumn_calendar_photos import COUNTDOWN_ID, photo
 from config.config import get_settings
 from photo_samples.battery import WIDE, wide_battery_sample
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services.post_layout_theme_registry import registered_themes
-from services.theme_content_regions import photo_layout_evidence, photo_layout_exclusion_reason
+from services.themes import post_layout_theme as themes
+from services.themes.post_layout_theme_registry import registered_themes
+from services.themes.theme_content_regions import (
+    photo_layout_evidence,
+    photo_layout_exclusion_reason,
+)
 
 SPLIT_REASON = "2x4左右两个大背板布局不使用图片背景"
 

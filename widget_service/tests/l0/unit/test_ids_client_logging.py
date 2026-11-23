@@ -7,8 +7,8 @@ import pytest
 import requests
 
 from models.generation import DeviceContext
-from services.ids_client import IDSClient
-from services.ids_response_logging import ids_response_diagnostic
+from services.capabilities.ids_client import IDSClient
+from services.capabilities.ids_response_logging import ids_response_diagnostic
 
 _NAMESPACE = "t_ids_kv_ohos_installed_apps"
 
@@ -22,7 +22,7 @@ def client_and_log(monkeypatch, ids_retry_clock):
     monkeypatch.setattr(client.settings, "ids_request_retry_budget_seconds", 0.0)
     monkeypatch.setattr(client, "build_ids_sign", lambda **_kwargs: "private-sign")
     log = Mock()
-    monkeypatch.setattr("services.ids_client.logger", log)
+    monkeypatch.setattr("services.capabilities.ids_client.logger", log)
     return client, log
 
 
@@ -37,7 +37,7 @@ def _respond(monkeypatch, payload, status=200):
     response.status_code = status
     response._content = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     request = Mock(return_value=response)
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     return request
 
 
@@ -141,7 +141,7 @@ def test_retry_error_log_is_warning_and_single_line(client_and_log, monkeypatch)
     response.status_code = 200
     response._content = b'{"nameSpaces": []}'
     request = Mock(side_effect=[requests.Timeout("failed\nprivate-odid"), response])
-    monkeypatch.setattr("services.ids_client.requests.request", request)
+    monkeypatch.setattr("services.capabilities.ids_client.requests.request", request)
     _query(client)
     log.error.assert_not_called()
     messages = [invocation.args[0] for invocation in log.warning.call_args_list]
@@ -157,7 +157,10 @@ def test_invalid_json_body_is_not_logged(client_and_log, monkeypatch):
     response = requests.Response()
     response.status_code = 502
     response._content = b"<html>private-odid secret-upstream-content</html>"
-    monkeypatch.setattr("services.ids_client.requests.request", Mock(return_value=response))
+    monkeypatch.setattr(
+        "services.capabilities.ids_client.requests.request",
+        Mock(return_value=response),
+    )
     assert _query(client).installed_apps == set()
     messages = str(log.mock_calls)
     assert "reason=invalid_json body_omitted=true" in messages

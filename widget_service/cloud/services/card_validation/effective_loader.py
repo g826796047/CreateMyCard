@@ -19,7 +19,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from services.asset_url_mapper import SYSTEM_INTERNAL_ASSET_SOURCES
+from services.artifacts.asset_url_mapper import SYSTEM_INTERNAL_ASSET_SOURCES
 
 
 def attach_effective_capabilities(

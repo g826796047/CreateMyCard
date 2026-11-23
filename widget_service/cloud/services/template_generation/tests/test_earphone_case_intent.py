@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from models.generation import CandidateDataBinding, EventAction, TaskSpec
-from services.generation_pipeline import (
+from services.generation.generation_pipeline import (
     DesignCompactProcessor,
     DslProcessingContext,
     DslProcessorKind,

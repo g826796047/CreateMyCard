@@ -7,15 +7,15 @@ import pytest
 
 from config.config import get_settings
 from models.capability import AssetCapability
-from services.asset_url_mapper import AssetUrlMapper
+from services.artifacts.asset_url_mapper import AssetUrlMapper
 from services.card_validation import ValidationOptions, validate_card
 from services.card_validation.compact_dsl_validator import (
     CompactDslValidationError,
     validate_compact_dsl,
 )
 from services.card_validation.effective_loader import attach_effective_capabilities
-from services.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
-from services.task_spec_builder import TaskSpecBuilder
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.generation.task_spec_builder import TaskSpecBuilder
 
 SRC = "resources/base/media/drop_1.svg"
 LOCAL = "resources/base/media/air_fill.svg"

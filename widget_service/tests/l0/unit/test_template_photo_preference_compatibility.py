@@ -18,7 +18,7 @@ def test_websocket_app_imports_with_both_generation_routes():
     source = (
         "from start_websocket_server import app; "
         "from services.template_generation import TemplateSourceGenerator; "
-        "from services import post_layout_theme; "
+        "from services.themes import post_layout_theme; "
         "assert any(getattr(route, 'path', None) == '/health' for route in app.routes); "
         "assert not hasattr(post_layout_theme, 'user_color_overrides'); "
         "assert callable(post_layout_theme.theme_artifact)"

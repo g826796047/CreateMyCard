@@ -15,7 +15,7 @@ from services.card_validation.compact_validation.semantic.display import (
 from services.card_validation.compact_validation.semantic.numeric_display import (
     _collect_numeric_component_errors,
 )
-from services.compact_dsl_a2ui_converter import ComponentRow
+from services.compact.compact_dsl_a2ui_converter import ComponentRow
 
 
 def _collect(

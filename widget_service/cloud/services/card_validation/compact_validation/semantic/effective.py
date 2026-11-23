@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from services.capabilities.event_matching import event_handlers_match
 from services.card_validation.compact_validation.diagnostics import (
     CompactDiagnostic,
     emit_error,
@@ -13,10 +14,9 @@ from services.card_validation.compact_validation.semantic.asset_references impor
     model_asset_references,
     task_asset_candidates,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
 )
-from services.event_matching import event_handlers_match
 
 
 def _collect_asset_source_errors(

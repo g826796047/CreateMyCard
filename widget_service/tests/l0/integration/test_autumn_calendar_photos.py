@@ -6,10 +6,10 @@ import pytest
 import yaml
 
 from photo_samples.common import expanded
-from services import post_layout_theme as themes
-from services import post_layout_theme_registry as registry
-from services.theme_content_regions import photo_layout_evidence
-from services.theme_user_preferences import filter_preferences, parse_preferences
+from services.themes import post_layout_theme as themes
+from services.themes import post_layout_theme_registry as registry
+from services.themes.theme_content_regions import photo_layout_evidence
+from services.themes.theme_user_preferences import filter_preferences, parse_preferences
 from theme_preference_samples import preference
 
 COUNTDOWN_ID = "photo-ux-birds-countdown-square"

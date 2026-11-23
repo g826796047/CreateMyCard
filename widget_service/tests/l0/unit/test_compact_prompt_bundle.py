@@ -7,17 +7,17 @@ from pathlib import Path
 import pytest
 
 from models.generation import TaskSpec
-from services import prompt_builder
-from services.compact_layout_runtime import layout_ids_for_size
-from services.compact_prompt_loader import (
+from services.compact.layout.compact_layout_runtime import layout_ids_for_size
+from services.generation import prompt_builder
+from services.generation.prompt_builder import PromptBuilder
+from services.protocols.compact_prompt_loader import (
     FRAGMENT,
     PROMPT_NAMES,
     _cached_prompts,
     assemble_prompts,
     read_prompt,
 )
-from services.prompt_builder import PromptBuilder
-from services.protocol_registry import (
+from services.protocols.protocol_registry import (
     DESIGN_COMPACT_PROFILE_ID,
     A2UIProtocolRegistry,
 )

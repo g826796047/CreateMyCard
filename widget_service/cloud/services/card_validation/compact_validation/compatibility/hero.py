@@ -26,7 +26,7 @@ from services.card_validation.compact_validation.text import (
     _pure_numeric_binding_path,
     _uses_visual_recipe,
 )
-from services.compact_dsl_a2ui_converter import (
+from services.compact.compact_dsl_a2ui_converter import (
     ComponentRow,
 )
 

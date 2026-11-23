@@ -391,10 +391,10 @@ async def _run_single_user_iteration(
             stage_start = _now_ms()
             validate_ms = 0.0
             try:
-                from services.card_validation import ValidationOptions, validate_card
-                from services.source_artifact_repository import (
+                from services.artifacts.source_artifact_repository import (
                     SourceArtifactRepository,
                 )
+                from services.card_validation import ValidationOptions, validate_card
 
                 artifact_url = generated.get("artifactUrl", "")
                 if artifact_url:
