@@ -29,7 +29,7 @@
       }
     ],
     "title": "国庆天气·全量",
-    "size": "2x4",
+    "size": "2x2",
     "candidateEventCandidates": [
       {
         "capabilityId": "event.open.weather",

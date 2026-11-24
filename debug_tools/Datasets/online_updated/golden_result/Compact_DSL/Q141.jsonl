@@ -1,5 +1,5 @@
 ["root","Layout",{"layout":"S-dual-info"},["first","second"]]
-["first","InfoBlock",{"surfaceRole":"panel","primaryText":{"path":"/data/healthSport/dailySteps"},"unit":"步","secondaryText":"昨日步数 华为运动健康"}]
-["second","InfoBlock",{"surfaceRole":"panel","primaryText":"{{ '今日温度 ' + ${/data/weather/current/temperatureText} }}","secondaryText":"实时温度"}]
-["/data/healthSport/dailySteps",7821]
+["first","InfoBlock",{"surfaceRole":"panel","primaryText":"7821步","secondaryText":"昨日累计步数 2026年10月19日 来源于华为运动健康"}]
+["second","InfoBlock",{"surfaceRole":"panel","primaryText":{"path":"/data/weather/current/temperatureText"},"secondaryText":"今日实时温度"}]
 ["/data/weather/current/temperatureText","29℃"]
+["/state/ready",true]

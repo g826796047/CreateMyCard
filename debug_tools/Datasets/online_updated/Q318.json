@@ -1,7 +1,7 @@
 {
   "content": {
     "bundleName": "com.huawei.genui",
-    "userQuery": "创建一张2x4的桌面卡片，显示每天的睡眠情况，包括睡眠得分、睡眠状态、夜间睡眠总时长、深睡时长、入睡时间和醒来时间。点击卡片可打开运动健康应用的睡眠详情页。",
+    "userQuery": "创建一张2x2的桌面卡片，显示每天的睡眠情况，包括睡眠得分、睡眠状态、夜间睡眠总时长、深睡时长、入睡时间和醒来时间。点击卡片可打开运动健康应用的睡眠详情页。",
     "candidateDataBindings": [
       {
         "capabilityId": "GetHealthAndSportSummary",
@@ -20,7 +20,7 @@
       }
     ],
     "title": "每日睡眠",
-    "size": "2x4",
+    "size": "2x2",
     "candidateEventCandidates": [
       {
         "capabilityId": "event.open.health.sleep",

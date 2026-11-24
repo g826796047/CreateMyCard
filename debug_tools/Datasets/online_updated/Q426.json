@@ -1,6 +1,6 @@
 {
   "content": {
-    "size": "2x4",
+    "size": "2x2",
     "functionName": "generateWidgetCardCompactDsl",
     "romVersion": "CMS-AL20 7.0.0.111",
     "candidateAssetIds": [
@@ -62,13 +62,7 @@
           "/daily/0/airQuality",
           "/daily/0/uvIndex",
           "/daily/0/coldLevel",
-          "/updatedAt",
-          "/daily/1/weekday",
-          "/daily/1/condition",
-          "/daily/1/temperatureRangeText",
-          "/daily/2/weekday",
-          "/daily/2/condition",
-          "/daily/2/temperatureRangeText"
+          "/updatedAt"
         ]
       }
     ]

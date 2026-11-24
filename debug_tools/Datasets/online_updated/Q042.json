@@ -37,7 +37,7 @@
       }
     ],
     "title": "漠河天气·电量",
-    "size": "2x4",
+    "size": "2x2",
     "candidateEventCandidates": [
       {
         "capabilityId": "event.open.weather",
