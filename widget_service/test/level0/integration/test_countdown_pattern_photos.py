@@ -13,6 +13,7 @@ from test_photo_asset_delivery import artifact
 
 from config.config import get_settings
 from services.card_validation.validator import ArtifactValidator
+from services.compact.components.countdown_pattern import CountdownPattern
 from services.generation.generation_pipeline import DesignCompactProcessor
 from services.protocols.protocol_registry import A2UIProtocolRegistry
 from services.themes import post_layout_theme as themes
@@ -45,7 +46,7 @@ def pattern_extensions(size):
 
 
 def processed(size, kind, days=4, relation="还剩", total=6):
-    context = _context(size, kind)
+    context = _context(size)
     counter = context.task_spec.get("dataModelSchema", {}).get("data", {}).get("customCounter", {})
     days_schema = counter.get("days")
     relation_schema = counter.get("relationText")
@@ -141,7 +142,7 @@ async def test_real_theme_selection_delivers_photo_and_keeps_day_colors(monkeypa
     delivered = await themes.theme_artifact(
         original, context.task_spec, client, ArtifactValidator({}),
         A2UIProtocolRegistry(original.meta.protocolProfileId).get_profile(),
-        final_layout=source, countdown_pattern=context.countdown_pattern,
+        final_layout=source, countdown_pattern=CountdownPattern(kind, ROOT + "/days"),
     )
     nodes = themes.components(themes.decode(delivered.genui))
     backgrounds = [node for node in nodes if node.get("id") == "__post_theme_base"]

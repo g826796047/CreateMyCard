@@ -42,10 +42,7 @@ def facts_for(size, kind, days=4, relation="还剩", total=6, root=ROOT, mutatio
     if root != ROOT:
         task = json.loads(json.dumps(context.task_spec).replace("customCounter", "otherCounter"))
         card = json.loads(json.dumps(context.card_spec).replace(ROOT, root))
-        context = replace(
-            context, task_spec=task, card_spec=card,
-            countdown_pattern=CountdownPattern(kind, root + "/days"),
-        )
+        context = replace(context, task_spec=task, card_spec=card)
         source = source.replace(ROOT, root)
         result = DesignCompactProcessor().process(source, context)
         assert not result.errors, result.errors
@@ -207,7 +204,7 @@ async def test_explicit_background_preference_delivers_each_extension(monkeypatc
     delivered = await themes.theme_artifact(
         saved, context.task_spec, client, ArtifactValidator({}),
         A2UIProtocolRegistry(saved.meta.protocolProfileId).get_profile(),
-        final_layout=source, countdown_pattern=context.countdown_pattern,
+        final_layout=source, countdown_pattern=CountdownPattern("dots", ROOT + "/days"),
     )
     nodes = themes.components(themes.decode(delivered.genui))
     image = next(node for node in nodes if node.get("id") == "__post_theme_base")

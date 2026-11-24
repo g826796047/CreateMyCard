@@ -1658,7 +1658,7 @@ class PromptBuilder:
         prompt = (
             "# 本轮组件与布局选择\n\n"
             f"当前尺寸 {task_spec.size}，常规合法布局范围：{layouts}。\n"
-            f"`{pattern_layout}` 在本轮服务端明确准入或已接受 Plan 选中时额外开放。\n"
+            f"`{pattern_layout}` 仅在本轮生效 Plan 的日期选型选中时开放。\n"
             "以已接受 Plan 的必要事实与动作为硬合同；优先落实语义、类型和容量匹配的"
             "组件软候选，再按完整内容选择合法布局。布局建议不是硬锁，"
             "不能按业务名称、候选字段总数或示例强制构图。"

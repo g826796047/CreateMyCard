@@ -85,9 +85,6 @@ _TARGET_STRUCTURE = {
     ],
     "options": {
         "allowDegradation": "boolean",
-        "countdownPattern": {
-            "kind": "bars|dots",
-        },
     },
 }
 _MISSING = object()

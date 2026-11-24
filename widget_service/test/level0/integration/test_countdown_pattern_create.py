@@ -14,15 +14,13 @@ from config.config import get_settings
 from core.date_counter import resolve_date_counter
 from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
-from models.generation import CandidateDataBinding, CountdownPatternPreference
+from models.generation import CandidateDataBinding
 from services.artifacts.artifact_store import ArtifactStore
+from services.capabilities.capability_registry import CapabilityRegistry
 from services.compact.components.countdown_pattern import (
     COUNTDOWN_COMPONENTS,
     COUNTDOWN_LAYOUTS,
     PATTERN_PREFIX,
-    CountdownPattern,
-    authorize_pattern,
-    countdown_prompt,
     paint_pattern,
 )
 from services.generation import generation_preflight
@@ -34,6 +32,14 @@ from services.themes.theme_countdown_pattern import countdown_pattern_evidence
 ROOT = "/data/customCounter"
 
 
+def test_create_request_rejects_removed_countdown_preference():
+    with pytest.raises(ValidationError, match=r"options\.countdownPattern"):
+        GenerateWidgetCardRequest(
+            uid="test-user", prdVer="11.7.9.300", device={"romVersion": "7.0"},
+            userQuery="做张考试倒计时卡", options={"countdownPattern": {"kind": "bars"}},
+        )
+
+
 def _binding(**arguments) -> CandidateDataBinding:
     return CandidateDataBinding(
         capabilityId="GetDateCounter",
@@ -41,34 +47,6 @@ def _binding(**arguments) -> CandidateDataBinding:
         writeResultTo=ROOT,
         candidateOutputFields=["/days", "/relationText", "/intervalDays"],
     )
-
-
-@pytest.mark.parametrize("kind", ["bars", "dots"])
-def test_patterns_need_no_creation_day_evidence(kind):
-    options = CountdownPatternPreference(kind=kind)
-    selected = authorize_pattern(options, [_binding()], has_events=False)
-    assert selected.days_path == ROOT + "/days"
-    assert selected.total_path == ROOT + "/intervalDays"
-
-
-@pytest.mark.parametrize(("name", "value"), [("remainingDays", 4), ("referenceDate", "2026-11-17")])
-def test_removed_creation_evidence_parameters_are_rejected(name, value):
-    with pytest.raises(ValidationError, match="Extra inputs"):
-        CountdownPatternPreference.model_validate({"kind": "bars", name: value})
-
-
-def test_pattern_requires_total_field_in_authorized_binding():
-    binding = _binding()
-    binding.candidateOutputFields = ["/days", "/relationText"]
-    with pytest.raises(ValueError, match="intervalDays"):
-        authorize_pattern(CountdownPatternPreference(kind="bars"), [binding], has_events=False)
-
-
-def test_dots_have_no_day_gate_but_reject_recurrence():
-    options = CountdownPatternPreference(kind="dots")
-    assert authorize_pattern(options, [_binding()], has_events=False).kind == "dots"
-    with pytest.raises(ValueError, match="周期"):
-        authorize_pattern(options, [_binding(repeat={"unit": "month"})], has_events=False)
 
 
 def _source(size, kind, *, days=3, relation="还剩", total=6, fixed_total=None, **extra) -> str:
@@ -91,7 +69,7 @@ def _source(size, kind, *, days=3, relation="还剩", total=6, fixed_total=None,
     return "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
 
 
-def _context(size, kind) -> DslProcessingContext:
+def _context(size) -> DslProcessingContext:
     return DslProcessingContext(
         size=size,
         task_spec={
@@ -106,9 +84,28 @@ def _context(size, kind) -> DslProcessingContext:
         card_spec={"suggestSize": size, "dataBindings": [_binding().model_dump()]},
         protocol_profile={"version": "v0.9"},
         design_profile_id="design-compact-dsl",
-        countdown_pattern=CountdownPattern(kind, ROOT + "/days"),
+        replay_countdown_pattern=True,
         colorless_layout=True,
     )
+
+
+def _creation_context(size, kind) -> DslProcessingContext:
+    plan = {
+        "info_required": [
+            {"requirement": "考试", "priority": "must", "text": "考试"},
+            {"requirement": "天数", "priority": "must", "dataId": ROOT + "/days"},
+            {"requirement": "日期关系", "priority": "must", "dataId": ROOT + "/relationText"},
+        ],
+        "dateCounterPresentation": {
+            "layout": COUNTDOWN_LAYOUTS.get(size),
+            "component": COUNTDOWN_COMPONENTS.get(size),
+            "pattern": kind,
+            "value": {"path": ROOT + "/days"},
+            "labelRelation": {"path": ROOT + "/relationText"},
+            "totalValue": {"path": ROOT + "/intervalDays"},
+        },
+    }
+    return replace(_context(size), replay_countdown_pattern=False, compact_plan=plan)
 
 
 @pytest.mark.parametrize(("size", "kind", "columns", "row_starts", "width", "height", "radius"), [
@@ -120,10 +117,10 @@ def _context(size, kind) -> DslProcessingContext:
 def test_processor_compiles_only_requested_geometry(
     size, kind, columns, row_starts, width, height, radius,
 ):
-    context = _context(size, kind)
+    context = _context(size)
     result = DesignCompactProcessor().process(_source(size, kind), context)
     assert not result.errors, result.errors
-    pattern = context.countdown_pattern
+    pattern = result.countdown_pattern
     assert pattern is not None
     painted = paint_pattern(result.standard_dsl, pattern, size)
     messages = [json.loads(line) for line in painted.splitlines()]
@@ -161,7 +158,7 @@ def test_processor_compiles_only_requested_geometry(
 @pytest.mark.parametrize("size", ["2x2", "2x4"])
 @pytest.mark.parametrize("kind", ["bars", "dots"])
 def test_today_first_frame_compiles_with_actual_date_counter_samples(size, kind):
-    context = _context(size, kind)
+    context = _context(size)
     schema = context.task_spec.get("dataModelSchema", {})
     counter = schema.get("data", {}).get("customCounter", {})
     days_schema = counter.get("days")
@@ -177,7 +174,7 @@ def test_today_first_frame_compiles_with_actual_date_counter_samples(size, kind)
 
 
 def test_source_cannot_select_unauthorized_pattern_or_override_program_cells():
-    context = _context("2x2", "bars")
+    context = _creation_context("2x2", "bars")
     processor = DesignCompactProcessor()
     result = processor.process(_source("2x2", "dots"), context)
     assert any("未通过本轮创建准入" in issue.message for issue in result.errors)
@@ -186,7 +183,7 @@ def test_source_cannot_select_unauthorized_pattern_or_override_program_cells():
     injected_cell = json.dumps([PATTERN_PREFIX + "cell_0_0", "Column", {}])
     result = processor.process(_source("2x2", "bars") + "\n" + injected_cell, context)
     assert any("不允许直接声明" in issue.message for issue in result.errors)
-    no_selection = replace(context, countdown_pattern=None)
+    no_selection = replace(context, compact_plan=None)
     result = processor.process(_source("2x2", "bars"), no_selection)
     assert any("未通过本轮创建准入" in issue.message for issue in result.errors)
 
@@ -194,7 +191,7 @@ def test_source_cannot_select_unauthorized_pattern_or_override_program_cells():
 @pytest.mark.parametrize("size", ["2x2", "2x4"])
 @pytest.mark.parametrize("kind", ["bars", "dots"])
 def test_online_first_frame_does_not_treat_model_total_as_real_data(size, kind):
-    context = replace(_context(size, kind), initialize_countdown_total=True)
+    context = _creation_context(size, kind)
     result = DesignCompactProcessor().process(_source(size, kind, total=91), context)
     assert not result.errors, result.errors
     messages = [json.loads(line) for line in result.standard_dsl.splitlines()]
@@ -209,9 +206,9 @@ def test_online_first_frame_does_not_treat_model_total_as_real_data(size, kind):
 @pytest.mark.parametrize("size", ["2x2", "2x4"])
 @pytest.mark.parametrize("kind", ["bars", "dots"])
 @pytest.mark.parametrize("total", [0, 6, 91])
-def test_long_countdown_compiles_without_creation_day_gate(size, kind, total):
+def test_replay_preserves_long_countdown(size, kind, total):
     result = DesignCompactProcessor().process(
-        _source(size, kind, days=91, total=total), _context(size, kind),
+        _source(size, kind, days=91, total=total), _context(size),
     )
     assert not result.errors, result.errors
 
@@ -225,7 +222,7 @@ def test_old_root_source_is_rejected_without_compatibility(size, kind):
             "eventTitle": "考试", "value": {"path": ROOT + "/days"},
         },
     ], ensure_ascii=False)
-    result = DesignCompactProcessor().process(source, _context(size, kind))
+    result = DesignCompactProcessor().process(source, _context(size))
     assert any("不兼容旧源 DSL" in issue.message for issue in result.errors)
 
 
@@ -250,7 +247,7 @@ def test_old_three_role_source_is_rejected_without_migration(size, kind):
         [ROOT + "/intervalDays", 6],
     ]
     source = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
-    result = DesignCompactProcessor().process(source, _context(size, kind))
+    result = DesignCompactProcessor().process(source, _context(size))
     assert result.errors
     assert not result.standard_dsl
 
@@ -262,7 +259,7 @@ def test_high_level_source_requires_all_business_props(size, kind, prop):
     rows = [json.loads(line) for line in _source(size, kind).splitlines()]
     rows[1][2].pop(prop)
     source = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
-    result = DesignCompactProcessor().process(source, _context(size, kind))
+    result = DesignCompactProcessor().process(source, _context(size))
     assert result.errors
 
 
@@ -272,21 +269,8 @@ def test_event_label_must_be_nonempty_static_text(size, label):
     rows = [json.loads(line) for line in _source(size, "bars").splitlines()]
     rows[1][2]["label"] = label
     source = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
-    result = DesignCompactProcessor().process(source, _context(size, "bars"))
+    result = DesignCompactProcessor().process(source, _context(size))
     assert result.errors
-
-
-@pytest.mark.parametrize("size", ["2x2", "2x4"])
-@pytest.mark.parametrize("kind", ["bars", "dots"])
-def test_generated_prompt_uses_one_size_specific_component(size, kind):
-    prompt = countdown_prompt(CountdownPattern(kind, ROOT + "/days"), size)
-    example = prompt.split("```jsonl\n", 1)[1].split("```", 1)[0]
-    rows = [json.loads(line) for line in example.splitlines()]
-    assert len(rows) == 2
-    assert rows[0] == ["root", "Layout", {"layout": COUNTDOWN_LAYOUTS.get(size)}, ["countdown"]]
-    assert rows[1][1] == COUNTDOWN_COMPONENTS.get(size)
-    assert rows[1][2].get("pattern") == kind
-    assert set(rows[1][2]) == {"label", "pattern", "value", "totalValue", "relationValue"}
 
 
 @pytest.mark.parametrize("size", ["2x2", "2x4"])
@@ -305,7 +289,7 @@ def test_high_level_source_rejects_visual_and_ratio_overrides(size, kind, prop, 
     role_props = rows[1][2]
     role_props[prop] = value
     source = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
-    result = DesignCompactProcessor().process(source, _context(size, kind))
+    result = DesignCompactProcessor().process(source, _context(size))
     assert result.errors
 
 
@@ -313,7 +297,7 @@ def test_high_level_source_rejects_visual_and_ratio_overrides(size, kind, prop, 
 @pytest.mark.parametrize("kind", ["bars", "dots"])
 def test_component_id_is_reference_and_does_not_control_visual_specs(size, kind):
     source = _source(size, kind).replace('"countdown"', '"myDisplay"')
-    result = DesignCompactProcessor().process(source, _context(size, kind))
+    result = DesignCompactProcessor().process(source, _context(size))
     assert not result.errors, result.errors
     themed = post_layout_theme.apply_theme(
         result.standard_dsl, post_layout_theme.fallback_theme(None), {"size": size}, {},
@@ -340,7 +324,7 @@ def test_component_structure_and_binding_mismatches_are_rejected(size, kind, mut
     else:
         rows[1].append(["countdown"])
     source = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
-    result = DesignCompactProcessor().process(source, _context(size, kind))
+    result = DesignCompactProcessor().process(source, _context(size))
     assert result.errors
 
 
@@ -375,15 +359,26 @@ async def test_fusion_create_delivers_pattern_after_real_theme_validation(
     stages = []
     artifacts = []
 
+    def resolve_at_creation(arguments, **_kwargs):
+        return resolve_date_counter(arguments, today=date(2026, 11, 23))
+
+    monkeypatch.setattr(generation_preflight, "resolve_date_counter", resolve_at_creation)
+    if kind == "bars":
+        binding = _binding(targetDate="2026-11-19", repeat={"unit": "week"})
+    else:
+        binding = _binding(targetDate="2026-10-26", repeat={"unit": "month"})
+
     async def generate(_client, prompt, profile=None, **_kwargs):
-        assert "本轮已通过单次图案倒计时准入" in prompt[0].get("content", "")
         if (profile or {}).get("format") == "raw-json":
             stages.append("plan")
             return json.dumps({
                 "name": "submit_card_plan",
                 "arguments": {
                     "info_required": [
-                        {"requirement": "考试", "priority": "must", "text": "考试"},
+                        {
+                            "requirement": "考试", "priority": "must", "text": "考试",
+                            "componentHints": ["SingleLineTitle"],
+                        },
                         {"requirement": "天数", "priority": "must", "dataId": ROOT + "/days"},
                         {
                             "requirement": "日期关系", "priority": "must",
@@ -393,6 +388,9 @@ async def test_fusion_create_delivers_pattern_after_real_theme_validation(
                 },
             }, ensure_ascii=False)
         stages.append("dsl")
+        submission = next(message for message in prompt if message.get("role") == "assistant")
+        plan = json.loads(submission.get("content", "")).get("arguments", {})
+        assert plan.get("dateCounterPresentation", {}).get("pattern") == kind
         return _source(size, kind, days=days, relation=relation)
 
     async def select(source, task, _client, **kwargs):
@@ -409,13 +407,11 @@ async def test_fusion_create_delivers_pattern_after_real_theme_validation(
     monkeypatch.setattr(A2UIModelClient, "generate", generate)
     monkeypatch.setattr(post_layout_theme, "select_theme", select)
     monkeypatch.setattr(ArtifactStore, "save", save)
-    preference = {"kind": kind}
     request = GenerateWidgetCardRequest(
         uid="test-user", prdVer="11.7.9.300", device={"romVersion": "7.0"},
         userQuery=f"做张考试倒计时卡，考试{relation} {days} 天",
         title="考试", description="考试倒计时",
-        size=size, candidateDataBindings=[_binding().model_dump()],
-        options={"countdownPattern": preference},
+        size=size, candidateDataBindings=[binding.model_dump()],
     )
     response = await WidgetGenerationService().generate_widget_card_compact_dsl(request)
     assert response.status == GenerationStatus.SUCCESS, response
@@ -448,15 +444,18 @@ def _recorded_plan_attachment(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(("size", "kind", "recurring", "use_pattern"), [
-    ("2x2", "bars", False, True),
-    ("2x4", "bars", False, True),
-    ("2x2", "dots", True, True),
-    ("2x4", "dots", True, True),
-    ("2x2", "bars", False, False),
+@pytest.mark.parametrize(("size", "kind", "target", "recurring", "use_pattern"), [
+    ("2x2", "bars", "2026-11-26", False, True),
+    ("2x4", "bars", "2026-11-26", False, True),
+    ("2x2", "dots", "2026-10-26", True, True),
+    ("2x4", "dots", "2026-10-26", True, True),
+    ("2x2", "bars", "2026-11-26", False, False),
+    ("2x2", "bars", "2026-11-23", False, True),
+    ("2x4", "bars", "2026-10-23", True, True),
+    ("2x2", "bars", "2026-11-23", True, True),
 ])
 async def test_automatic_plan_can_deliver_and_replay_its_pattern(
-    monkeypatch, tmp_path, size, kind, recurring, use_pattern,
+    monkeypatch, tmp_path, size, kind, target, recurring, use_pattern,
 ):
     settings = get_settings()
     monkeypatch.setattr(settings, "enable_a2ui_model_mock", False)
@@ -471,12 +470,18 @@ async def test_automatic_plan_can_deliver_and_replay_its_pattern(
         return resolve_date_counter(arguments, today=date(2026, 11, 23))
 
     monkeypatch.setattr(generation_preflight, "resolve_date_counter", resolve_at_creation)
-    bindings = _binding(targetDate="2026-11-26")
+    bindings = _binding(targetDate=target)
     if recurring:
-        bindings = _binding(targetDate="2026-10-26", repeat={"unit": "month"})
+        bindings.arguments["repeat"] = {"unit": "month"}
     else:
         bindings.candidateOutputFields = ["/days", "/relationText"]
     bindings.candidateOutputFields.append("/targetDateText")
+    counter = resolve_at_creation(bindings.arguments)
+    fixed_total = None if recurring else max(1, counter.days)
+    relation = "就是今天" if counter.relation == "today" else "还剩"
+    pattern_source = _source(
+        size, kind, days=counter.days, relation=relation, fixed_total=fixed_total,
+    )
     plan_facts = [
         {
             "requirement": "考试", "priority": "must", "text": "考试",
@@ -485,6 +490,7 @@ async def test_automatic_plan_can_deliver_and_replay_its_pattern(
         {"requirement": "天数", "priority": "must", "dataId": ROOT + "/days"},
         {"requirement": "日期关系", "priority": "must", "dataId": ROOT + "/relationText"},
         {"requirement": "考试日期", "priority": "must", "dataId": ROOT + "/targetDateText"},
+        {"requirement": "单位", "priority": "must", "text": "天"},
     ]
     artifacts = []
 
@@ -502,14 +508,15 @@ async def test_automatic_plan_can_deliver_and_replay_its_pattern(
         assert isinstance(effective_plan, dict)
         assert "dateCounterPresentation" in effective_plan
         assert ROOT + "/targetDateText" not in json.dumps(effective_plan)
-        assert "dateCounterPresentation" not in prompt[-1].get("content", "")
+        assert '"dateCounterPresentation"' not in prompt[-1].get("content", "")
         if use_pattern:
-            return _source(size, kind, fixed_total=None if recurring else 3)
-        label = "{{ '考试 ' + ${/data/customCounter/relationText} }}"
+            return pattern_source
+        title = "{{ '考试 ' + ${/data/customCounter/relationText} }}"
         rows = [
-            ["root", "Layout", {"layout": "S-center"}, ["content"]],
-            ["content", "DataDisplay", {
-                "label": label, "value": {"path": ROOT + "/days"}, "unit": "天",
+            ["root", "Layout", {"layout": "S-title-content"}, ["title", "content"]],
+            ["title", "SingleLineTitle", {"title": title, "fontSize": 12}],
+            ["content", "EmphasizedData", {
+                "value": {"path": ROOT + "/days"}, "unit": "天", "fontSize": 30,
             }],
             [ROOT + "/days", 3],
             [ROOT + "/relationText", "还剩"],
@@ -530,7 +537,7 @@ async def test_automatic_plan_can_deliver_and_replay_its_pattern(
             if recurring:
                 assert evidence.get("totalPath") == ROOT + "/intervalDays"
             else:
-                assert evidence.get("totalValue") == 3
+                assert evidence.get("totalValue") == fixed_total
         theme = post_layout_theme.fallback_theme(None)
         return post_layout_theme.apply_theme(source, theme, task, {}), {"theme": theme}
 
@@ -541,10 +548,12 @@ async def test_automatic_plan_can_deliver_and_replay_its_pattern(
     monkeypatch.setattr(A2UIModelClient, "generate", generate)
     monkeypatch.setattr(post_layout_theme, "select_theme", select)
     monkeypatch.setattr(ArtifactStore, "save", save)
+    unrelated = _binding()
+    unrelated.writeResultTo = "/data/unselectedCounter"
     request = GenerateWidgetCardRequest(
         uid="batch-countdow-00001-000", prdVer="11.9.9.342", device={"romVersion": "7.0"},
-        userQuery="做张考试倒计时卡，显示考试日期", title="考试", description="考试倒计时",
-        size=size, candidateDataBindings=[bindings.model_dump()],
+        userQuery="做张考试倒计时卡，显示天数和考试日期", title="考试", description="考试倒计时",
+        size=size, candidateDataBindings=[unrelated.model_dump(), bindings.model_dump()],
     )
     response = await WidgetGenerationService().generate_widget_card_compact_dsl(request)
     assert response.status == GenerationStatus.SUCCESS, response
@@ -572,6 +581,8 @@ async def test_automatic_plan_can_deliver_and_replay_its_pattern(
     assert ROOT + "/targetDateText" in json.dumps(original_plan)
     assert ROOT + "/targetDateText" not in json.dumps(rewritten_plan)
     assert rewritten_plan == json.loads(assistant.get("content", "")).get("arguments")
+    presentation = rewritten_plan.get("dateCounterPresentation", {})
+    assert presentation.get("value") == {"path": ROOT + "/days"}
 
     artifact = next(iter(artifacts))
     if use_pattern:
@@ -581,14 +592,20 @@ async def test_automatic_plan_can_deliver_and_replay_its_pattern(
             assert ROOT + "/intervalDays" in artifact.genui
         else:
             assert ROOT + "/intervalDays" not in artifact.genui
-            assert "/ 3)" in artifact.genui
+            assert f"/ {fixed_total})" in artifact.genui
+        if counter.relation == "today":
+            assert "就是今天" in artifact.genui
+            update = json.loads(artifact.genui.splitlines()[2]).get("updateDataModel", {})
+            date_data = update.get("value", {}).get("data", {}).get("customCounter", {})
+            assert date_data.get("days") == 0
+            assert date_data.get("relationText") == "就是今天"
+            if recurring:
+                assert date_data.get("intervalDays") == 0
         context = replace(
-            _context(size, kind), countdown_pattern=None, replay_countdown_pattern=True,
+            _context(size),
             card_spec=artifact.cardSpec, task_spec=artifact.taskSpec,
         )
-        replay = DesignCompactProcessor().process(
-            _source(size, kind, fixed_total=None if recurring else 3), context,
-        )
+        replay = DesignCompactProcessor().process(pattern_source, context)
         assert not replay.errors, replay.errors
     else:
         assert PATTERN_PREFIX not in artifact.genui
@@ -600,10 +617,18 @@ def test_automatic_plan_rejects_pattern_with_different_mode_total_or_kind(fixed_
         "layout": "S-countdown-pattern", "component": "SCountdown", "pattern": "bars",
         "value": {"path": ROOT + "/days"}, "totalValue": 3,
     }}
-    context = replace(_context("2x2", kind), countdown_pattern=None, compact_plan=plan)
+    context = replace(_context("2x2"), replay_countdown_pattern=False, compact_plan=plan)
     source = _source("2x2", kind, fixed_total=fixed_total)
     result = DesignCompactProcessor().process(source, context)
     assert any("未通过本轮创建准入" in issue.message for issue in result.errors)
+
+
+def test_pattern_is_rejected_when_the_plan_selected_a_number_layout():
+    plan = {"dateCounterPresentation": {"layout": "S-center", "component": "DataDisplay"}}
+    context = replace(_context("2x2"), replay_countdown_pattern=False, compact_plan=plan)
+    result = DesignCompactProcessor().process(_source("2x2", "bars", fixed_total=3), context)
+    errors = [issue.message for issue in result.errors]
+    assert any("实际倒计时布局为 S-countdown-pattern，本轮应使用 S-center" in m for m in errors)
 
 
 def _assert_square_countdown_titles(genui: str) -> None:
@@ -640,19 +665,77 @@ def _assert_square_countdown_titles(genui: str) -> None:
     assert "lineHeight" not in styles
 
 
+
+
 @pytest.mark.asyncio
-@pytest.mark.parametrize("kind", ["bars", "dots"])
-async def test_ineligible_create_stops_before_model(monkeypatch, kind):
-    async def generate(*_args, **_kwargs):
-        pytest.fail("不适用图案的请求不应调用模型")
+@pytest.mark.parametrize("extra_candidate", ["weather", "second_counter", "action"])
+async def test_unselected_candidates_do_not_block_plan_rewrite(monkeypatch, extra_candidate):
+    settings = get_settings()
+    monkeypatch.setattr(settings, "enable_a2ui_model_mock", False)
+    monkeypatch.setattr(settings, "enable_artifact_validation", True)
+    monkeypatch.setattr(WidgetGenerationService, "_enable_card_template", lambda _self: False)
+
+    def resolve_at_creation(arguments, **_kwargs):
+        return resolve_date_counter(arguments, today=date(2026, 11, 23))
+
+    monkeypatch.setattr(generation_preflight, "resolve_date_counter", resolve_at_creation)
+    bindings = [_binding(targetDate="2026-11-26").model_dump()]
+    events = []
+    if extra_candidate == "weather":
+        bindings.append({
+            "capabilityId": "ViewWeather",
+            "arguments": {"prefectureName": "杭州市", "forecastDays": 1},
+            "writeResultTo": "/data/weather",
+            "candidateOutputFields": ["/current/condition"],
+        })
+    elif extra_candidate == "second_counter":
+        second = _binding(targetDate="2026-12-01")
+        second.writeResultTo = "/data/secondCounter"
+        bindings.append(second.model_dump())
+    else:
+        registry = CapabilityRegistry(version="app-11.7.9.300_rom-7.0")
+        event = registry.get_event_capability("event.open.settings.battery")
+        assert event is not None
+        events.append({
+            "capabilityId": event.id,
+            "action": event.actionTemplate.model_dump(mode="json"),
+        })
+
+    async def generate(_client, prompt, profile=None, **_kwargs):
+        if (profile or {}).get("format") == "raw-json":
+            return json.dumps({
+                "name": "submit_card_plan",
+                "arguments": {"info_required": [
+                    {
+                        "requirement": "考试", "priority": "must", "text": "考试",
+                        "componentHints": ["SingleLineTitle"],
+                    },
+                    {"requirement": "天数", "priority": "must", "dataId": ROOT + "/days"},
+                    {"requirement": "关系", "priority": "must", "dataId": ROOT + "/relationText"},
+                ]},
+            }, ensure_ascii=False)
+        submission = next(message for message in prompt if message.get("role") == "assistant")
+        plan = json.loads(submission.get("content", "")).get("arguments", {})
+        presentation = plan.get("dateCounterPresentation", {})
+        assert presentation.get("pattern") == "bars"
+        assert presentation.get("value") == {"path": ROOT + "/days"}
+        return _source("2x2", "bars", fixed_total=3)
+
+    async def select(source, task, _client, **_kwargs):
+        theme = post_layout_theme.fallback_theme(None)
+        return post_layout_theme.apply_theme(source, theme, task, {}), {"theme": theme}
+
+    def save(_store, saved_artifact):
+        assert PATTERN_PREFIX + "cell_0_0" in saved_artifact.genui
+        return SimpleNamespace(artifactUrl="https://artifact.test/countdown", artifactDigest="test")
 
     monkeypatch.setattr(A2UIModelClient, "generate", generate)
+    monkeypatch.setattr(post_layout_theme, "select_theme", select)
+    monkeypatch.setattr(ArtifactStore, "save", save)
     request = GenerateWidgetCardRequest(
         uid="test-user", prdVer="11.7.9.300", device={"romVersion": "7.0"},
         userQuery="做张考试倒计时卡", title="考试", description="考试倒计时",
-        size="2x2", candidateDataBindings=[_binding(repeat={"unit": "month"}).model_dump()],
-        options={"countdownPattern": {"kind": kind}},
+        size="2x2", candidateDataBindings=bindings, candidateEventCandidates=events,
     )
     response = await WidgetGenerationService().generate_widget_card_compact_dsl(request)
-    assert response.status == GenerationStatus.UNSUPPORTED
-    assert "周期" in response.message
+    assert response.status == GenerationStatus.SUCCESS, response

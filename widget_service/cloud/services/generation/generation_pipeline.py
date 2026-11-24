@@ -15,6 +15,9 @@ from services.card_validation import (
 )
 from services.card_validation.compact_validation.diagnostics import DiagnosticGroup
 from services.card_validation.compact_validation.repair_guidance import RepairGuidanceContext
+from services.card_validation.compact_validation.semantic.plan_contracts import (
+    date_counter_layout_error,
+)
 from services.card_validation.display_unit_rules import repair_repeated_display_units
 from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
@@ -122,9 +125,7 @@ class DslProcessingContext:
     repair_context: RepairGuidanceContext | None = None
     colorless_layout: bool = False
     content_policy: GenerationContentPolicy = EXISTING_CONTENT_POLICY
-    countdown_pattern: CountdownPattern | None = None
     replay_countdown_pattern: bool = False
-    initialize_countdown_total: bool = False
 
 
 @dataclass(frozen=True)
@@ -145,7 +146,6 @@ class DslProcessingResult:
 def _countdown_scope(
     source: str, context: DslProcessingContext,
 ) -> tuple[str | None, CountdownPattern | None]:
-    selected = context.countdown_pattern
     rows = parse_compact_dsl_rows(
         source,
         expand_layouts=False,
@@ -160,15 +160,14 @@ def _countdown_scope(
     root = pattern_layout(rows)
     scope = context.layout_scope
     pattern: CountdownPattern | None = None
-    if root is None:
-        if selected is not None:
-            raise CompactDslConversionError("本轮指定图案倒计时，请使用已裁决的图案布局。")
-    else:
+    if root is not None:
         pattern = pattern_from_source(root, rows)
         if not context.replay_countdown_pattern:
-            allowed = selected or pattern_from_plan(
-                (context.compact_plan or {}).get(PRESENTATION), context.size,
-            )
+            presentation = (context.compact_plan or {}).get(PRESENTATION)
+            layout_error = date_counter_layout_error(root.props.get("layout"), presentation)
+            if layout_error is not None:
+                raise CompactDslConversionError(layout_error)
+            allowed = pattern_from_plan(presentation, context.size)
             if allowed != pattern:
                 raise CompactDslConversionError("图案类型或绑定未通过本轮创建准入。")
         check_pattern_binding(pattern, context.card_spec)
@@ -235,10 +234,7 @@ class DesignCompactProcessor:
         ):
             result = self._process(source_dsl, context)
             enabled = get_settings().enable_design_compact_deterministic_repair
-            may_repair = (
-                enabled and not context.skip_compact_dsl_validation
-                and context.countdown_pattern is None
-            )
+            may_repair = enabled and not context.skip_compact_dsl_validation
             if may_repair and result.errors and not context.content_policy.is_static:
                 result = self._repair_duplicate_display(result, context)
             if context.content_policy.is_static and result.errors:
@@ -474,18 +470,16 @@ class DesignCompactProcessor:
         original_source_dsl = source_dsl
         try:
             layout_scope, pattern = _countdown_scope(source_dsl, context)
-            automatic = context.countdown_pattern is None and not context.replay_countdown_pattern
-            if pattern is not None and automatic:
+            if pattern is not None and not context.replay_countdown_pattern:
                 logger.info(
                     f"[Countdown Pattern] automatic_source_accepted size={context.size} "
                     f"kind={pattern.kind} fixed_total={pattern.fixed_total}"
                 )
-            initialize_total = context.initialize_countdown_total or automatic
-            if pattern is not None and pattern.fixed_total is None and initialize_total:
-                source_dsl = initialize_pattern_total(source_dsl, pattern)
-                logger.info(
-                    "[Countdown Pattern] initial_interval_days=0 awaiting_runtime_data=true"
-                )
+                if pattern.fixed_total is None:
+                    source_dsl = initialize_pattern_total(source_dsl, pattern)
+                    logger.info(
+                        "[Countdown Pattern] initial_interval_days=0 awaiting_runtime_data=true"
+                    )
             if in_layout_phase():
                 source_dsl = strip_source_colors(source_dsl)
                 original_source_dsl = source_dsl
@@ -527,8 +521,7 @@ class DesignCompactProcessor:
                 )
         except CompactDslConversionError as exc:
             presentation = (context.compact_plan or {}).get(PRESENTATION)
-            automatic_pattern = isinstance(presentation, dict) and "pattern" in presentation
-            if context.countdown_pattern is not None or automatic_pattern:
+            if isinstance(presentation, dict) and "pattern" in presentation:
                 logger.warning(
                     f"[Countdown Pattern] source_rejected type={type(exc).__name__} reason={exc}"
                 )

@@ -21,6 +21,7 @@ from services.compact.planning.compact_action_instances import (
     event_card_item_handlers,
     plan_action_handlers,
 )
+from services.compact.planning.compact_date_counter_plan import DATE_COUNTER_LAYOUTS, PRESENTATION
 from services.compact.planning.compact_plan import (
     _compact_fact_coverage_result,
     _compact_visible_state,
@@ -184,6 +185,8 @@ def collect_plan_contract_errors(
     errors: list[str],
     *,
     size: str | None,
+    source_components: list[ComponentRow] | None = None,
+    actual_layout: str | None = None,
 ) -> None:
     """校验模型输出对 Plan 素材分配和语义分区的落实情况。"""
     _collect_title_icon_contract_errors(components, errors)
@@ -197,7 +200,48 @@ def collect_plan_contract_errors(
         size=size,
     )
     _collect_anchor_support_errors(components, compact_plan, errors)
-    _collect_data_display_role_errors(components, compact_plan, errors)
+    presentation = (compact_plan or {}).get(PRESENTATION)
+    if isinstance(presentation, dict):
+        _collect_date_counter_layout_errors(source_components, actual_layout, presentation, errors)
+    if not isinstance(presentation, dict) or actual_layout == presentation.get("layout"):
+        _collect_data_display_role_errors(components, compact_plan, errors)
+
+
+def _collect_date_counter_layout_errors(
+    source_components: list[ComponentRow] | None,
+    actual_layout: str | None,
+    presentation: dict[str, Any],
+    errors: list[str],
+) -> None:
+    """普通布局可承接同一 Plan，只有倒计时布局受分发约束。"""
+    if actual_layout not in DATE_COUNTER_LAYOUTS or source_components is None:
+        return
+    layout_error = date_counter_layout_error(actual_layout, presentation)
+    if layout_error is not None:
+        errors.append(layout_error)
+        return
+    selected_component = presentation.get("component")
+    for row in source_components:
+        if row.component_type != selected_component:
+            continue
+        if row.props.get("value") != presentation.get("value"):
+            errors.append(f"{selected_component}.value 必须绑定本轮选定的日期计数天数。")
+        if row.props.get("icon") is not None:
+            errors.append(f"倒计时布局 {actual_layout} 不使用业务图标。")
+        return
+    errors.append(f"倒计时布局 {actual_layout} 必须使用 {selected_component}。")
+
+
+def date_counter_layout_error(actual_layout: Any, presentation: Any) -> str | None:
+    """自动图案准入和最终 Plan 校验共用布局分发判定。"""
+    if not isinstance(actual_layout, str) or actual_layout not in DATE_COUNTER_LAYOUTS:
+        return None
+    if not isinstance(presentation, dict) or actual_layout == presentation.get("layout"):
+        return None
+    return (
+        f"实际倒计时布局为 {actual_layout}，本轮应使用 {presentation.get('layout')} + "
+        f"{presentation.get('component')}，或改用可完整承接事实的合法普通布局。"
+    )
 
 
 def _collect_data_display_role_errors(

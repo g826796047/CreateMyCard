@@ -45,6 +45,7 @@ from services.compact.planning.compact_composition_planner import compound_durat
 from services.compact.planning.compact_date_counter_plan import (
     PRESENTATION,
     date_counter_label_prefix,
+    date_counter_plan_instruction,
 )
 from services.compact.planning.compact_plan_output import (
     PlanDuplicateKeyError,
@@ -1744,6 +1745,12 @@ def compact_plan_context(
                 "assetAssignments 中整卡动作的 assetId 为 null，不生成按钮或消费按钮素材；"
                 "title 的已分配素材仍按原标题合同落实。"
             )
+        if isinstance(plan.get(PRESENTATION), dict):
+            asset_instruction = (
+                "assetAssignments 的标题素材仅供普通布局使用；"
+                "普通布局采用主 SingleLineTitle.icon 时，遵守本轮素材分配。"
+            )
+    date_instruction = date_counter_plan_instruction(plan)
     preference_instruction = (
         "componentHints 第一项是首选：语义、类型、素材、事件和容量成立时应落实；"
         "具体条件不成立才改选合法备选或组件组合。"
@@ -1761,6 +1768,7 @@ def compact_plan_context(
             "按对象信息关系和当前尺寸完整案例组织，不能把候选第一项当作逐事实实例清单。"
             "普通时间、数量说明和状态不因候选排序新增强调焦点；标题与主值职责保持不变。"
             "局部修复保持待修树的合法结构，只处理明确错误。"
+            f"{date_instruction}"
             f"{asset_instruction}"
             f"{whole_card_instruction}"
             f"{wide_action_instruction}"
@@ -1790,6 +1798,7 @@ def compact_plan_context(
         "才允许省略程序指定的非 Action 事实。"
         "除标题组件职责外，"
         f"{layout_instruction}"
+        f"{date_instruction}"
         f"{pure_action_instruction}"
         f"{preference_instruction}先按对象和信息关系合组，再映射可见 Prop。"
         "不能因为完整案例使用了其它组件就将匹配的信息组拆成逐字段的单文字组件。"
@@ -1933,6 +1942,9 @@ def _compact_visible_state(
             date_label = date_counter_label_prefix(component)
             if date_label:
                 visible_literals.append(date_label)
+            if component.component_type in {"SCountdown", "WCountdown"}:
+                # 单位由程序读数提供，目标当天则按组件合同只展示“就是今天”。
+                visible_literals.append("天")
         if component.component_type == "DataDisplay":
             from services.compact.planning.compact_composition_context import (
                 small_card_display_text,

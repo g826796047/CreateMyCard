@@ -83,17 +83,10 @@ class EventAction(BaseModel):
     args: dict[str, Any]
 
 
-class CountdownPatternPreference(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    kind: Literal["bars", "dots"]
-
-
 class GenerationOptions(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     allowDegradation: bool = True
-    countdownPattern: CountdownPatternPreference | None = None
 
 
 class CardSpec(BaseModel):

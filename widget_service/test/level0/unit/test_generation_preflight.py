@@ -79,6 +79,18 @@ def test_generation_tool_schema_matches_source_direct_result_contract():
         "capabilityId",
         "candidateOutputFields",
     }
+    options = properties.get("options", {})
+    assert options.get("additionalProperties") is False
+    assert set(options.get("properties", {})) == {"allowDegradation"}
+    schema_path = (
+        PROJECT_ROOT / "widget_service" / "docs" / "schemas"
+        / "generateWidgetCardCompactDsl.schema.json"
+    )
+    envelope = json.loads(schema_path.read_text(encoding="utf-8")).get("messageEnvelope", {})
+    content = envelope.get("properties", {}).get("content", {})
+    documented_options = content.get("properties", {}).get("options", {})
+    assert documented_options.get("additionalProperties") is False
+    assert documented_options.get("properties") == options.get("properties")
     assert output_schema["required"] == ["status", "suggestSize"]
     assert "omittedRequirements" in output_schema["properties"]
     assert "artifactUrl" in output_schema["properties"]

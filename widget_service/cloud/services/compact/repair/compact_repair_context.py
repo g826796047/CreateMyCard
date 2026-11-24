@@ -13,6 +13,10 @@ from services.compact.planning.compact_action_instances import (
     event_card_detail_action,
     plan_action_candidates,
 )
+from services.compact.planning.compact_date_counter_plan import (
+    PRESENTATION,
+    date_counter_plan_instruction,
+)
 
 JOINT_RECOMPOSITION_INSTRUCTION = (
     "此前布局已失败，本轮把结构、容量、事实、动作和素材作为同一重组问题处理，"
@@ -880,9 +884,12 @@ def joint_repair_contract(
             "仅 approvedOmissions 中的非Action事实获准省略。其它事实保留标签、完整值、单位及绑定，"
             "不冻结原组件软候选。"
             f"{action_instruction}"
+            f"{date_counter_plan_instruction(plan)}"
             "按本轮scope保护未受影响区域；重组结束同时对照本清单，不以当前错误消失代替整体核对。"
         ),
     }
     if isinstance(whole_card_action_id, str):
         result["wholeCardActionId"] = whole_card_action_id
+    if isinstance(plan.get(PRESENTATION), dict):
+        result[PRESENTATION] = copy.deepcopy(plan.get(PRESENTATION))
     return result

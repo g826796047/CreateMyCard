@@ -76,6 +76,7 @@ from services.compact.layout.compact_layout_runtime import (
     match_compact_layout,
 )
 from services.compact.layout.compact_whole_card_click import accepted_whole_card_click
+from services.compact.planning.compact_date_counter_plan import PRESENTATION
 
 from .context import ComponentRows, ValidationContext
 from .diagnostics import DiagnosticCollector
@@ -114,7 +115,10 @@ def validate_compact_dsl(
         countdown_root = pattern_layout(original_rows)
         if countdown_root is not None:
             check_pattern_binding(pattern_from_source(countdown_root, original_rows), card_spec)
-        from services.generation.generation_content_policy import current_content_policy
+        from services.generation.generation_content_policy import (
+            current_content_policy,
+            effective_layout_scope,
+        )
 
         if current_content_policy().is_static:
             source_components = [row for row in original_rows if isinstance(row, ComponentRow)]
@@ -169,35 +173,41 @@ def validate_compact_dsl(
             declared_layout = source_layout
     if layout_scope is None and declared_layout == "W-countdown-center":
         layout_scope = declared_layout
+    actual_layout = declared_layout
+    is_date_counter_plan = isinstance((compact_plan or {}).get(PRESENTATION), dict)
+    if layout_scope is None and declared_layout is None and is_date_counter_plan:
+        if isinstance(size, str):
+            layout_scope = effective_layout_scope(size)
     if layout_scope is not None:
         if not isinstance(size, str):
             layout_errors.append("Compact layout validation requires a valid widget size.")
         else:
             try:
                 whole_card_click = accepted_whole_card_click(task_spec, compact_plan)
-                match_compact_layout(
+                layout_match = match_compact_layout(
                     components, size=size, layout_scope=layout_scope,
                     root_action_handler=(
                         whole_card_click.handler if whole_card_click is not None else None
                     ),
                     declared_layout=declared_layout,
                 )
+                if actual_layout is None:
+                    actual_layout = layout_match.layout_id
             except CompactLayoutRuntimeError as exc:
                 layout_errors.append(str(exc))
     binding_contract_errors = _compact_component_binding_errors(
         components, task_spec.get("dataModelSchema")
     )
-    collect_actions_only_plan_errors(
-        [row for row in original_rows if isinstance(row, ComponentRow)],
-        compact_plan,
-        binding_contract_errors,
-    )
+    source_components = [row for row in original_rows if isinstance(row, ComponentRow)]
+    collect_actions_only_plan_errors(source_components, compact_plan, binding_contract_errors)
     collect_plan_contract_errors(
         components,
         task_spec,
         compact_plan,
         binding_contract_errors,
         size=size if isinstance(size, str) else None,
+        source_components=source_components,
+        actual_layout=actual_layout,
     )
     if enforce_model_component_types:
         collect_secondary_body_context_errors(components, binding_contract_errors)

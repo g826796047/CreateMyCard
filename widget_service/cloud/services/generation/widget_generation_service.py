@@ -59,7 +59,6 @@ from services.capabilities.device_capability_resolver import DeviceCapabilityRes
 from services.card_validation.compact_validation.repair_guidance import RepairGuidanceContext
 from services.card_validation.validator import ArtifactValidator
 from services.compact.compact_dsl_a2ui_converter import serialize_compact_dsl_source
-from services.compact.components.countdown_pattern import authorize_pattern, countdown_prompt
 from services.compact.planning.compact_date_counter_plan import (
     PRESENTATION,
     apply_date_counter_plan,
@@ -583,36 +582,6 @@ class WidgetGenerationService:
         task_spec = preflight.task_spec
         if card_spec is None or task_spec is None:
             raise RuntimeError("generation preflight did not build generation specs")
-        countdown_pattern = None
-        preference = request.options.countdownPattern
-        if preference is not None:
-            try:
-                if generation_mode != "create":
-                    raise ValueError("图案倒计时仅用于新建。")
-                if policy.operation != "generateWidgetCardCompactDsl":
-                    raise ValueError("图案倒计时仅用于 Fusion 创建。")
-                countdown_pattern = authorize_pattern(
-                    preference,
-                    effective_bindings,
-                    has_events=bool(request.candidateEventCandidates or effective_events),
-                )
-            except ValueError as exc:
-                logger.info(
-                    f"[Countdown Pattern] selection_rejected kind={preference.kind} "
-                    f"type={type(exc).__name__} reason={json_for_log(str(exc))}"
-                )
-                return GenerateWidgetCardResponse(
-                    status=GenerationStatus.UNSUPPORTED,
-                    suggestSize=card_spec.suggestSize,
-                    message=str(exc),
-                    errorCode=ErrorCode.PROTOCOL_CAPABILITY_UNSUPPORTED.value,
-                )
-            logger.info(
-                f"[Countdown Pattern] selection_accepted kind={preference.kind} "
-                f"size={card_spec.suggestSize}"
-            )
-            template_source_generator = None
-            need_fallback = True
         content_policy = resolve_content_policy(
             operation=policy.operation,
             enabled=settings.enable_static_content_generation_policy,
@@ -791,13 +760,6 @@ class WidgetGenerationService:
                         and not settings.enable_a2ui_model_mock
                     ),
                 )
-                if countdown_pattern is not None:
-                    system_message = next(iter(prompt))
-                    system_content = system_message.get("content")
-                    if not isinstance(system_content, str):
-                        raise RuntimeError("Fusion 图案倒计时缺少系统提示。")
-                    pattern_contract = countdown_prompt(countdown_pattern, task_spec.size)
-                    system_message["content"] = f"{system_content}\n\n{pattern_contract}"
             else:
                 prompt = PromptBuilder().build(
                     task_spec,
@@ -885,8 +847,6 @@ class WidgetGenerationService:
             data_capabilities=effective_data_capabilities,
             event_candidates=effective_events,
             repair_context=RepairGuidanceContext(mode="edit" if source_load_result else "create"),
-            countdown_pattern=countdown_pattern,
-            initialize_countdown_total=countdown_pattern is not None,
             layout_scope=(
                 PromptBuilder.layout_scope(display_task)
                 if policy.processor_kind == DslProcessorKind.DESIGN_COMPACT
@@ -1470,15 +1430,24 @@ class WidgetGenerationService:
                 if source_fallback_started:
                     trace_phase_outcome("degraded", reason="fallback_to_model")
                 accepted_compact_plan = await generate_compact_plan()
-                automatic_date_counter = countdown_pattern is None and preflight.date_counters
-                if generation_mode == "create" and automatic_date_counter and not capacity_recovery:
+                # 日期方案按 Plan 已选择的事实和动作判断，未选候选不影响改写。
+                if (
+                    generation_mode == "create"
+                    and preflight.date_counters
+                    and not capacity_recovery
+                ):
                     rewrite_started_at = time.perf_counter()
                     task_value = display_task.model_dump(mode="json", exclude_none=True)
+                    recurring_roots = set()
+                    for binding in effective_bindings:
+                        if binding.arguments.get("repeat") is not None:
+                            recurring_roots.add(binding.writeResultTo)
                     selection = apply_date_counter_plan(
                         accepted_compact_plan,
                         display_task.size,
                         set(compact_plan_data_paths(task_value)),
                         preflight.date_counters,
+                        recurring_roots=frozenset(recurring_roots),
                     )
                     accepted_compact_plan = selection.plan
                     rewrite_duration_ms = self._elapsed_ms(rewrite_started_at)
@@ -2614,14 +2583,6 @@ class WidgetGenerationService:
     ) -> GenerateWidgetCardResponse:
         """复制请求并锁定路由对应的协议 profile。"""
         is_edit = "sourceArtifactUrl" in request.model_fields_set
-        if is_edit and request.options.countdownPattern is not None:
-            logger.info("[Countdown Pattern] selection_rejected reason=edit")
-            return GenerateWidgetCardResponse(
-                status=GenerationStatus.UNSUPPORTED,
-                suggestSize=request.size or DEFAULT_WIDGET_SIZE,
-                message="图案倒计时仅用于新建，已有卡片暂不支持切换为图案样式。",
-                errorCode=ErrorCode.PROTOCOL_CAPABILITY_UNSUPPORTED.value,
-            )
         if is_edit:
             from services.editing.widget_edit_service import WidgetEditService
 

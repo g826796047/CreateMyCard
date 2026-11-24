@@ -149,9 +149,9 @@ def test_countdown_layout_prompt_is_conditional_and_size_specific(
     create = prompts.get("create", "")
     component = "SCountdown" if size == "2x2" else "WCountdown"
     assert f"Layout＋{component}" in create
-    assert "自动单次图案的 totalValue 使用 Plan 中创建时剩余天数的固定整数" in create
-    assert "自动周期图案及显式图案的 totalValue 绑定同级 /intervalDays" in create
-    assert "不接受旧根属性" in create
+    assert f"根仅提交 layout，children 只引用一个 {component}" in create
+    assert "自动单次图案的 totalValue 使用生效 Plan 指定的固定正整数" in create
+    assert "周期图案的 totalValue 绑定同级 /intervalDays" in create
     assert "不提交 unit、fillMode、视觉属性" in create
 
     task = TaskSpec(size=size, userQuery="做张倒计时卡", dataModelSchema={"data": {}})
@@ -159,7 +159,7 @@ def test_countdown_layout_prompt_is_conditional_and_size_specific(
         task, create, DESIGN_COMPACT_PROFILE_ID, defer_compact_examples=True,
     )
     system = prompt[0].get("content", "")
-    assert f"`{layout}` 在本轮服务端明确准入或已接受 Plan 选中时额外开放" in system
+    assert f"`{layout}` 仅在本轮生效 Plan 的日期选型选中时开放" in system
     assert system.count(f"`{layout}`：图案倒计时") == 1
     assert other_layout not in system
 

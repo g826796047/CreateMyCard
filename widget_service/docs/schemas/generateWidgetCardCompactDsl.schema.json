@@ -93,23 +93,6 @@
             "properties": {
               "allowDegradation": {
                 "type": "Boolean"
-              },
-              "countdownPattern": {
-                "type": "Object",
-                "description": "仅 Fusion 新建单次倒计时使用。柱条与圆点均按 days/intervalDays 连续填充，无剩余天数门槛。",
-                "required": [
-                  "kind"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                  "kind": {
-                    "type": "String",
-                    "enum": [
-                      "bars",
-                      "dots"
-                    ]
-                  }
-                }
               }
             }
           },

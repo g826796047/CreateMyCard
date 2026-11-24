@@ -6,7 +6,6 @@ import json
 from dataclasses import dataclass
 from typing import Literal
 
-from models.generation import CandidateDataBinding, CountdownPatternPreference
 from services.compact.compact_dsl_a2ui_converter import (
     CompactDslConversionError,
     CompactRow,
@@ -77,23 +76,6 @@ def _load_geometry() -> dict[tuple[str, str], PatternGeometry]:
 
 
 GEOMETRY = _load_geometry()
-
-
-def authorize_pattern(
-    preference: CountdownPatternPreference,
-    bindings: list[CandidateDataBinding],
-    *,
-    has_events: bool,
-) -> CountdownPattern:
-    if len(bindings) != 1 or has_events:
-        raise ValueError("图案倒计时只支持一个日期计数目标和无动作布局。")
-    binding = next(iter(bindings))
-    if binding.capabilityId != "GetDateCounter" or binding.arguments.get("repeat") is not None:
-        raise ValueError("图案只用于单次倒计时，周期倒计时可使用普通样式。")
-    required = {"/days", "/relationText", "/intervalDays"}
-    if not required.issubset(binding.candidateOutputFields):
-        raise ValueError("比例图案需要日期计数的天数、日期关系和 intervalDays。")
-    return CountdownPattern(preference.kind, binding.writeResultTo.rstrip("/") + "/days")
 
 
 def pattern_layout(rows: tuple[CompactRow, ...]) -> ComponentRow | None:
@@ -195,40 +177,23 @@ def pattern_from_plan(presentation: object, size: str) -> CountdownPattern | Non
 
 def check_pattern_binding(pattern: CountdownPattern, card_spec: dict) -> None:
     bindings = card_spec.get("dataBindings")
-    if not isinstance(bindings, list) or len(bindings) != 1:
-        raise CompactDslConversionError("图案需要一个已授权的日期计数绑定。")
-    binding = next(iter(bindings))
-    if not isinstance(binding, dict) or binding.get("capabilityId") != "GetDateCounter":
-        raise CompactDslConversionError("图案需要已授权的日期计数能力。")
+    matching = []
+    if isinstance(bindings, list):
+        for candidate in bindings:
+            if not isinstance(candidate, dict) or candidate.get("capabilityId") != "GetDateCounter":
+                continue
+            root = candidate.get("writeResultTo")
+            if isinstance(root, str) and root.rstrip("/") + "/days" == pattern.days_path:
+                matching.append(candidate)
+    # 自动选型按已选对象绑定；同一请求中的其它候选不参与图案承载。
+    if len(matching) != 1:
+        raise CompactDslConversionError("图案必须绑定当前目标对应的唯一已授权日期计数天数。")
+    binding = next(iter(matching))
     arguments = binding.get("arguments")
     if not isinstance(arguments, dict):
         raise CompactDslConversionError("图案缺少有效的日期计数参数。")
     if arguments.get("repeat") is not None and pattern.fixed_total is not None:
         raise CompactDslConversionError("周期图案总量必须绑定同一日期计数的 /intervalDays。")
-    root = binding.get("writeResultTo")
-    if not isinstance(root, str) or root.rstrip("/") + "/days" != pattern.days_path:
-        raise CompactDslConversionError("图案必须绑定当前目标对应的数值天数。")
-
-
-def countdown_prompt(pattern: CountdownPattern, size: str) -> str:
-    layout = COUNTDOWN_LAYOUTS.get(size)
-    bindings = {
-        "value": {"path": pattern.days_path},
-        "relationValue": {"path": pattern.relation_path},
-    }
-    template = [
-        ["root", "Layout", {"layout": layout}, ["countdown"]],
-        ["countdown", COUNTDOWN_COMPONENTS.get(size), {
-            "label": "本轮事件名称", "pattern": pattern.kind, **bindings,
-            "totalValue": {"path": pattern.total_path},
-        }],
-    ]
-    source = "\n".join(json.dumps(row, ensure_ascii=False) for row in template)
-    return (
-        "本轮已通过单次图案倒计时准入。\n\n"
-        f"本轮源组件结构为：\n```jsonl\n{source}\n```\n"
-        "intervalDays 必须有首帧数据行；尚未取得本轮真实值时填 0，不能复制能力样例作为真实总量。"
-    )
 
 
 def _visual_styles(size: str, slot: str) -> dict:
