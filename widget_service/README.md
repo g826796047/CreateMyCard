@@ -131,7 +131,7 @@ py -3.12 cloud\start_websocket_server.py
 在 `widget_service` 目录激活项目的 Python 环境后，本地改完代码和 PR 检查都执行同一条命令：
 
 ```powershell
-python -m pytest tests/compact_dsl_smoke.py -q
+python -m pytest test/smoke/compact_dsl_smoke.py -q
 ```
 
 该用例在独立端口启动当前检出的主服务，通过真实模型生成一张 2×2 欢迎卡片。它从临时工作目录读取本次上传的产物，
@@ -151,7 +151,7 @@ py -3.12 cloud\start_websocket_server.py
 
 ```powershell
 cd widget_service
-py -3.12 tests\test_running_ws_server.py
+py -3.12 -m pytest tests\manual\live_ws\test_running_ws_server.py -s -q
 ```
 
 该脚本会调用真实 `generateWidgetCardCompactDsl`，读取服务保存的 artifact，通过
@@ -163,14 +163,14 @@ py -3.12 tests\test_running_ws_server.py
 ```powershell
 cd widget_service
 # 运行全部单功能用例
-py -3.12 -m pytest tests\test_running_ws_features.py -s -q
+py -3.12 -m pytest tests\manual\live_ws\test_running_ws_features.py -s -q
 # 只测能力概述
-py -3.12 -m pytest tests\test_running_ws_features.py::test_live_widget_capability_overview -s -q
+py -3.12 -m pytest tests\manual\live_ws\test_running_ws_features.py::test_live_widget_capability_overview -s -q
 # 只测一个数据能力 schema
-py -3.12 -m pytest "tests\test_running_ws_features.py::test_live_each_data_capability_schema[ViewWeather]" -s -q
+py -3.12 -m pytest "tests\manual\live_ws\test_running_ws_features.py::test_live_each_data_capability_schema[ViewWeather]" -s -q
 # 只测 A2UI Form 或 Compact DSL 生成
-py -3.12 -m pytest tests\test_running_ws_features.py::test_live_generate_widget_card -s -q
-py -3.12 -m pytest tests\test_running_ws_features.py::test_live_generate_widget_card_compact_dsl -s -q
+py -3.12 -m pytest tests\manual\live_ws\test_running_ws_features.py::test_live_generate_widget_card -s -q
+py -3.12 -m pytest tests\manual\live_ws\test_running_ws_features.py::test_live_generate_widget_card_compact_dsl -s -q
 ```
 
 该文件中的健康检查、四个 WS 接口、八个数据能力 schema、缺失能力和参数异常都是独立
@@ -188,9 +188,7 @@ py -3.12 cloud\start_websocket_server.py
 
 ```powershell
 cd widget_service
-py -3.12 tests\test_running_ws_multi_round.py
-# 或显示每轮响应：
-py -3.12 -m pytest tests\test_running_ws_multi_round.py -s -q
+py -3.12 -m pytest tests\manual\live_ws\test_running_ws_multi_round.py -s -q
 ```
 
 测试会依次执行首次生成、纯视觉继承编辑和显式清空数据三轮，并断言每轮返回新的 artifact URL。
@@ -214,12 +212,12 @@ py -3.12 -m pytest tests\test_service_units.py -s -q
 流程使用 Ubuntu 和 Python 3.12，安装 `requirements.txt`，在 `widget_service/` 下运行：
 
 ```powershell
-python -m pytest tests -q -ra --junitxml=test-results/pytest.xml
+python -m pytest test -m l0 -q -ra --junitxml=test-results/l0-widget-service.xml
 ```
 
-执行范围为 `widget_service/tests/` 中 pytest 自动发现的用例；不包含其它目录下的测试和
-`pressure_test_ws.py` 压测脚本。CI 不启动真实 WebSocket 服务，依赖该服务的联调用例按现有逻辑
-跳过，跳过原因在日志和 JUnit 报告中保留。测试失败会使检查失败，报告作为 Actions artifact 上传。
+执行范围为 `widget_service/test/level0/` 中带 `l0` 标记的确定性用例；不包含 L1、真实模型冒烟、
+人工联调和 `test/manual/load/pressure_test_ws.py` 压测脚本。测试失败会使检查失败，报告作为 Actions
+artifact 上传。
 同一 PR 追加提交后，会取消之前尚未完成的运行。
 
 如需测试失败时禁止合并，在 GitHub 目标分支的保护规则或 Ruleset 中将

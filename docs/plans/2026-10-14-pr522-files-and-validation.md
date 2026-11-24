@@ -47,18 +47,18 @@
 | `widget_service/cloud/services/generation_pipeline.py` | 记录语义源和展开源及诊断来源 |
 | `widget_service/cloud/services/prompt_builder.py` | 按尺寸区分阶段协议、补齐 Action/Data 的最小修复指引 |
 | `widget_service/cloud/services/widget_generation_service.py` | 保存真实 Compact 源，排除 JSX 标准输出误解析，兼容模板专用入口 |
-| `widget_service/tests/test_compact_calendar_badge_context.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_compact_component_bindings.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_compact_infoblock_text_geometry.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_compact_layout_runtime.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_compact_prompt_bundle.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_compact_semantic_layout.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_compact_semantic_ratio_conversion.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_compact_wide_expression_budget.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_compact_wide_label_budget.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_design_compact_few_shots.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_design_compact_repair_prompt.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
-| `widget_service/tests/test_service_units.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_compact_calendar_badge_context.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_compact_component_bindings.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_compact_infoblock_text_geometry.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_compact_layout_runtime.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_compact_prompt_bundle.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_compact_semantic_layout.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_compact_semantic_ratio_conversion.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_compact_wide_expression_budget.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_compact_wide_label_budget.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_design_compact_few_shots.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_design_compact_repair_prompt.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
+| `widget_service/test/test_service_units.py` | 对应文件所指链路的回归测试；覆盖语义协议或当前主仓合同 |
 | `widget_service/tools/analyze_compact_semantic_run.py` | 分析模型运行结果和失败类型 |
 | `widget_service/tools/migrate_compact_semantic_fewshots.py` | 将原有示例迁移为语义结构 |
 | `widget_service/tools/run_compact_semantic_batch.py` | 语义分支运行与追踪入口 |
@@ -69,7 +69,7 @@
 ## 验证
 
 - 相关链路：571 passed、41 subtests passed；补充入口：61 passed。
-- 全 widget_service/tests：2151 passed、19 failed、16 skipped、59 subtests passed。
+- 全 widget_service/test：2151 passed、19 failed、16 skipped、59 subtests passed。
 - 独立 main `a376ba4`：2049 passed、19 failed、16 skipped、59 subtests passed；失败集合相同，无新增失败。
 - `ca27f1f` 后续仅改蓝牙能力说明；合入后能力与语义链路定向回归：325 passed。
 - 十个既有 2×4 示例的输入/业务事实核对和完整 Processor 均通过；渲染器 27 项通过。

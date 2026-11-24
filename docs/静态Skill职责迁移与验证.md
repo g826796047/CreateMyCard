@@ -68,8 +68,8 @@ Few-shot仍在Plan之后追加，Repair仍在反馈后追加，不重建第二�
 - `widget_service/cloud/services/static_prompt_source.py`：静态装配、验证、过滤及缓存。
 - `widget_service/cloud/services/compact_prompt_loader.py`：公开入口委托，动态装配不变。
 - `widget_service/cloud/services/prompt_builder.py`：删除两尺寸重复预加载。
-- `widget_service/tests/test_static_prompt_source.py`：职责、尺寸、缓存、异常及案例不变回归。
-- `widget_service/tests/test_static_content_generation.py`：新路径与阶段装配断言。
+- `widget_service/test/test_static_prompt_source.py`：职责、尺寸、缓存、异常及案例不变回归。
+- `widget_service/test/test_static_content_generation.py`：新路径与阶段装配断言。
 - `docs/云侧方案设计.md`：总方案登记。
 - `docs/开域静态内容卡片技术方案.md`：专项装配设计。
 - `docs/开域静态内容卡片实施与验证记录.md`：历史路径迁移说明。

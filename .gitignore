@@ -74,6 +74,8 @@ tempelate.jpg
 .claude/
 SVG图标素材库清单.md
 test/
+!/widget_service/test/
+!/widget_service/test/**
 test.jsonl
 /widget_service/cloud/compact-dsl-renderer/
 /widget_service/cloud/a2ui-renderer/

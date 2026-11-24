@@ -915,7 +915,7 @@ BASE-02 至 BASE-04 分别保留结构冲突、按旧建议修复后出现新错
 | `widget_service/cloud/services/generation/prompt_builder.py` | 为模型请求创建副本，统一格式化 Compact 错误说明，保留其他质量问题的载荷 |
 | `widget_service/cloud/services/artifacts/artifact_store.py` | 修复记录类型标注允许嵌套诊断，序列化及既有字段保持不变 |
 | `widget_service/cloud/data/protocol_profiles/design-compact-dsl/REPAIR_SYSTEM_PROMPT.md` | 说明如何读取 Compact 分段错误说明，同时保留标准产物校验结构化字段的解释 |
-| `widget_service/tests/` 中相关测试 | 覆盖行为等价、文案解耦、建议接口及修复链路 |
+| `widget_service/test/` 中相关测试 | 覆盖行为等价、文案解耦、建议接口及修复链路 |
 | 相关模板测试目录 | 验证模板跳过逻辑和已有调用兼容性 |
 
 ### 10.1 实施时同步到 AGENTS.md 的归属检查规范

@@ -1,0 +1,533 @@
+"""静态展示一致性：词元、布局、标题可见性、遗漏对账和角色。"""
+
+import copy
+import json
+
+import pytest
+from test.fixtures.static_content.static_title import titled_rows
+
+from services.card_validation import validate_compact_dsl
+from services.card_validation.compact_validation.semantic.static_content import (
+    _fact_covered,
+    _identity_covered,
+    static_group_errors,
+)
+from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
+from services.compact.components.compact_high_level_components import CompactDslConversionError
+from services.compact.planning.compact_plan import (
+    CompactPlanValidationError,
+    _normalize_static_omissions,
+    compact_plan_omitted_facts,
+    evaluate_compact_plan_coverage,
+    parse_compact_plan_call,
+)
+from services.compact.static_content.static_content_context import standard_components
+from services.generation.generation_content_policy import (
+    EXISTING_CONTENT_POLICY,
+    STATIC_CONTENT_POLICY,
+    content_policy_scope,
+)
+
+
+def fact(text, priority="must", **extras):
+    return {
+        "requirement": text,
+        "text": text,
+        "priority": priority,
+        "sourceTexts": [text],
+        **extras,
+    }
+
+
+def source(component, props, *, size="2x4", variant=None, header=None):
+    children = ["body"]
+    rows = []
+    if header:
+        children.insert(0, "header")
+        rows.append(["header", "SingleLineTitle", header])
+    prefix = "S" if size == "2x2" else "W"
+    layout_props = {"layout": prefix + "-static-content"}
+    if variant is not None:
+        layout_props["variant"] = variant
+    rows.insert(0, ["root", "Layout", layout_props, children])
+    rows.extend([["body", component, props], ["/state/ready", True]])
+    return "\n".join(json.dumps(row, ensure_ascii=False) for row in titled_rows(rows))
+
+
+def accept(value, query, size="2x4"):
+    raw = json.dumps({"name": "submit_card_plan", "arguments": value})
+    return parse_compact_plan_call(raw, {"userQuery": query, "size": size}).plan
+
+
+@pytest.fixture
+def static_scope():
+    with content_policy_scope(STATIC_CONTENT_POLICY):
+        yield
+
+
+@pytest.mark.parametrize(
+    "name,visible",
+    [
+        ("Charlie Puth", "Charlie Puth Whatever's Clever"),
+        ("Adele", "Adele · Moonlight Tour"),
+        ("Alpha Beta", "Alpha Beta | Future"),
+        ("Bruno Mars", "Bruno   Mars — An Evening"),
+    ],
+)
+def test_independent_english_name_keeps_word_boundaries(name, visible):
+    assert _identity_covered(name, [visible])
+    assert _fact_covered(fact(name), [visible])
+
+
+@pytest.mark.parametrize(
+    "name,visible",
+    [
+        ("GPT", "ChatGPT"),
+        ("Adele", "Adeles"),
+        ("Charlie Puth", "Charlie PuthX"),
+        ("Bruno Mars", "Mars Bruno"),
+    ],
+)
+def test_name_does_not_borrow_partial_or_reordered_words(name, visible):
+    assert not _identity_covered(name, [visible])
+
+
+@pytest.mark.parametrize(
+    "text,parts",
+    [
+        ("30GB", ["130GB"]),
+        ("30GB", ["3", "0GB"]),
+        ("500分钟", ["1500分钟"]),
+        ("-5℃", ["5℃"]),
+    ],
+)
+def test_boundary_fix_keeps_full_readings(text, parts):
+    assert not _fact_covered(fact(text), parts)
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("size", ["2x2", "2x4"])
+def test_guided_layout_matches_its_own_compiler_contract(size):
+    value = {
+        "info_required": [fact("完整内容")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0]},
+        ],
+    }
+    prefix = "S" if size == "2x2" else "W"
+    validate_compact_dsl(
+        source("EmphasisText", {"mainText": "完整内容"}, size=size),
+        task_spec={"size": size, "userQuery": "完整内容", "dataModelSchema": {"data": {}}},
+        card_spec={"suggestSize": size},
+        compact_plan=value,
+        layout_scope=prefix + "-static-content-guided",
+    )
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("size", ["2x2", "2x4"])
+@pytest.mark.parametrize("variant", ["flow", "compact"])
+def test_legacy_layout_variant_is_not_reintroduced(size, variant):
+    dsl = source("EmphasisText", {"mainText": "完整内容"}, size=size, variant=variant)
+    with pytest.raises(CompactDslConversionError, match="不支持以下语义属性：variant"):
+        convert_compact_dsl_to_a2ui(dsl, size=size)
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_long_static_header_fails_instead_of_clipping():
+    dsl = source(
+        "EmphasisText",
+        {"mainText": "完整内容"},
+        size="2x2",
+        header={
+            "title": "上海油价 2026年10月10日24时调价",
+        },
+    )
+    with pytest.raises(CompactDslConversionError, match="COMPACT_STATIC_TEXT_CAPACITY"):
+        convert_compact_dsl_to_a2ui(dsl, size="2x2")
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_static_header_line_box_and_icon_budget_are_owned():
+    dsl = source("EmphasisText", {"mainText": "内容"}, size="2x2", header={"title": "短标题"})
+    nodes = standard_components(convert_compact_dsl_to_a2ui(dsl, size="2x2"))
+    title = nodes.get("header__static_title")
+    assert title
+    assert title.get("styles", {}).get("height") == 16
+    assert title.get("styles", {}).get("fontSize") == 12
+    dsl = source(
+        "EmphasisText",
+        {"mainText": "内容"},
+        size="2x2",
+        header={
+            "title": "一二三四五六七八九十",
+            "icon": "resources/test.svg",
+        },
+    )
+    with pytest.raises(CompactDslConversionError, match="COMPACT_STATIC_TEXT_CAPACITY"):
+        convert_compact_dsl_to_a2ui(dsl, size="2x2")
+
+
+def test_dynamic_header_recipe_is_unchanged():
+    dsl = source("ContentBlock", {"body": "内容"}, size="2x2", header={"title": "短标题"})
+    with content_policy_scope(EXISTING_CONTENT_POLICY):
+        with pytest.raises(CompactDslConversionError):
+            convert_compact_dsl_to_a2ui(dsl, size="2x2")
+    from services.compact.components.compact_component_runtime import component_visual_recipe
+
+    with content_policy_scope(EXISTING_CONTENT_POLICY):
+        recipe = component_visual_recipe("SingleLineTitle", size="2x2")
+    title = recipe.get("parts", {}).get("title", {}).get("styles", {})
+    assert title.get("lineHeight") == 1
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("restored", [True, False])
+def test_referenced_omission_is_decided_by_final_visibility(restored):
+    value = {
+        "info_required": [fact("核心"), fact("补充", "should")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0, 1]},
+        ],
+        "omittedContents": [{"description": "可能省略补充", "factIndexes": [1]}],
+    }
+    accepted = accept(value, "核心；补充")
+    dsl = source("EmphasisText", {"mainText": "核心；补充" if restored else "核心"})
+    omitted = compact_plan_omitted_facts(dsl, accepted, {}, ())
+    assert len(omitted) == (0 if restored else 1)
+    assert accepted.get("omissionCandidates")
+    assert accepted.get("omittedContents") == []
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_unselected_input_loss_and_legacy_declarations_remain_conservative():
+    value = {
+        "info_required": [fact("核心")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0]},
+        ],
+        "omittedContents": [{"description": "未选择的独立内容", "factIndexes": []}, "旧版自由说明"],
+    }
+    accepted = accept(value, "核心；未选择的独立内容")
+    omitted = compact_plan_omitted_facts(
+        source("EmphasisText", {"mainText": "核心"}), accepted, {}, (),
+    )
+    assert len(omitted) == 2
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize(
+    "indexes,expected_notes",
+    [([True], ["说明"]), ([-1], ["说明"]), ([2], ["说明"]), ([0], [])],
+)
+def test_omission_references_downgrade_core_or_invalid_indexes(indexes, expected_notes):
+    value = {
+        "info_required": [fact("核心"), fact("补充", "should")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0, 1]},
+        ],
+        "omittedContents": [{"description": "说明", "factIndexes": indexes}],
+    }
+    raw = json.dumps({"name": "submit_card_plan", "arguments": value})
+    result = parse_compact_plan_call(raw, {"userQuery": "核心；补充", "size": "2x4"})
+    assert result.plan.get("omittedContents") == expected_notes
+    assert not result.plan.get("omissionCandidates")
+    assert any("已撤销删除授权" in warning for warning in result.warnings)
+
+
+def _single_line_omission_source(text):
+    rows = [
+        ["root", "Layout", {"layout": "W-static-content"}, ["body"]],
+        ["body", "SingleLineList", {"items": [{"text": text}]}],
+        ["/state/ready", True],
+    ]
+    return "\n".join(json.dumps(row, ensure_ascii=False) for row in titled_rows(rows))
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("restored", [True, False])
+def test_denied_known_omission_reports_only_actual_authorized_loss(restored):
+    value = {
+        "info_required": [fact("核心"), fact("补充")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0, 1]},
+        ],
+        "omittedContents": [{"description": "整组未展示", "factIndexes": [0, 1]}],
+    }
+    original = copy.deepcopy(value)
+    accepted = accept(value, "核心；补充")
+    text = "核心；补充" if restored else "核心"
+    dsl = _single_line_omission_source(text)
+    allowed = () if restored else (1,)
+    omitted = compact_plan_omitted_facts(dsl, accepted, {}, allowed)
+    assert value == original
+    assert accepted.get("omittedContents") == []
+    assert not accepted.get("omissionCandidates")
+    assert len(omitted) == (0 if restored else 1)
+    if not restored:
+        assert omitted[0].get("requirement") == "补充"
+        assert omitted[0].get("omissionReason") == "bounded_drop"
+    coverage = evaluate_compact_plan_coverage(
+        dsl, accepted, {}, allowed_omitted_fact_indexes=allowed,
+    )
+    assert not coverage.errors
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_denied_known_omission_does_not_authorize_missing_core():
+    value = {
+        "info_required": [fact("核心"), fact("补充")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0, 1]},
+        ],
+        "omittedContents": [{"description": "补充未展示", "factIndexes": [1]}],
+    }
+    accepted = accept(value, "核心；补充")
+    dsl = _single_line_omission_source("核心")
+    coverage = evaluate_compact_plan_coverage(dsl, accepted, {})
+    assert coverage.errors
+    assert any("补充" in error for error in coverage.errors)
+    assert not compact_plan_omitted_facts(dsl, accepted, {}, ())
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("indexes", [[0, 99], [0, True], [0, -1], [0, 0]])
+def test_denied_omission_with_unknown_tail_keeps_conservative_feedback(indexes):
+    value = {
+        "info_required": [fact("核心")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0]},
+        ],
+        "omittedContents": [{"description": "独立补充未展示", "factIndexes": indexes}],
+    }
+    accepted = accept(value, "核心；独立补充")
+    dsl = _single_line_omission_source("核心")
+    omitted = compact_plan_omitted_facts(dsl, accepted, {}, ())
+    assert accepted.get("omittedContents") == ["独立补充未展示"]
+    assert not accepted.get("omissionCandidates")
+    assert len(omitted) == 1
+    assert omitted[0].get("omissionReason") == "plan_selection"
+
+
+@pytest.mark.parametrize("mapping", [{0: 0}, {0: 0, 1: 99}, {0: 0, 1: True}])
+def test_denied_omission_with_unknown_mapping_keeps_description(mapping):
+    facts = [fact("核心"), fact("补充", "should")]
+    declaration = [{"description": "补充未展示", "factIndexes": [0, 1]}]
+    result = _normalize_static_omissions(declaration, facts, mapping, facts)
+    assert result.descriptions == ["补充未展示"]
+    assert not result.candidates
+    assert any("已撤销删除授权" in warning for warning in result.warnings)
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("restored", [True, False])
+def test_known_should_omission_still_uses_actual_visible_list(restored):
+    value = {
+        "info_required": [fact("核心"), fact("补充", "should")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0, 1]},
+        ],
+        "omittedContents": [{"description": "可能省略补充", "factIndexes": [1]}],
+    }
+    accepted = accept(value, "核心；补充")
+    dsl = _single_line_omission_source("核心；补充" if restored else "核心")
+    omitted = compact_plan_omitted_facts(dsl, accepted, {}, ())
+    assert accepted.get("omissionCandidates")
+    assert accepted.get("omittedContents") == []
+    assert len(omitted) == (0 if restored else 1)
+    if not restored:
+        assert omitted[0].get("omissionReason") == "optional_omission"
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize(
+    "declaration", [{"description": "独立补充", "factIndexes": []}, "独立补充"],
+)
+def test_unmapped_omission_description_is_not_guessed_from_visible_core(declaration):
+    value = {
+        "info_required": [fact("核心")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0]},
+        ],
+        "omittedContents": [declaration],
+    }
+    accepted = accept(value, "核心；独立补充")
+    omitted = compact_plan_omitted_facts(_single_line_omission_source("核心"), accepted, {}, ())
+    assert accepted.get("omittedContents") == ["独立补充"]
+    assert len(omitted) == 1
+    assert omitted[0].get("omissionReason") == "plan_selection"
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("indexes", [[1, 1], "1"])
+def test_omission_reference_shape_errors_remain_blocking(indexes):
+    value = {
+        "info_required": [fact("核心"), fact("补充", "should")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0, 1]},
+        ],
+        "omittedContents": [{"description": "说明", "factIndexes": indexes}],
+    }
+    with pytest.raises(CompactPlanValidationError):
+        accept(value, "核心；补充")
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_protected_should_omission_is_downgraded():
+    value = {
+        "info_required": [fact("核心"), fact("原文补充", "should", protectedTexts=["原文补充"])],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0, 1]},
+        ],
+        "omittedContents": [{"description": "不删除原文补充", "factIndexes": [1]}],
+    }
+    raw = json.dumps({"name": "submit_card_plan", "arguments": value})
+    result = parse_compact_plan_call(raw, {"userQuery": "核心；原文补充", "size": "2x4"})
+    assert result.plan.get("omittedContents") == []
+    assert not result.plan.get("omissionCandidates")
+    assert any("受保护事实" in warning for warning in result.warnings)
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_omission_indexes_follow_deduplication():
+    value = {
+        "info_required": [fact("核心"), fact("核心"), fact("补充", "should")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0, 1, 2]},
+        ],
+        "omittedContents": [{"description": "补充", "factIndexes": [2]}],
+    }
+    before = copy.deepcopy(value)
+    accepted = accept(value, "核心；补充")
+    candidates = accepted.get("omissionCandidates")
+    assert candidates and candidates[0].get("factIndexes") == [1]
+    assert value == before
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("part,expected", [("text", "start"), ("assist", "end")])
+def test_list_alignment_follows_current_component_contract(part, expected):
+    dsl = source(
+        "SingleLineList", {"items": [{"text": "字段", "assist": "内容"}]},
+        header={"title": "短标题"},
+    )
+    nodes = standard_components(convert_compact_dsl_to_a2ui(dsl, size="2x4"))
+    node = nodes.get(f"body__static_item0_{part}")
+    assert node and node.get("styles", {}).get("textAlign", "start") == expected
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_component_metadata_is_not_visible_text():
+    value = {
+        "info_required": [fact("body")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0]},
+        ],
+    }
+    dsl = source("EmphasisText", {"mainText": "别的文字"})
+    assert static_group_errors(dsl, value)
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_long_shared_header_without_legal_candidate_preserves_facts_and_feedback():
+    header = "上海油价 2026年10月10日24时调价"
+    value = {
+        "info_required": [
+            fact(header, displayRole="title"),
+            fact("92号汽油7.32元/升"),
+            fact("95号汽油7.80元/升"),
+            fact("0号柴油6.95元/升"),
+        ],
+        "contentGroups": [
+            {"id": "h", "kind": "shared", "identity": None, "factIndexes": [0]},
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [1]},
+            {"id": "b", "kind": "object", "identity": None, "factIndexes": [2]},
+            {"id": "c", "kind": "object", "identity": None, "factIndexes": [3]},
+        ],
+    }
+    plan = accept(
+        value, "；".join(item.get("text", "") for item in value.get("info_required", [])), "2x2"
+    )
+    dsl = plan.get("staticPresentation")
+    assert not dsl
+    assert plan.get("staticPresentationFeedback")
+    assert plan.get("info_required", [])[0].get("text") == header
+    assert len(plan.get("info_required", [])) == 4
+    assert not plan.get("omittedContents")
+
+
+def test_line_break_keeps_closing_punctuation_off_new_lines():
+    from services.compact.static_content.static_text_capacity import measure_text, text_spec
+
+    text = "甲乙丙丁，戊己庚辛；壬癸（说明）"
+    capacity = measure_text(text, 50.4, text_spec("detail"))
+    assert "".join(capacity.wrapped_lines) == text
+    for line in capacity.wrapped_lines:
+        assert not line.startswith(("，", "；", "）"))
+        assert not line.endswith("（")
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_exact_duplicate_name_is_relocated_not_deleted_by_candidate():
+    value = {
+        "info_required": [fact("主体", displayRole="label"), fact("完整说明")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": "主体", "factIndexes": [0, 1]},
+        ],
+    }
+    accepted = accept(value, "主体完整说明")
+    dsl = accepted.get("staticPresentation")
+    assert dsl and dsl.count("主体") == 1
+    assert not static_group_errors(dsl, accepted)
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_new_submissions_require_omission_references_but_legacy_parse_remains_supported():
+    value = {
+        "info_required": [fact("核心")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0]},
+        ],
+        "omittedContents": ["自由说明"],
+    }
+    raw = json.dumps({"name": "submit_card_plan", "arguments": value})
+    with pytest.raises(CompactPlanValidationError, match="新静态遗漏声明"):
+        parse_compact_plan_call(
+            raw, {"userQuery": "核心", "size": "2x4"}, require_static_omission_refs=True
+        )
+    assert parse_compact_plan_call(raw, {"userQuery": "核心", "size": "2x4"}).plan
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("font", [11, 10])
+def test_static_header_cannot_be_shrunk_to_fit(font):
+    dsl = source("EmphasisText", {"mainText": "内容"}, header={"title": "短标题", "fontSize": font})
+    with pytest.raises(CompactDslConversionError, match="header 只允许字段"):
+        convert_compact_dsl_to_a2ui(dsl, size="2x4")
+
+
+@pytest.mark.usefixtures("static_scope")
+def test_omission_reference_cannot_hide_a_core_fact_after_deduplication():
+    value = {
+        "info_required": [fact("相同文字"), fact("相同文字", "should")],
+        "contentGroups": [
+            {"id": "a", "kind": "object", "identity": None, "factIndexes": [0, 1]},
+        ],
+        "omittedContents": [{"description": "补充", "factIndexes": [1]}],
+    }
+    raw = json.dumps({"name": "submit_card_plan", "arguments": value})
+    result = parse_compact_plan_call(raw, {"userQuery": "相同文字", "size": "2x4"})
+    assert result.plan.get("omittedContents") == []
+    assert not result.plan.get("omissionCandidates")
+    assert any("去重后指向 must" in warning for warning in result.warnings)
+
+
+@pytest.mark.usefixtures("static_scope")
+@pytest.mark.parametrize("value_role", [None, "unknown", {}])
+def test_legacy_attribute_role_is_rejected_by_current_component(value_role):
+    dsl = source(
+        "SingleLineList", {"items": [{"text": "字段", "assist": "内容", "valueRole": value_role}]},
+        header={"title": "短标题"},
+    )
+    with pytest.raises(CompactDslConversionError, match="单行条目 只允许字段"):
+        convert_compact_dsl_to_a2ui(dsl, size="2x4")

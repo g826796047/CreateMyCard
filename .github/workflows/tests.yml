@@ -78,7 +78,7 @@ jobs:
       - name: Run L0 tests
         run: >-
           python -m pytest
-          tests
+          test
           -m l0
           -q -ra
           --junitxml=test-results/l0-widget-service.xml
@@ -123,4 +123,4 @@ jobs:
           WIDGET_SERVICE_OPENAI_MASTER_CLIENT: deepseek_official_http
           WIDGET_SERVICE_ENABLE_OPENAI_FALLBACK: "false"
           WIDGET_SERVICE_DEEPSEEK_OFFICIAL_HTTP_API_KEY: ${{ secrets.WIDGET_SERVICE_DEEPSEEK_OFFICIAL_HTTP_API_KEY }}
-        run: python -m pytest tests/compact_dsl_smoke.py -q
+        run: python -m pytest test/smoke/compact_dsl_smoke.py -q

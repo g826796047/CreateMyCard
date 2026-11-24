@@ -1,0 +1,149 @@
+"""Q16/Q1紧邻辅助文本不应被误认为左右分栏，准入与前景保持不变。"""
+
+import asyncio
+import copy
+import json
+from pathlib import Path
+from unittest.mock import AsyncMock
+
+import pytest
+from test.fixtures.photos.common import expanded
+from test_photo_asset_delivery import artifact
+from test_uniform_photo_eligibility import PATHS, choose, evidence, photo, rejection, sample
+
+from services.capabilities.capability_registry import CapabilityRegistry
+from services.card_validation.validator import ArtifactValidator
+from services.protocols.protocol_registry import A2UIProtocolRegistry
+from services.themes import post_layout_theme as themes
+
+CASES = json.loads(
+    (Path(__file__).parents[2] / "fixtures/photos/photo_weather_q16_q1.json").read_text(
+        encoding="utf-8",
+    )
+)
+ABSTRACT = {
+    "photo-ux-texture-blue-diamond-square",
+    "photo-ux-texture-blue-diagonal-square",
+}
+
+
+def weather_case(case):
+    fixture = CASES.get(case)
+    assert fixture is not None
+    rows = themes.decode(fixture.get("compact"))
+    return expanded(rows, copy.deepcopy(fixture.get("task")))
+
+
+@pytest.mark.parametrize("case", ["Q16", "Q1"])
+def test_weather_inline_support_counts_actual_lines_and_stays_globally_left(case):
+    saved = weather_case(case)
+    before = copy.deepcopy(saved)
+    measured = evidence(saved)
+    flow = measured.get("photoBodyTextFlow", {})
+    assert flow.get("support", {}).get("leftAligned") is True
+    assert flow.get("root", {}).get("leftAligned") is True
+    assert flow.get("root", {}).get("lineCount") == 3
+    for identity in ABSTRACT:
+        assert rejection(saved, identity) is None
+    assert rejection(saved, "photo-ux-mountain-sunset-lake-square")
+    assert rejection(saved, "photo-ux-pink-sunset-lake-square")
+    assert rejection(saved, "photo-ux-cumulus-blue-square")
+    assert rejection(saved, "photo-ux-clouds-weather-square")
+    assert saved == before
+
+
+@pytest.mark.parametrize("case", ["Q16", "Q1"])
+@pytest.mark.parametrize("selected", sorted(ABSTRACT))
+def test_weather_abstract_selection_and_final_obs_delivery_preserve_foreground(
+    monkeypatch, case, selected,
+):
+    saved = weather_case(case)
+    monkeypatch.setattr(themes.secrets, "choice", lambda items: selected)
+    result, audit = choose(saved, monkeypatch)
+    assert set(audit.get("candidates", [])) == ABSTRACT
+    assert audit.get("themeId") == selected
+    assert themes.foreground_signature(result) == themes.foreground_signature(saved.source)
+    original = artifact()
+    original.genui = saved.source
+    original.taskSpec = saved.task
+    fixture = CASES.get(case)
+    assert fixture is not None
+    original.cardSpec = copy.deepcopy(fixture.get("cardSpec"))
+    capabilities = CapabilityRegistry(version=original.meta.capabilityRegistryVersion)
+    weather = capabilities.get_data_capability("ViewWeather")
+    assert weather is not None
+    original.effectiveCapabilities["data"] = [weather.model_dump()]
+    original.effectiveCapabilities["event"] = saved.task.get("eventCandidates", [])
+    monkeypatch.setattr(themes, "select_theme", AsyncMock(return_value=(result, audit)))
+    delivered = asyncio.run(themes.theme_artifact(
+        original, saved.task, None, ArtifactValidator({}),
+        A2UIProtocolRegistry(original.meta.protocolProfileId).get_profile(),
+        final_layout=saved.compact,
+    ))
+    assert not audit.get("finalValidationErrors"), audit.get("finalValidationErrors")
+    assert themes.foreground_signature(delivered.genui) == themes.foreground_signature(saved.source)
+    backgrounds = []
+    for node in themes.components(themes.decode(delivered.genui)):
+        if node.get("component") == "Image" and node.get("id", "").startswith(themes.PREFIX):
+            backgrounds.append(node.get("src"))
+    selected_photo = photo(selected)
+    expected_source = selected_photo.get("remoteUrl") or selected_photo.get("src")
+    assert backgrounds == [expected_source]
+
+
+@pytest.mark.parametrize("change", ["missing-source", "invalid-source"])
+def test_abstract_photo_still_requires_trusted_compact_source(change):
+    saved = weather_case("Q16")
+    if change == "missing-source":
+        saved.compact = None
+    else:
+        saved.compact = "not compact"
+    assert rejection(saved, "photo-ux-texture-blue-diamond-square")
+
+
+@pytest.mark.parametrize("change", ["width", "weight", "children", "center", "spaceBetween"])
+def test_abstract_photo_accepts_supported_secondary_body_layout_variations(change):
+    saved = weather_case("Q16")
+    support_item = next(node for node in saved.nodes if node.get("id") == "support_item0")
+    support_row = next(node for node in saved.nodes if node.get("id") == "support_row0")
+    if change == "width":
+        support_item.get("styles", {})["width"] = 1
+    elif change == "weight":
+        support_item.get("styles", {})["layoutWeight"] = 1
+    elif change == "children":
+        support_item.get("children", []).reverse()
+    else:
+        support_row.get("styles", {})["justifyContent"] = change
+    assert rejection(saved, "photo-ux-texture-blue-diamond-square") is None
+
+
+@pytest.mark.parametrize("business,identity", [
+    ("sleep", "photo-ux-sleep-square"), ("calendar", "photo-ux-meeting-room-square"),
+    ("countdown", "photo-ux-hourglass-square"),
+])
+@pytest.mark.parametrize("lines", [2, 3])
+def test_inline_provenance_works_across_businesses_but_keeps_three_line_limit(
+    business, identity, lines,
+):
+    saved = sample(PATHS.get(business), lines, button=False)
+    rows = themes.decode(saved.compact)
+    rows[0][3].append("details")
+    rows.append(["details", "SecondaryBody", {"items": [
+        {"label": "甲", "value": "一"}, {"label": "乙", "value": "二"},
+    ]}])
+    saved = expanded(rows, saved.task)
+    flow = evidence(saved).get("photoBodyTextFlow", {}).get("root", {})
+    assert flow.get("lineCount") == lines + 1
+    assert (rejection(saved, identity) is None) is (lines == 2)
+
+
+def test_base_components_with_fixed_width_still_count_as_distributed_columns():
+    saved = sample(PATHS.get("weather"), 1, button=False)
+    rows = themes.decode(saved.compact)
+    rows[0][3].append("details")
+    rows.extend([
+        ["details", "Row", {}, ["first", "second"]],
+        ["first", "Text", {"width": 28, "content": "甲"}],
+        ["second", "Text", {"content": "乙"}],
+    ])
+    assert rejection(expanded(rows, saved.task), "photo-ux-wave-square")

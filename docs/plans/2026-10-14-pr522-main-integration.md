@@ -43,7 +43,7 @@
 
 - 相关链路第一组：571 passed、41 subtests passed。
 - 跨入口补充回归：61 passed；双环/四环新增完整转换测试 9 项全部通过。
-- 最终 widget_service/tests：2151 passed、19 failed、16 skipped、59 subtests passed。
+- 最终 widget_service/test：2151 passed、19 failed、16 skipped、59 subtests passed。
 - 独立 main a376ba4 对照：2049 passed、19 failed、16 skipped、59 subtests passed。
   两边失败测试集合完全相同，未新增失败。19 项集中于旧接口重试样例、Hero/低阶 Text 断言、
   编辑 Prompt、运行配置/能力清单和旧 ActionUnit 等，不能报告为全量通过；本 PR 不顺带修复它们。

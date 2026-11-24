@@ -1,0 +1,358 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Huawei Technologies Co., Ltd. 2026-2026. All rights reserved.
+import asyncio
+import json
+from dataclasses import replace
+from pathlib import Path
+
+import pytest
+from widget_service.test.level0.unit.test_asset_url_mapper import SRC, URL, components
+
+from api.schemas import GenerateWidgetCardRequest
+from config.config import get_settings
+from core.errors import GenerationStatus
+from custom.a2ui_model_client import A2UIModelClient
+from services.artifacts.source_artifact_repository import SourceArtifactRepository
+from services.card_validation.validator import ArtifactValidator
+from services.editing.widget_edit_utils import source_digest
+from services.generation.widget_generation_service import WidgetGenerationService
+from services.template_generation import TemplateSourceGenerator
+from utils.card_runtime import UploadFileOSMS
+
+# 本组验证既有创建、回退或路由合同，静态策略由专项测试覆盖。
+pytestmark = pytest.mark.usefixtures("existing_generation_policy")
+
+
+def design_source():
+    rows = [
+        ["root", "Column", {"width": "matchParent", "height": "matchParent", "padding": 12},
+         ["title", "body"]],
+        ["title", "SingleLineTitle", {"title": "天气", "icon": SRC,
+         "fillColor": "#FF1F4799"}],
+        ["body", "Column", {"width": "matchParent", "layoutWeight": 1}, ["content"]],
+        ["content", "EmphasisText", {"mainText": "天气"}],
+        ["/ui/state", "ready"],
+    ]
+    return "\n".join(
+        json.dumps(row, ensure_ascii=False)
+        for row in rows
+    )
+
+
+def semantic_edit_response(messages, phase):
+    payload = json.loads(messages[1].get("content"))
+    if phase == "edit_intent":
+        return json.dumps({"outcome": "ready", "explanation": "仅增加根容器圆角",
+                           "mode": "patch", "targetSize": "2x4", "dimensions": ["shape"],
+                           "targets": ["root"]}, ensure_ascii=False)
+    original = payload.get("previousGenui")
+    assert isinstance(original, str)
+    root = next(node for node in components(original) if node.get("id") == "root")
+    styles = root.get("styles", {})
+    before = {"exists": "borderRadius" in styles}
+    if before.get("exists"):
+        before["value"] = styles.get("borderRadius")
+    return json.dumps({
+        "sourceDigest": source_digest(original),
+        "changes": [{"componentId": "root", "property": "styles.borderRadius",
+                     "before": before,
+                     "value": styles.get("borderRadius", 0) + 1}],
+    })
+
+
+def json_rows(text):
+    return [json.loads(line) for line in text.splitlines() if line.strip()]
+
+
+def plan_output() -> str:
+    """模拟模型提交合法计划，保留本测试需要验证的标题素材分配。"""
+    return json.dumps(
+        {
+            "name": "submit_card_plan",
+            "arguments": {
+                "info_required": [
+                    {"requirement": "展示天气主题", "priority": "must", "text": "天气"},
+                ],
+                "assetAssignments": {
+                    "actions": [],
+                    "title": {"assetId": "asset.drop_1"},
+                },
+            },
+        },
+        ensure_ascii=False,
+    )
+
+
+def request(**updates):
+    values = {
+        "uid": "test-user",
+        "device": {"romVersion": "7.0"},
+        "prdVer": "11.7.7.331",
+        "userQuery": "生成天气卡片",
+        "title": "天气",
+        "description": "天气图标",
+        "size": "2x4",
+        "candidateAssetIds": ["asset.drop_1"],
+    }
+    values.update(updates)
+    return GenerateWidgetCardRequest(**values)
+
+
+@pytest.fixture
+def storage(tmp_path, monkeypatch, isolated_theme_stage):
+    settings = get_settings()
+    monkeypatch.setattr(settings, "WORKSPACE_ROOT", tmp_path)
+    monkeypatch.setattr(settings, "artifact_base_url", "https://artifact.test")
+    monkeypatch.setattr(settings, "enable_widget_edit", True)
+    # 本文件验证旧路由的素材还原/重新映射；字段补丁编辑保留已交付地址。
+    monkeypatch.setattr(settings, "enable_semantic_widget_edit", True)
+    monkeypatch.setattr(settings, "enable_artifact_download_mock", True)
+    monkeypatch.setattr(settings, "enable_validation_failure_retry", False)
+    monkeypatch.setattr(settings, "enable_a2ui_model_mock", False)
+    monkeypatch.setattr(settings, "asset_src_url_mapping", {SRC: URL})
+    monkeypatch.setattr(
+        WidgetGenerationService, "_enable_card_template", staticmethod(lambda: False)
+    )
+    monkeypatch.setattr(
+        "services.artifacts.artifact_store.file_obs",
+        UploadFileOSMS(),
+    )
+    return tmp_path / "mock_obs"
+
+
+@pytest.mark.parametrize("backend", ["model", "template"])
+@pytest.mark.parametrize("validation_enabled", [True, False])
+@pytest.mark.asyncio
+async def test_generation_maps_before_validation_and_saves_separate_sources(
+    storage,
+    monkeypatch,
+    backend,
+    validation_enabled,
+):
+    settings = get_settings()
+    monkeypatch.setattr(settings, "enable_artifact_validation", validation_enabled)
+    token = design_source()
+    inputs = []
+    validated = []
+    phases = []
+
+    def generate(_client, prompt, profile, *, phase="initial", **_kwargs):
+        inputs.append(json.dumps(prompt, ensure_ascii=False))
+        phases.append(phase)
+        # 生成期间配置变化，不应改变本次请求的映射快照。
+        monkeypatch.setattr(settings, "asset_src_url_mapping", {SRC: URL + "changed"})
+        if phase == "plan":
+            assert profile.get("id") == "compact-info-plan"
+            return plan_output()
+        return token
+
+    async def template(_generator, task, *_args):
+        inputs.append(task.model_dump_json())
+        return token
+
+    def validate(validator, artifact, _profile):
+        validated.append(artifact.genui)
+        assert validator.asset_src_url_mapping == {SRC: URL}
+        return []
+
+    monkeypatch.setattr(A2UIModelClient, "generate", generate)
+    monkeypatch.setattr(TemplateSourceGenerator, "__call__", template)
+    monkeypatch.setattr(ArtifactValidator, "validate", validate)
+    monkeypatch.setattr(
+        WidgetGenerationService,
+        "_enable_card_template",
+        staticmethod(lambda: backend == "template"),
+    )
+
+    result = await WidgetGenerationService().generate_widget_card_compact_dsl(request())
+    assert result.status == GenerationStatus.SUCCESS
+    if backend == "model":
+        assert phases == ["plan", "initial"]
+    else:
+        assert not phases
+    source = await asyncio.to_thread(SourceArtifactRepository().load, result.artifactUrl)
+    assert inputs
+    for model_input in inputs:
+        assert SRC in model_input
+        assert URL not in model_input
+    images = [
+        item for item in components(source.artifact.genui) if item.get("component") == "Image"
+    ]
+    assert images
+    for item in images:
+        assert item.get("src") == URL
+    if validation_enabled:
+        assert len(validated) == 1
+        assert json_rows(validated[0]) == json_rows(source.artifact.genui)
+    else:
+        assert not validated
+    assert source.design_token is not None
+    assert SRC in source.design_token
+    assert URL not in source.design_token
+    task = source.artifact.taskSpec
+    assert URL not in json.dumps(task)
+    md = (storage / result.artifactUrl.rsplit("/", 1)[-1]).read_text(encoding="utf-8")
+    genui_block = md.split("```genui\n", 1)[1].split("\n```", 1)[0]
+    assert json_rows(genui_block) == json_rows(source.artifact.genui)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("source_version", ["app-11.7.5.205_rom-6.0", "app-11.7.7.300_rom-7.0"])
+async def test_edit_and_legacy_url_migration_preserve_source_artifact(
+    storage, monkeypatch, source_version
+):
+    # 编辑原卡必须已完成主题；其它素材测试隔离主题，不能把内部角色交给编辑。
+    from services.themes.post_layout_theme import apply_theme, presets
+
+    async def theme(artifact, task, *_args, **_kwargs):
+        preset = next(item for item in presets(task) if item.get("id") == "gradient-blue")
+        return artifact.model_copy(update={"genui": apply_theme(artifact.genui, preset, task, {})})
+
+    monkeypatch.setattr("services.themes.post_layout_theme.theme_artifact", theme)
+    monkeypatch.setattr(get_settings(), "enable_artifact_validation", False)
+    prompts = []
+    phases = []
+
+    def generate(_client, prompt, profile, *, phase="initial", **_kwargs):
+        prompts.append(json.dumps(prompt, ensure_ascii=False))
+        phases.append(phase)
+        if phase in {"edit_intent", "edit_execute"}:
+            return semantic_edit_response(prompt, phase)
+        if phase == "plan":
+            assert profile.get("id") == "compact-info-plan"
+            return plan_output()
+        return design_source()
+
+    monkeypatch.setattr(A2UIModelClient, "generate", generate)
+    service = WidgetGenerationService()
+    created = await service.generate_widget_card_compact_dsl(request())
+    assert created.status == GenerationStatus.SUCCESS
+    source = await asyncio.to_thread(SourceArtifactRepository().load, created.artifactUrl)
+    assert source.artifact.meta.capabilityRegistryVersion == "app-11.7.7.300_rom-7.0"
+    source_path = storage / created.artifactUrl.rsplit("/", 1)[-1]
+    original_bytes = source_path.read_bytes()
+    assert source.design_token is not None
+
+    legacy_artifact = source.artifact.model_copy(deep=True)
+    legacy_artifact.meta.capabilityRegistryVersion = source_version
+    candidates = legacy_artifact.taskSpec.get("assetCandidates")
+    assert isinstance(candidates, list)
+    candidates[0]["src"] = URL
+    legacy = replace(
+        source,
+        artifact=legacy_artifact,
+        design_token=source.design_token.replace(SRC, URL),
+    )
+    restored = SourceArtifactRepository.restore_asset_paths(legacy, {}, restore_genui=True)
+    assert restored.artifact_digest == legacy.artifact_digest
+    assert restored.design_token is not None
+    assert URL not in restored.design_token
+    assert URL not in restored.artifact.genui
+    assert candidates[0].get("src") == URL
+    assert legacy.design_token is not None and URL in legacy.design_token
+    assert restored.artifact.meta.capabilityRegistryVersion == source_version
+
+    source_url = created.artifactUrl
+    load_artifact = SourceArtifactRepository.load
+
+    def load_historical_source(repository, url):
+        result = legacy if url == source_url else load_artifact(repository, url)
+        return result
+
+    monkeypatch.setattr(SourceArtifactRepository, "load", load_historical_source)
+
+    for _ in range(2):
+        edited = await service.generate_widget_card_compact_dsl(
+            request(
+                sourceArtifactUrl=created.artifactUrl,
+                userQuery="仅增加根容器圆角",
+            )
+        )
+        assert edited.status == GenerationStatus.SUCCESS
+        assert edited.artifactUrl != created.artifactUrl
+        edited_source = await asyncio.to_thread(
+            SourceArtifactRepository().load, edited.artifactUrl
+        )
+        assert edited_source.artifact.meta.capabilityRegistryVersion == "app-11.7.7.300_rom-7.0"
+        created = edited
+    assert source_path.read_bytes() == original_bytes
+    assert phases == ["plan", "initial", *(["edit_intent", "edit_execute"] * 2)]
+    for prompt in prompts[:2]:
+        assert URL not in prompt
+    for prompt in prompts[2:]:
+        assert URL in prompt
+
+
+@pytest.mark.asyncio
+async def test_repair_uses_original_paths_and_remaps_final_output(storage, monkeypatch):
+    settings = get_settings()
+    monkeypatch.setattr(settings, "enable_artifact_validation", True)
+    monkeypatch.setattr(settings, "enable_validation_failure_retry", True)
+    monkeypatch.setattr(settings, "validation_failure_max_repair_attempts", 1)
+    prompts = []
+    validated = []
+    phases = []
+
+    def generate(_client, prompt, profile, *, phase="initial", **_kwargs):
+        prompts.append(json.dumps(prompt, ensure_ascii=False))
+        phases.append(phase)
+        if phase in {"edit_intent", "edit_execute"}:
+            return semantic_edit_response(prompt, phase)
+        if phase == "plan":
+            assert profile.get("id") == "compact-info-plan"
+            return plan_output()
+        return design_source()
+
+    def validate(validator, artifact, _profile):
+        validated.append(artifact.genui)
+        if len(validated) == 1:
+            validator.error_prompt_contexts = [{"actual": URL, "expected": [URL]}]
+            return ["test layout issue"]
+        return []
+
+    monkeypatch.setattr(A2UIModelClient, "generate", generate)
+    monkeypatch.setattr(ArtifactValidator, "validate", validate)
+    result = await WidgetGenerationService().generate_widget_card_compact_dsl(request())
+    assert result.status == GenerationStatus.SUCCESS
+    assert phases == ["plan", "initial", "repair"]
+    assert len(prompts) == 3
+    assert len(validated) == 2
+    for prompt in prompts:
+        assert URL not in prompt
+        assert SRC in prompt
+    for dsl in validated:
+        assert URL in dsl
+    saved = await asyncio.to_thread(SourceArtifactRepository().load, result.artifactUrl)
+    assert json_rows(saved.artifact.genui) == json_rows(validated[-1])
+    assert saved.design_token is not None and URL not in saved.design_token
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(("fixture_name", "artifact_id"), [
+    ("legacy_standard_asset.md", "91c3f19f-55bd-422f-b1d8-8daa37e2098a"),
+    ("legacy_template_asset.md", "1ecf607b-854b-4acd-af8c-e7e3b2cea939"),
+])
+async def test_semantic_edit_preserves_source_paths_without_remapping(
+    storage, monkeypatch, fixture_name, artifact_id,
+):
+    monkeypatch.setattr(get_settings(), "enable_artifact_validation", False)
+    sample = Path(__file__).with_name("fixtures") / fixture_name
+    source_name = f"artifact_{artifact_id}.md"
+    storage.mkdir(parents=True, exist_ok=True)
+    (storage / source_name).write_bytes(sample.read_bytes())
+    prompts = []
+
+    def generate(_client, prompt, _profile, *, phase, **_kwargs):
+        prompts.append(json.dumps(prompt, ensure_ascii=False))
+        return semantic_edit_response(prompt, phase)
+
+    monkeypatch.setattr(A2UIModelClient, "generate", generate)
+    edited = await WidgetGenerationService().generate_widget_card_compact_dsl(request(
+        sourceArtifactUrl=f"https://artifact.test/{source_name}", userQuery="仅增加根容器圆角",
+    ))
+    assert edited.status == GenerationStatus.SUCCESS
+    assert len(prompts) == 2
+    assert "previousGenui" in prompts[0]
+    assert URL in prompts[0]
+    source = await asyncio.to_thread(SourceArtifactRepository().load, edited.artifactUrl)
+    assert URL in source.artifact.genui

@@ -81,7 +81,7 @@ Q040/Q041 的状态也有回落。两批都为三成功三降级，但逐例并�
 | `widget_service/cloud/services/compact_semantic_layout.py` | 上游静态共同信息与布局回退适配 |
 | `widget_service/cloud/services/generation_pipeline.py` | 上游跨轮 Plan/生成上下文适配 |
 | `widget_service/cloud/services/widget_generation_service.py` | 上游生成入口行为适配 |
-| `widget_service/tests/test_capacity_recovery_warning.py` | 上游容量恢复反馈回归 |
-| `widget_service/tests/test_static_prompt_source.py` | 公共正文占位及完整示例标题接入、转换回归 |
-| `widget_service/tests/test_static_shared_header_repair.py` | 上游公共标题修复回归 |
-| `widget_service/tests/test_static_validation_joint_capacity.py` | 上游容量与覆盖组合回归 |
+| `widget_service/test/test_capacity_recovery_warning.py` | 上游容量恢复反馈回归 |
+| `widget_service/test/test_static_prompt_source.py` | 公共正文占位及完整示例标题接入、转换回归 |
+| `widget_service/test/test_static_shared_header_repair.py` | 上游公共标题修复回归 |
+| `widget_service/test/test_static_validation_joint_capacity.py` | 上游容量与覆盖组合回归 |

@@ -1,6 +1,6 @@
 # Debug Tools 测试
 
-调试工具测试统一放在本目录。`widget_service/tests/` 仅维护微服务自身的测试。
+调试工具测试统一放在本目录。`widget_service/test/` 仅维护微服务自身的测试。
 测试辅助文件与专用夹具同样随测试存放，业务源码和生产脚本不存放测试用例。
 
 | 目录 | 用途 |
@@ -19,7 +19,7 @@
 
 ```shell
 uv run --project debug_tools pytest -c debug_tools/pyproject.toml debug_tools/tests/python -q
-uv run --project debug_tools pytest -c debug_tools/pyproject.toml widget_service/tests -q
+uv run --project debug_tools pytest -c debug_tools/pyproject.toml widget_service/test -q
 ```
 
 从仓库根目录执行 `uv run --directory debug_tools pytest` 会收集两套测试；在 `widget_service/` 执行时只收集微服务测试。

@@ -45,16 +45,17 @@ packages = ["cloud"]
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-src = ["cloud", "tests"]
+src = ["cloud", "test"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 ignore = ["UP009"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["test"]
 pythonpath = ["cloud", ".", ".."]
 addopts = "--strict-markers"
+asyncio_default_fixture_loop_scope = "function"
 markers = [
     "l0: 确定性业务测试及组件合同测试，不调用真实模型或外部服务",
     "l1: 使用固定模型响应的编排与链路回放测试",

@@ -186,13 +186,13 @@ original_source、repair_context。绑定修复原文用于位置核对，展开
 | [widget_service/cloud/services/generation_pipeline.py](../../widget_service/cloud/services/generation/generation_pipeline.py) | 叠加诊断分组，保留 Plan 错误码、Trace 与主线参数 |
 | [widget_service/cloud/services/prompt_builder.py](../../widget_service/cloud/services/generation/prompt_builder.py) | 只转换 qualityErrors，保留失败历史及组合恢复上下文 |
 | [widget_service/cloud/services/widget_generation_service.py](../../widget_service/cloud/services/generation/widget_generation_service.py) | 在线入口传递 create/edit 建议上下文 |
-| [widget_service/tests/fixtures/compact_validation_baseline.json](../../widget_service/tests/fixtures/compact_validation_baseline.json) | 冻结 main 的 87 组实际校验调用与输出 |
-| [widget_service/tests/fixtures/compact_validation_rule_inventory.json](../../widget_service/tests/fixtures/compact_validation_rule_inventory.json) | 登记当前 30 个诊断发布位置与分类 |
-| [widget_service/tests/test_compact_validation_architecture.py](../../widget_service/tests/test_compact_validation_architecture.py) | 检查活动错误码、归属及无旧流程依赖 |
-| [widget_service/tests/test_compact_validation_diagnostics.py](../../widget_service/tests/test_compact_validation_diagnostics.py) | 保留诊断与位置验证，使用当前模型组件合同 |
-| [widget_service/tests/test_compact_validation_equivalence.py](../../widget_service/tests/test_compact_validation_equivalence.py) | 对比 main 的公开结果、异常与 warning |
-| [widget_service/tests/test_compact_validation_fusion.py](../../widget_service/tests/test_compact_validation_fusion.py) | 白名单、展开定位、布局文本、Plan 与恢复信息回归 |
-| [widget_service/tests/test_compact_validation_repair_integration.py](../../widget_service/tests/test_compact_validation_repair_integration.py) | 两条修复入口、素材还原和内部记录验证 |
+| [widget_service/test/fixtures/card_validation/compact_validation_baseline.json](../../widget_service/test/fixtures/card_validation/compact_validation_baseline.json) | 冻结 main 的 87 组实际校验调用与输出 |
+| [widget_service/test/fixtures/card_validation/compact_validation_rule_inventory.json](../../widget_service/test/fixtures/card_validation/compact_validation_rule_inventory.json) | 登记当前 30 个诊断发布位置与分类 |
+| [widget_service/test/test_compact_validation_architecture.py](../../widget_service/test/test_compact_validation_architecture.py) | 检查活动错误码、归属及无旧流程依赖 |
+| [widget_service/test/test_compact_validation_diagnostics.py](../../widget_service/test/test_compact_validation_diagnostics.py) | 保留诊断与位置验证，使用当前模型组件合同 |
+| [widget_service/test/test_compact_validation_equivalence.py](../../widget_service/test/test_compact_validation_equivalence.py) | 对比 main 的公开结果、异常与 warning |
+| [widget_service/test/test_compact_validation_fusion.py](../../widget_service/test/test_compact_validation_fusion.py) | 白名单、展开定位、布局文本、Plan 与恢复信息回归 |
+| [widget_service/test/test_compact_validation_repair_integration.py](../../widget_service/test/test_compact_validation_repair_integration.py) | 两条修复入口、素材还原和内部记录验证 |
 
 ## 从旧重构包撤下的文件
 
@@ -213,9 +213,9 @@ original_source、repair_context。绑定修复原文用于位置核对，展开
 - `widget_service/cloud/services/card_validation/compact_validation/semantic/layout/typography.py`
 - `widget_service/cloud/services/card_validation/compact_validation/semantic/layout/w1.py`
 - `widget_service/cloud/services/card_validation/compact_validation/semantic/layout/w9.py`
-- `widget_service/tests/fixtures/compact_validation_rule_cases.json`
-- `widget_service/tests/test_compact_validation_rule_cases.py`
-- `widget_service/tests/test_compact_validation_w9.py`
+- `widget_service/test/fixtures/card_validation/compact_validation_rule_cases.json`
+- `widget_service/test/test_compact_validation_rule_cases.py`
+- `widget_service/test/test_compact_validation_w9.py`
 
 
 ## PR489/492 继续融合
@@ -344,19 +344,19 @@ qualityErrors 在路由判断时仍保留原记录；模型副本可格式化，
 | [widget_service/cloud/services/prompt_builder.py](../../widget_service/cloud/services/generation/prompt_builder.py) | 合入主线修复策略和容量开关，保留模型副本格式化 |
 | [widget_service/cloud/services/retry_controller.py](../../widget_service/cloud/services/generation/retry_controller.py) | 原样合入主线组合求解、组件展开或修复策略实现 |
 | [widget_service/cloud/services/widget_generation_service.py](../../widget_service/cloud/services/generation/widget_generation_service.py) | 合入主线重试策略跟踪与兜底，保留可选建议上下文 |
-| [widget_service/tests/fixtures/compact_validation_baseline.json](../../widget_service/tests/fixtures/compact_validation_baseline.json) | 以最新主线重放 112 组输入，保留原 87 组期望 |
-| [widget_service/tests/test_compact_component_bindings.py](../../widget_service/tests/test_compact_component_bindings.py) | 原样合入主线组件合同、修复或提示词回归 |
-| [widget_service/tests/test_compact_dsl_a2ui_converter.py](../../widget_service/tests/test_compact_dsl_a2ui_converter.py) | 原样合入主线组件合同、修复或提示词回归 |
-| [widget_service/tests/test_compact_dsl_validator.py](../../widget_service/tests/test_compact_dsl_validator.py) | 原样合入主线组件合同、修复或提示词回归 |
-| [widget_service/tests/test_compact_prompt_bundle.py](../../widget_service/tests/test_compact_prompt_bundle.py) | 原样合入主线组件合同、修复或提示词回归 |
-| [widget_service/tests/test_compact_repair_strategy.py](../../widget_service/tests/test_compact_repair_strategy.py) | 原样合入主线组件合同、修复或提示词回归 |
-| [widget_service/tests/test_compact_runtime_prompt_context.py](../../widget_service/tests/test_compact_runtime_prompt_context.py) | 原样合入主线组件合同、修复或提示词回归 |
-| [widget_service/tests/test_compact_validation_equivalence.py](../../widget_service/tests/test_compact_validation_equivalence.py) | 标明当前等价测试的行为基线 |
-| [widget_service/tests/test_compact_validation_fusion.py](../../widget_service/tests/test_compact_validation_fusion.py) | 同时验证容量提示开启与关闭的反馈边界 |
-| [widget_service/tests/test_compact_validation_fusion_followup.py](../../widget_service/tests/test_compact_validation_fusion_followup.py) | 新增 6 项跨规则、标签和修复策略回归 |
-| [widget_service/tests/test_design_compact_few_shots.py](../../widget_service/tests/test_design_compact_few_shots.py) | 原样合入主线组件合同、修复或提示词回归 |
-| [widget_service/tests/test_design_compact_repair_prompt.py](../../widget_service/tests/test_design_compact_repair_prompt.py) | 原样合入主线组件合同、修复或提示词回归 |
-| [widget_service/tests/test_service_units.py](../../widget_service/tests/test_service_units.py) | 原样合入主线组件合同、修复或提示词回归 |
+| [widget_service/test/fixtures/card_validation/compact_validation_baseline.json](../../widget_service/test/fixtures/card_validation/compact_validation_baseline.json) | 以最新主线重放 112 组输入，保留原 87 组期望 |
+| [widget_service/test/test_compact_component_bindings.py](../../widget_service/test/test_compact_component_bindings.py) | 原样合入主线组件合同、修复或提示词回归 |
+| [widget_service/test/test_compact_dsl_a2ui_converter.py](../../widget_service/test/test_compact_dsl_a2ui_converter.py) | 原样合入主线组件合同、修复或提示词回归 |
+| [widget_service/test/test_compact_dsl_validator.py](../../widget_service/test/test_compact_dsl_validator.py) | 原样合入主线组件合同、修复或提示词回归 |
+| [widget_service/test/test_compact_prompt_bundle.py](../../widget_service/test/test_compact_prompt_bundle.py) | 原样合入主线组件合同、修复或提示词回归 |
+| [widget_service/test/test_compact_repair_strategy.py](../../widget_service/test/test_compact_repair_strategy.py) | 原样合入主线组件合同、修复或提示词回归 |
+| [widget_service/test/test_compact_runtime_prompt_context.py](../../widget_service/test/test_compact_runtime_prompt_context.py) | 原样合入主线组件合同、修复或提示词回归 |
+| [widget_service/test/test_compact_validation_equivalence.py](../../widget_service/test/test_compact_validation_equivalence.py) | 标明当前等价测试的行为基线 |
+| [widget_service/test/test_compact_validation_fusion.py](../../widget_service/test/test_compact_validation_fusion.py) | 同时验证容量提示开启与关闭的反馈边界 |
+| [widget_service/test/test_compact_validation_fusion_followup.py](../../widget_service/test/test_compact_validation_fusion_followup.py) | 新增 6 项跨规则、标签和修复策略回归 |
+| [widget_service/test/test_design_compact_few_shots.py](../../widget_service/test/test_design_compact_few_shots.py) | 原样合入主线组件合同、修复或提示词回归 |
+| [widget_service/test/test_design_compact_repair_prompt.py](../../widget_service/test/test_design_compact_repair_prompt.py) | 原样合入主线组件合同、修复或提示词回归 |
+| [widget_service/test/test_service_units.py](../../widget_service/test/test_service_units.py) | 原样合入主线组件合同、修复或提示词回归 |
 | [widget_service/uv.lock](../../widget_service/uv.lock) | 原样合入主线依赖锁定版本 |
 
 
@@ -416,11 +416,11 @@ qualityErrors 在路由判断时仍保留原记录；模型副本可格式化，
 | `widget_service/cloud/services/card_validation/compact_validation/semantic/layout/assets.py` | 有组件边界的 SVG 缺色检查 |
 | `widget_service/cloud/services/card_validation/compact_validation/semantic/numeric_display.py` | 证据充分时检查数值组件误用 |
 | `widget_service/cloud/services/asset_url_mapper.py` | 原有还原阶段补齐嵌套图标 |
-| `widget_service/tests/fixtures/compact_validation_rule_inventory.json` | 同步 32 个规则发布位置，供架构测试核对 |
-| `widget_service/tests/test_compact_validation_assets.py` | 素材范围、颜色例外、原始位置与内部节点回归 |
-| `widget_service/tests/test_compact_validation_numeric_display.py` | 数值、文本、绑定、配速、占位及表达式正反例 |
-| `widget_service/tests/test_compact_validation_restoration_integration.py` | 正式示例、新错误到修复、颜色实际转换、模板跳过及历史还原交叉回归 |
-| `widget_service/tests/test_asset_url_mapper.py` | 嵌套还原、未知／歧义地址及非素材字段不变回归 |
+| `widget_service/test/fixtures/card_validation/compact_validation_rule_inventory.json` | 同步 32 个规则发布位置，供架构测试核对 |
+| `widget_service/test/test_compact_validation_assets.py` | 素材范围、颜色例外、原始位置与内部节点回归 |
+| `widget_service/test/test_compact_validation_numeric_display.py` | 数值、文本、绑定、配速、占位及表达式正反例 |
+| `widget_service/test/test_compact_validation_restoration_integration.py` | 正式示例、新错误到修复、颜色实际转换、模板跳过及历史还原交叉回归 |
+| `widget_service/test/test_asset_url_mapper.py` | 嵌套还原、未知／歧义地址及非素材字段不变回归 |
 
 ### 本轮验证
 
@@ -494,9 +494,9 @@ TEMP 的 `compact-restoration-focused.xml` 与同名 log。
 | `docs/compact-dsl-validator-refactor/Compact_DSL_Fusion融合记录.md` | 记录 rebase、冲突处置、文件清单和验证结果 |
 | `widget_service/cloud/services/card_validation/字段约束与演进记录.md` | 移除已失效的原色 SVG 豁免说明 |
 | `widget_service/cloud/services/card_validation/compact_validation/semantic/layout/assets.py` | 移除素材描述导致的 SVG 缺色豁免，保留原始位置诊断 |
-| `widget_service/tests/test_compact_dsl_validator.py` | 衔接主线新增测试与结构化错误码 |
-| `widget_service/tests/test_compact_validation_assets.py` | 验证颜色描述不再豁免 SVG 缺色 |
-| `widget_service/tests/test_compact_validation_restoration_integration.py` | 验证 SVG 拒绝、显式颜色、PNG 原色及历史嵌套素材还原 |
+| `widget_service/test/test_compact_dsl_validator.py` | 衔接主线新增测试与结构化错误码 |
+| `widget_service/test/test_compact_validation_assets.py` | 验证颜色描述不再豁免 SVG 缺色 |
+| `widget_service/test/test_compact_validation_restoration_integration.py` | 验证 SVG 拒绝、显式颜色、PNG 原色及历史嵌套素材还原 |
 
 ### 验证
 
@@ -543,14 +543,14 @@ TEMP 的 `compact-restoration-focused.xml` 与同名 log。
 | `widget_service/cloud/services/card_validation/compact_validation/semantic/layout/assets.py` | 恢复素材描述中的原色 SVG 豁免 |
 | `widget_service/cloud/services/card_validation/字段约束与演进记录.md` | 恢复字段颜色策略与历史登记 |
 | `widget_service/cloud/services/compact_high_level_components.py` | 移除展开后全局填色门禁，恢复 InfoBlock 默认颜色和 native |
-| `widget_service/tests/compact_dsl_validate/_collect_asset_color_errors/01/expected.json` | 恢复原色 SVG 校验预期 |
-| `widget_service/tests/compact_dsl_validate/_collect_asset_color_errors/01/sample_compact.dsl` | 恢复原色 SVG 回归样例 |
-| `widget_service/tests/compact_dsl_validate/coverage.json` | 恢复上述样例的规则覆盖登记 |
-| `widget_service/tests/test_compact_dsl_a2ui_converter.py` | 恢复 PR497 前测试合同 |
-| `widget_service/tests/test_compact_dsl_validator.py` | 移除要求全部 SVG 填色的 PR497 测试，原有缺色检查由专项测试覆盖 |
-| `widget_service/tests/test_compact_prompt_bundle.py` | 恢复提示词描述驱动颜色策略断言 |
-| `widget_service/tests/test_compact_validation_assets.py` | 恢复原色 SVG 豁免测试 |
-| `widget_service/tests/test_compact_validation_restoration_integration.py` | 恢复 InfoBlock 默认补色和 SVG native 测试，保留新增 PNG 原色测试 |
+| `widget_service/test/compact_dsl_validate/_collect_asset_color_errors/01/expected.json` | 恢复原色 SVG 校验预期 |
+| `widget_service/test/compact_dsl_validate/_collect_asset_color_errors/01/sample_compact.dsl` | 恢复原色 SVG 回归样例 |
+| `widget_service/test/compact_dsl_validate/coverage.json` | 恢复上述样例的规则覆盖登记 |
+| `widget_service/test/test_compact_dsl_a2ui_converter.py` | 恢复 PR497 前测试合同 |
+| `widget_service/test/test_compact_dsl_validator.py` | 移除要求全部 SVG 填色的 PR497 测试，原有缺色检查由专项测试覆盖 |
+| `widget_service/test/test_compact_prompt_bundle.py` | 恢复提示词描述驱动颜色策略断言 |
+| `widget_service/test/test_compact_validation_assets.py` | 恢复原色 SVG 豁免测试 |
+| `widget_service/test/test_compact_validation_restoration_integration.py` | 恢复 InfoBlock 默认补色和 SVG native 测试，保留新增 PNG 原色测试 |
 
 ### 更正后的验证
 
@@ -631,19 +631,19 @@ TEMP 的 `compact-restoration-focused.xml` 与同名 log。
 - `widget_service/cloud/services/card_validation/compact_validation/syntax/expressions.py`
 - `widget_service/cloud/services/card_validation/compact_validation/text.py`
 - `widget_service/cloud/services/compact_high_level_components.py`
-- `widget_service/tests/compact_dsl_validate/_collect_asset_color_errors/01/expected.json`
-- `widget_service/tests/compact_dsl_validate/_collect_asset_color_errors/01/sample_compact.dsl`
-- `widget_service/tests/compact_dsl_validate/coverage.json`
-- `widget_service/tests/fixtures/compact_validation_baseline.json`
-- `widget_service/tests/fixtures/compact_validation_rule_inventory.json`
-- `widget_service/tests/test_asset_url_mapper.py`
-- `widget_service/tests/test_compact_dsl_a2ui_converter.py`
-- `widget_service/tests/test_compact_dsl_validator.py`
-- `widget_service/tests/test_compact_prompt_bundle.py`
-- `widget_service/tests/test_compact_validation_architecture.py`
-- `widget_service/tests/test_compact_validation_assets.py`
-- `widget_service/tests/test_compact_validation_equivalence.py`
-- `widget_service/tests/test_compact_validation_numeric_display.py`
+- `widget_service/test/compact_dsl_validate/_collect_asset_color_errors/01/expected.json`
+- `widget_service/test/compact_dsl_validate/_collect_asset_color_errors/01/sample_compact.dsl`
+- `widget_service/test/compact_dsl_validate/coverage.json`
+- `widget_service/test/fixtures/card_validation/compact_validation_baseline.json`
+- `widget_service/test/fixtures/card_validation/compact_validation_rule_inventory.json`
+- `widget_service/test/test_asset_url_mapper.py`
+- `widget_service/test/test_compact_dsl_a2ui_converter.py`
+- `widget_service/test/test_compact_dsl_validator.py`
+- `widget_service/test/test_compact_prompt_bundle.py`
+- `widget_service/test/test_compact_validation_architecture.py`
+- `widget_service/test/test_compact_validation_assets.py`
+- `widget_service/test/test_compact_validation_equivalence.py`
+- `widget_service/test/test_compact_validation_numeric_display.py`
 
 #### 修复反馈与集成测试（11 个文件）
 
@@ -653,11 +653,11 @@ TEMP 的 `compact-restoration-focused.xml` 与同名 log。
 - `widget_service/cloud/services/generation_pipeline.py`
 - `widget_service/cloud/services/prompt_builder.py`
 - `widget_service/cloud/services/widget_generation_service.py`
-- `widget_service/tests/test_compact_validation_fusion.py`
-- `widget_service/tests/test_compact_validation_fusion_followup.py`
-- `widget_service/tests/test_compact_validation_repair_integration.py`
-- `widget_service/tests/test_compact_validation_restoration_integration.py`
-- `widget_service/tests/test_compact_validation_diagnostics.py`
+- `widget_service/test/test_compact_validation_fusion.py`
+- `widget_service/test/test_compact_validation_fusion_followup.py`
+- `widget_service/test/test_compact_validation_repair_integration.py`
+- `widget_service/test/test_compact_validation_restoration_integration.py`
+- `widget_service/test/test_compact_validation_diagnostics.py`
 
 ## 最新 main 同步与三提交重整
 
@@ -792,15 +792,15 @@ Compact 组件提示词同步注明可染色与原色 SVG 的区别，避免模�
 | `widget_service/cloud/services/multi_step_generation/references/prompt_source/components/components_common.md` | 融合主线标题图标与 anchor 提示规则 |
 | `widget_service/cloud/services/multi_step_generation/references/prompt_source/composition/composition_common.md` | 融合主线标题图标与 anchor 提示规则 |
 | `widget_service/cloud/services/multi_step_generation/references/prompt_source/core/core_common.md` | 融合主线标题图标与 anchor 提示规则 |
-| `widget_service/tests/test_compact_component_runtime.py` | 主线标题 withIcon Recipe 回归 |
-| `widget_service/tests/test_compact_composition_planner.py` | 主线 anchor 组合求解回归 |
-| `widget_service/tests/test_compact_dsl_a2ui_converter.py` | 保留主线标题图标展开及高度反例，排除旧全局填色测试 |
-| `widget_service/tests/test_compact_dsl_validator.py` | 保留主线标题合法素材与非法来源回归 |
-| `widget_service/tests/test_compact_plan.py` | 保留主线 anchor 规划回归 |
-| `widget_service/tests/test_compact_validation_assets.py` | 补充标题原始素材范围及各类 SVG 描述策略 |
-| `widget_service/tests/test_compact_validation_equivalence.py` | 保持冻结快照，仅登记两项标题合同预期变化 |
-| `widget_service/tests/test_compact_validation_title_icon.py` | 新增 23 项公开入口、颜色异常、反馈与高度预算交叉回归 |
-| `widget_service/tests/test_jsx_runner_prompt.py` | 保留主线 JSX 标题图标提示词与合同回归 |
+| `widget_service/test/test_compact_component_runtime.py` | 主线标题 withIcon Recipe 回归 |
+| `widget_service/test/test_compact_composition_planner.py` | 主线 anchor 组合求解回归 |
+| `widget_service/test/test_compact_dsl_a2ui_converter.py` | 保留主线标题图标展开及高度反例，排除旧全局填色测试 |
+| `widget_service/test/test_compact_dsl_validator.py` | 保留主线标题合法素材与非法来源回归 |
+| `widget_service/test/test_compact_plan.py` | 保留主线 anchor 规划回归 |
+| `widget_service/test/test_compact_validation_assets.py` | 补充标题原始素材范围及各类 SVG 描述策略 |
+| `widget_service/test/test_compact_validation_equivalence.py` | 保持冻结快照，仅登记两项标题合同预期变化 |
+| `widget_service/test/test_compact_validation_title_icon.py` | 新增 23 项公开入口、颜色异常、反馈与高度预算交叉回归 |
+| `widget_service/test/test_jsx_runner_prompt.py` | 保留主线 JSX 标题图标提示词与合同回归 |
 
 ## 同日晚间继续融合 #498
 
@@ -869,19 +869,19 @@ Compact 组件提示词同步注明可染色与原色 SVG 的区别，避免模�
 | `widget_service/cloud/services/generation_pipeline.py` | 外层重排、Trace 与结构化校验反馈共同接入 |
 | `widget_service/cloud/services/prompt_builder.py` | 保留结构化模型说明，接入原规格与文字压力提示 |
 | `widget_service/cloud/services/widget_generation_service.py` | 修复链路保留首次显示规格及已有上下文 |
-| `widget_service/tests/test_asset_mapping_generation.py` | 保留 #498 对 asset_mapping_generation 的回归更新 |
-| `widget_service/tests/test_asset_url_mapper.py` | 保留 #498 对 asset_url_mapper 的回归更新 |
-| `widget_service/tests/test_compact_dsl_a2ui_converter.py` | 保留 #498 对 compact_dsl_a2ui_converter 的回归更新 |
-| `widget_service/tests/test_compact_dsl_validator.py` | 保留 #498 对 compact_dsl_validator 的回归更新 |
-| `widget_service/tests/test_compact_nested_text_bottom.py` | 保留 #498 对 compact_nested_text_bottom 的回归更新 |
-| `widget_service/tests/test_compact_plan.py` | 保留 #498 对 compact_plan 的回归更新 |
-| `widget_service/tests/test_compact_validation_small_card_merge.py` | 新增 4 项压力提示、异常兼容及高度容差交叉回归 |
-| `widget_service/tests/test_compact_validation_title_icon.py` | 高度反例适配主线 2vp 容差，仍检查有无图标的 Recipe |
-| `widget_service/tests/test_debug_quality_score.py` | 保留 #498 对 debug_quality_score 的回归更新 |
-| `widget_service/tests/test_debug_quality_workflow.py` | 保留 #498 对 debug_quality_workflow 的回归更新 |
-| `widget_service/tests/test_generation_trace_recorder.py` | 保留 #498 对 generation_trace_recorder 的回归更新 |
-| `widget_service/tests/test_model_routing.py` | 保留 #498 对 model_routing 的回归更新 |
-| `widget_service/tests/test_template_ring_geometry.py` | 保留 #498 对 template_ring_geometry 的回归更新 |
+| `widget_service/test/test_asset_mapping_generation.py` | 保留 #498 对 asset_mapping_generation 的回归更新 |
+| `widget_service/test/test_asset_url_mapper.py` | 保留 #498 对 asset_url_mapper 的回归更新 |
+| `widget_service/test/test_compact_dsl_a2ui_converter.py` | 保留 #498 对 compact_dsl_a2ui_converter 的回归更新 |
+| `widget_service/test/test_compact_dsl_validator.py` | 保留 #498 对 compact_dsl_validator 的回归更新 |
+| `widget_service/test/test_compact_nested_text_bottom.py` | 保留 #498 对 compact_nested_text_bottom 的回归更新 |
+| `widget_service/test/test_compact_plan.py` | 保留 #498 对 compact_plan 的回归更新 |
+| `widget_service/test/test_compact_validation_small_card_merge.py` | 新增 4 项压力提示、异常兼容及高度容差交叉回归 |
+| `widget_service/test/test_compact_validation_title_icon.py` | 高度反例适配主线 2vp 容差，仍检查有无图标的 Recipe |
+| `widget_service/test/test_debug_quality_score.py` | 保留 #498 对 debug_quality_score 的回归更新 |
+| `widget_service/test/test_debug_quality_workflow.py` | 保留 #498 对 debug_quality_workflow 的回归更新 |
+| `widget_service/test/test_generation_trace_recorder.py` | 保留 #498 对 generation_trace_recorder 的回归更新 |
+| `widget_service/test/test_model_routing.py` | 保留 #498 对 model_routing 的回归更新 |
+| `widget_service/test/test_template_ring_geometry.py` | 保留 #498 对 template_ring_geometry 的回归更新 |
 
 
 ## PR 范围收敛复核（2026-10-12）
@@ -949,10 +949,10 @@ JSX 基线告警为 `compact-scope-jsx-ruff-main.json`。
 | `widget_service/cloud/services/multi_step_generation/jsx_runner/resources.py` | 撤销独立 JSX 整改，与 main 一致 |
 | `widget_service/cloud/services/multi_step_generation/jsx_runner/validation.py` | 撤销独立 JSX 整改，与 main 一致 |
 | `widget_service/cloud/services/multi_step_generation/jsx_runner/workflow.py` | 撤销独立 JSX 整改，与 main 一致 |
-| `widget_service/tests/test_compact_dsl_a2ui_converter.py` | 恢复四处无关测试输入的原始颜色字段 |
-| `widget_service/tests/test_compact_dsl_validator.py` | 恢复两项不应删除的 main 正向测试 |
-| `widget_service/tests/test_compact_validation_diagnostics.py` | 验证 ID 索引、原始顺序和重复项兼容 |
-| `widget_service/tests/test_jsx_runner_codecheck.py` | 删除与本次重构无关的 JSX 专属整改测试 |
+| `widget_service/test/test_compact_dsl_a2ui_converter.py` | 恢复四处无关测试输入的原始颜色字段 |
+| `widget_service/test/test_compact_dsl_validator.py` | 恢复两项不应删除的 main 正向测试 |
+| `widget_service/test/test_compact_validation_diagnostics.py` | 验证 ID 索引、原始顺序和重复项兼容 |
+| `widget_service/test/test_jsx_runner_codecheck.py` | 删除与本次重构无关的 JSX 专属整改测试 |
 
 
 ## 最终设计复核与单提交整理（2026-10-12）
@@ -1076,23 +1076,23 @@ JSX 基线告警为 `compact-scope-jsx-ruff-main.json`。
 | `widget_service/cloud/services/generation_pipeline.py` | 传递原文及建议条件，按旧错误分组适配诊断，保留主线 Plan 警告 |
 | `widget_service/cloud/services/prompt_builder.py` | 只在模型请求边界将诊断副本组织成说明 |
 | `widget_service/cloud/services/widget_generation_service.py` | 传递可信 create/edit 建议上下文，保留主线省略授权 |
-| `widget_service/tests/compact_dsl_validate/_collect_asset_color_errors/01/expected.json` | 同步已确认 SVG 漏色场景与旧测试覆盖记录 |
-| `widget_service/tests/compact_dsl_validate/_collect_asset_color_errors/01/sample_compact.dsl` | 同步已确认 SVG 漏色场景与旧测试覆盖记录 |
-| `widget_service/tests/compact_dsl_validate/coverage.json` | 同步已确认 SVG 漏色场景与旧测试覆盖记录 |
-| `widget_service/tests/fixtures/compact_validation_baseline.json` | 固定历史行为样本或活动规则归属，快照不随主线变化重生成 |
-| `widget_service/tests/fixtures/compact_validation_rule_inventory.json` | 固定历史行为样本或活动规则归属，快照不随主线变化重生成 |
-| `widget_service/tests/test_asset_url_mapper.py` | 验证 asset_url_mapper 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_dsl_a2ui_converter.py` | 验证 compact_dsl_a2ui_converter 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_dsl_validator.py` | 验证 compact_dsl_validator 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_prompt_bundle.py` | 验证 compact_prompt_bundle 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_architecture.py` | 验证 compact_validation_architecture 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_assets.py` | 验证 compact_validation_assets 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_diagnostics.py` | 验证 compact_validation_diagnostics 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_equivalence.py` | 验证 compact_validation_equivalence 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_fusion.py` | 验证 compact_validation_fusion 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_fusion_followup.py` | 验证 compact_validation_fusion_followup 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_numeric_display.py` | 验证 compact_validation_numeric_display 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_repair_integration.py` | 验证 compact_validation_repair_integration 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_restoration_integration.py` | 验证 compact_validation_restoration_integration 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_small_card_merge.py` | 验证 compact_validation_small_card_merge 对应行为及兼容边界 |
-| `widget_service/tests/test_compact_validation_title_icon.py` | 验证 compact_validation_title_icon 对应行为及兼容边界 |
+| `widget_service/test/compact_dsl_validate/_collect_asset_color_errors/01/expected.json` | 同步已确认 SVG 漏色场景与旧测试覆盖记录 |
+| `widget_service/test/compact_dsl_validate/_collect_asset_color_errors/01/sample_compact.dsl` | 同步已确认 SVG 漏色场景与旧测试覆盖记录 |
+| `widget_service/test/compact_dsl_validate/coverage.json` | 同步已确认 SVG 漏色场景与旧测试覆盖记录 |
+| `widget_service/test/fixtures/card_validation/compact_validation_baseline.json` | 固定历史行为样本或活动规则归属，快照不随主线变化重生成 |
+| `widget_service/test/fixtures/card_validation/compact_validation_rule_inventory.json` | 固定历史行为样本或活动规则归属，快照不随主线变化重生成 |
+| `widget_service/test/test_asset_url_mapper.py` | 验证 asset_url_mapper 对应行为及兼容边界 |
+| `widget_service/test/test_compact_dsl_a2ui_converter.py` | 验证 compact_dsl_a2ui_converter 对应行为及兼容边界 |
+| `widget_service/test/test_compact_dsl_validator.py` | 验证 compact_dsl_validator 对应行为及兼容边界 |
+| `widget_service/test/test_compact_prompt_bundle.py` | 验证 compact_prompt_bundle 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_architecture.py` | 验证 compact_validation_architecture 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_assets.py` | 验证 compact_validation_assets 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_diagnostics.py` | 验证 compact_validation_diagnostics 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_equivalence.py` | 验证 compact_validation_equivalence 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_fusion.py` | 验证 compact_validation_fusion 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_fusion_followup.py` | 验证 compact_validation_fusion_followup 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_numeric_display.py` | 验证 compact_validation_numeric_display 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_repair_integration.py` | 验证 compact_validation_repair_integration 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_restoration_integration.py` | 验证 compact_validation_restoration_integration 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_small_card_merge.py` | 验证 compact_validation_small_card_merge 对应行为及兼容边界 |
+| `widget_service/test/test_compact_validation_title_icon.py` | 验证 compact_validation_title_icon 对应行为及兼容边界 |

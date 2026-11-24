@@ -63,7 +63,7 @@
 - 缺少硬约束的新诊断视为不完整，模型请求回退旧说明；大背板的内容加动作约束使用当前动作类型，避免把合法图文动作错误地指导成 Button。
 
 逐项迁移登记保存在
-[规则迁移登记](../../widget_service/tests/fixtures/compact_validation_rule_inventory.json)，
+[规则迁移登记](../../widget_service/test/fixtures/card_validation/compact_validation_rule_inventory.json)，
 包含原观察编号、原函数、当前模块与函数、错误码、旧文案表达式摘要及测试关联。
 其中 `behaviorCovered: false` 表示尚缺该规则的直接触发用例，不能解释为已完成行为验证。
 当前全部 147 个稳定错误码已有关联的通过用例直接触发；这不代表每条规则的所有分支和边界已覆盖。
@@ -119,7 +119,7 @@
 | 6 | [widget_service/cloud/services/generation_pipeline.py](../../widget_service/cloud/services/generation/generation_pipeline.py) | 保留原始文本、适配诊断分组并保持旧字符串出口。 |
 | 6 | [widget_service/cloud/services/prompt_builder.py](../../widget_service/cloud/services/generation/prompt_builder.py) | 仅在模型请求副本中组织 Compact 错误说明。 |
 | 6 | [widget_service/cloud/services/widget_generation_service.py](../../widget_service/cloud/services/generation/widget_generation_service.py) | 注入有可信来源的创建／编辑条件。 |
-| 6 | [widget_service/tests/test_service_units.py](../../widget_service/tests/test_service_units.py) | 同步一处模型说明断言，保留外层 stage/code。 |
+| 6 | [widget_service/test/test_service_units.py](../../widget_service/test/test_service_units.py) | 同步一处模型说明断言，保留外层 stage/code。 |
 | 7 | [docs/compact-dsl-validator-refactor/Compact_DSL重构实施与验证记录.md](../../docs/compact-dsl-validator-refactor/Compact_DSL重构实施与验证记录.md) | 记录基线、已知失败、验收证据及逐文件清单。 |
 | 2 | [widget_service/cloud/data/validator_rules/compact/repair_hints.json](../../widget_service/cloud/data/validator_rules/compact/repair_hints.json) | 按具体规则码配置四项通用修复建议。 |
 | 2 | [widget_service/cloud/services/card_validation/compact_validation/__init__.py](../../widget_service/cloud/services/card_validation/compact_validation/__init__.py) | 声明对应职责包。 |
@@ -157,15 +157,15 @@
 | 2 | [widget_service/cloud/services/card_validation/compact_validation/syntax/components.py](../../widget_service/cloud/services/card_validation/compact_validation/syntax/components.py) | 语法／组件结构契约，保持结构门禁。 |
 | 2 | [widget_service/cloud/services/card_validation/compact_validation/syntax/expressions.py](../../widget_service/cloud/services/card_validation/compact_validation/syntax/expressions.py) | 语法／表达式和路径结构检查。 |
 | 2 | [widget_service/cloud/services/card_validation/compact_validation/text.py](../../widget_service/cloud/services/card_validation/compact_validation/text.py) | 复用文本、单位及绑定事实查询。 |
-| 1 | [widget_service/tests/fixtures/compact_validation_baseline.json](../../widget_service/tests/fixtures/compact_validation_baseline.json) | 固定 82 组公开入口的旧实现输出。 |
-| 5 | [widget_service/tests/fixtures/compact_validation_rule_cases.json](../../widget_service/tests/fixtures/compact_validation_rule_cases.json) | 固定 91 组规则或流程输入与旧错误顺序。 |
-| 5 | [widget_service/tests/fixtures/compact_validation_rule_inventory.json](../../widget_service/tests/fixtures/compact_validation_rule_inventory.json) | 逐项登记 153 个观察位置的归属和测试证据。 |
-| 5 | [widget_service/tests/test_compact_validation_architecture.py](../../widget_service/tests/test_compact_validation_architecture.py) | 检查诊断归属、旧文案表达式、注册及依赖方向。 |
-| 6 | [widget_service/tests/test_compact_validation_diagnostics.py](../../widget_service/tests/test_compact_validation_diagnostics.py) | 验证异常、分组、来源、建议配置和模型副本。 |
-| 1 | [widget_service/tests/test_compact_validation_equivalence.py](../../widget_service/tests/test_compact_validation_equivalence.py) | 逐项比较公开入口与旧实现的异常及警告。 |
-| 6 | [widget_service/tests/test_compact_validation_repair_integration.py](../../widget_service/tests/test_compact_validation_repair_integration.py) | 验证固定返回序列、素材还原和修复记录。 |
-| 5 | [widget_service/tests/test_compact_validation_rule_cases.py](../../widget_service/tests/test_compact_validation_rule_cases.py) | 比较原规则输出顺序并验证诊断可序列化和说明完整。 |
-| 5 | [widget_service/tests/test_compact_validation_w9.py](../../widget_service/tests/test_compact_validation_w9.py) | 验证复合 W9 检查的门禁、交错顺序及分类。 |
+| 1 | [widget_service/test/fixtures/card_validation/compact_validation_baseline.json](../../widget_service/test/fixtures/card_validation/compact_validation_baseline.json) | 固定 82 组公开入口的旧实现输出。 |
+| 5 | [widget_service/test/fixtures/compact_validation_rule_cases.json](../../widget_service/test/fixtures/compact_validation_rule_cases.json) | 固定 91 组规则或流程输入与旧错误顺序。 |
+| 5 | [widget_service/test/fixtures/card_validation/compact_validation_rule_inventory.json](../../widget_service/test/fixtures/card_validation/compact_validation_rule_inventory.json) | 逐项登记 153 个观察位置的归属和测试证据。 |
+| 5 | [widget_service/test/test_compact_validation_architecture.py](../../widget_service/test/test_compact_validation_architecture.py) | 检查诊断归属、旧文案表达式、注册及依赖方向。 |
+| 6 | [widget_service/test/test_compact_validation_diagnostics.py](../../widget_service/test/test_compact_validation_diagnostics.py) | 验证异常、分组、来源、建议配置和模型副本。 |
+| 1 | [widget_service/test/test_compact_validation_equivalence.py](../../widget_service/test/test_compact_validation_equivalence.py) | 逐项比较公开入口与旧实现的异常及警告。 |
+| 6 | [widget_service/test/test_compact_validation_repair_integration.py](../../widget_service/test/test_compact_validation_repair_integration.py) | 验证固定返回序列、素材还原和修复记录。 |
+| 5 | [widget_service/test/test_compact_validation_rule_cases.py](../../widget_service/test/test_compact_validation_rule_cases.py) | 比较原规则输出顺序并验证诊断可序列化和说明完整。 |
+| 5 | [widget_service/test/test_compact_validation_w9.py](../../widget_service/test/test_compact_validation_w9.py) | 验证复合 W9 检查的门禁、交错顺序及分类。 |
 
 ## 分批提交与独立快照验证
 

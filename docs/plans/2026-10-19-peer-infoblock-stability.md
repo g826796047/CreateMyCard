@@ -32,7 +32,7 @@
 - `prompt_source/layouts/2x2.md`：区分 standard 主辅与 stacked-info 同级；无标题双槽同样承载已成立组合。
 - `prompt_source/plan.md`：组合映射到软组件推荐，不复制触发条件，不添加输出字段。
 - `prompt_source/repair.md`：保留同级关系；主文本超宽先按组件合同恢复填槽分工，不冻结不适配组件。
-- `widget_service/tests/test_peer_info_prompt_contract.py`：10 项文案归属、加载及 Few-shot 摘要回归。
+- `widget_service/test/test_peer_info_prompt_contract.py`：10 项文案归属、加载及 Few-shot 摘要回归。
 - 本文件：计划、开发过程和验证边界。Information 原有同级规则足够明确，未重复修改；Few-shot 未改。
 
 上述 prompt_source 均位于 `widget_service/cloud/data/protocol_profiles/design-compact-dsl-fusion/`。

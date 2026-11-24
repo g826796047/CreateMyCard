@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 def test_service_tests_do_not_import_debug_tools() -> None:
-    service_tests = Path(__file__).resolve().parents[3] / "widget_service/tests"
+    service_tests = Path(__file__).resolve().parents[3] / "widget_service/test"
     violations: list[str] = []
     for path in service_tests.rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8-sig"))

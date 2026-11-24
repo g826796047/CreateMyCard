@@ -72,7 +72,7 @@ Plan阶段不加载案例。检索按同尺寸和运行时动作容量过滤，�
 以下目录前缀简写仅用于维护清单，不发给模型：
 `P = widget_service/cloud/data/protocol_profiles/design-compact-dsl-fusion/prompt_source/`；
 `R = widget_service/cloud/data/protocol_profiles/design-compact-dsl-fusion/runtime/`；
-`S = widget_service/cloud/services/`；`T = widget_service/tests/`。
+`S = widget_service/cloud/services/`；`T = widget_service/test/`。
 
 | 文件 | 用途 |
 |---|---|

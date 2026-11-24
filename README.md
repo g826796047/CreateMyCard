@@ -18,7 +18,7 @@
 ### 云侧服务
 
 - `widget_service/cloud/` 包含服务入口、业务实现、能力注册表、协议配置与模型提示词。
-- `widget_service/tests/` 存放微服务回归测试。
+- `widget_service/test/` 存放微服务回归测试。
 - `widget_service/tools/`、`sql/` 和 `docs/` 分别存放服务辅助工具、数据库脚本和服务文档。
 - 依赖与运行方式见 [微服务 README](widget_service/README.md)。
 

@@ -114,10 +114,10 @@ few-shot启用、筛选关闭、runtime prompt context关闭、接口/模型失�
 | widget_service/cloud/services/card_validation/compact_validation/source_locations.py | 诚实定位生成布局诊断 |
 | widget_service/cloud/services/card_validation/compact_validation/semantic/display.py | 指标标签跨模板承载层，不跨真实业务分区 |
 | widget_service/cloud/services/card_validation/字段约束与演进记录.md | 校验归属与适配登记 |
-| widget_service/tests/test_compact_semantic_layout.py | 父/子布局、镜像、旧协议、绑定/素材、空间、标签、产物、修复路由测试 |
-| widget_service/tests/test_compact_layout_runtime.py | 原低阶匹配测试先展开语义fixture |
-| widget_service/tests/test_compact_prompt_bundle.py | 新语义Prompt合同断言 |
-| widget_service/tests/test_service_units.py | warning-only测试改用合法Compact源，仍隔离warning行为 |
+| widget_service/test/test_compact_semantic_layout.py | 父/子布局、镜像、旧协议、绑定/素材、空间、标签、产物、修复路由测试 |
+| widget_service/test/test_compact_layout_runtime.py | 原低阶匹配测试先展开语义fixture |
+| widget_service/test/test_compact_prompt_bundle.py | 新语义Prompt合同断言 |
+| widget_service/test/test_service_units.py | warning-only测试改用合法Compact源，仍隔离warning行为 |
 | widget_service/tools/migrate_compact_semantic_fewshots.py | 机械迁移已有布局，不构造业务答案 |
 | widget_service/tools/verify_compact_semantic_examples.py | 检查输入/业务不变，验证并导出示例，无模型调用 |
 | widget_service/tools/run_compact_semantic_batch.py | 串行单外层请求、记录完整耗时和真实修复数 |

@@ -23,7 +23,7 @@
   `expected 2 blank lines, found 0` 表示定义之间缺少空行，只补齐分隔，不改变函数体或调用顺序。
   合并冲突后须复核函数边界；`semantic/layout/geometry.py` 的标题高度预算辅助函数按此修复，
   使用 Ruff 的 `--preview --select E302,E305` 专项检查，相关行为回归见
-  `tests/l0/integration/test_s_center_numeric_focus.py`。
+  `test/level0/integration/test_s_center_numeric_focus.py`。
 - 一行只写一条语句，函数体不得与 `def` 或 `async def` 写在同一行。
 - 单行代码不得超过 120 个字符；`widget_service/` 内 Python 代码还必须遵守 Ruff 的 100 字符行宽限制。
   长调用、长签名和长字符串应在保持内容等价的前提下主动换行。
@@ -47,7 +47,7 @@
   `test_theme_codecheck_regressions.py` 检查注册表的推导式子句及 schema 等价性。
   2026-11-23 组件配方测试的排除集合导致推导式 `if` 子句跨行，改为独立集合与显式循环，
   保持筛选范围、字典顺序及配方对象引用不变；回归见
-  `tests/l0/unit/test_compact_component_runtime.py::test_visual_recipe_contract_uses_consistent_icon_and_overflow_rules`。
+  `test/level0/unit/test_compact_component_runtime.py::test_visual_recipe_contract_uses_consistent_icon_and_overflow_rules`。
 - 展开 `dict.fromkeys(generator)` 等代码时必须保留原有顺序和去重语义；不能直接改成无序 `set`。
 - 除非当前作用域已显式证明键存在，否则不得直接使用 `mapping[key]`。可选键使用 `get()` 并检查结果；
   必选键使用 `get()` 后显式 `raise`，测试中使用 `get()` 后显式 `assert`。
@@ -73,12 +73,15 @@
   2026-11-20 转换器重复导入 `VISUAL_RECIPE_VERSION` 按此等价移除，
   `test_theme_codecheck_regressions.py` 检查转换器局部导入不遮蔽模块级导入。
   2026-11-22 图案创建回归的嵌套保存回调参数改为 `saved_artifact`，避免遮蔽外层产物变量；
-  参数改名须保持回调传参与对象身份不变。`tests/l0/unit/test_compact_codecheck_regressions.py`
+  参数改名须保持回调传参与对象身份不变。`test/level0/unit/test_compact_codecheck_regressions.py`
   覆盖图案编译模块及创建回调的词法作用域，区分真实外层绑定与类成员作用域。
 - 遵守 `G.ERR.09`。同一个 `except` 元组不得同时捕获父异常和子异常；例如已捕获 `OSError` 时，不再
   重复列出其子类 `TimeoutError`。
 - 遵守 `G.ERR.07`。不得使用 `except` 后直接 `pass`；可选流程发生异常时也要记录异常类型和原因，
   必要时转换为明确的业务失败。
+- `except` 分支的唯一语句为裸 `raise`，且没有转换、记录或清理逻辑时，不保留该分支，让异常自然向上传播。
+  2026-11-23 真实模型冒烟客户端移除 `ModelSmokeClientError` 的冗余捕获和原样重抛，保持异常类型与调用语义；
+  `test_model_smoke_client.py` 通过 AST 回归检查 `invoke_generate()` 不再出现同类处理器。
 - 生成文件出现问题时先修复 generator、source prompt、template 或 build script，再重新生成。确属不可改的
   生成产物时，才按项目统一配置处理检查范围，不在单个文件中随意屏蔽规则。
 - 四段数字版本号等真实协议值被公网地址扫描误报时，必须保留协议语义，并使用项目批准的白名单或抑制

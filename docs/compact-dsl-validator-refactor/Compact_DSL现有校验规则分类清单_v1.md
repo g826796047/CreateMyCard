@@ -1341,7 +1341,7 @@ BASE-02 至 BASE-04 同样不在本次文档更新中修正规则。新反馈涉
 
 下表对应本次实施后的实际代码；第 5 节继续保留重构前的 153 个观察位置，不将历史行号改为新文件行号。
 每项的原函数、当前文件及函数、稳定错误码、旧文案表达式摘要和关联测试见
-[规则迁移登记](../../widget_service/tests/fixtures/compact_validation_rule_inventory.json)。
+[规则迁移登记](../../widget_service/test/fixtures/card_validation/compact_validation_rule_inventory.json)。
 该登记由 `test_compact_validation_architecture.py` 对照实际源码检查，重复旧文案按原输出位置分别登记。
 
 | 分类 | 已结构化的位置数 | 实际规则模块（相对 compact_validation） |
@@ -1532,7 +1532,7 @@ DSL 的布局判定、自动重排和重试沿用既有检查。
   text_width.py::_collect_data_display_value_width_errors仅为新数值Row累计数字和单位的总宽，
   复用small_card_display_text和_text_width，不改变其它Row的预算或新增错误码。建议由现有修复提示词负责，重试仍归既有策略。
 - Plan角色格式与单核心路线：compact_plan.py，不迁移普通修复范围之外的历史规则。
-- 回归：widget_service/tests/test_s_center_numeric_focus.py。
+- 回归：widget_service/test/test_s_center_numeric_focus.py。
 
 S-center弹性数值区的高度属于语义／布局：44vp标题、8vp间距及74vp内部行的下界，
 继续由semantic/layout/geometry.py核算，区域分配复用compact_region_layout.py，不复制新预算算法。

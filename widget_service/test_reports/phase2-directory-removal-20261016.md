@@ -32,15 +32,15 @@
 | widget_service/cloud/services/source_artifact_repository.py | 历史一期素材恢复兼容及日志 |
 | widget_service/cloud/services/template_generation/tests/test_image_color_policy.py | 素材测试读取二期 |
 | widget_service/cloud/services/template_generation/tests/test_retired_app_usage.py | 下线能力测试只检查在用二期 |
-| widget_service/tests/test_phase_two_registry_defaults.py | 新增 111 个版本、回退、模板路径、历史素材恢复测试 |
-| widget_service/tests/test_service_units.py | 能力选择、参数、过滤及校验测试迁到二期 |
-| widget_service/tests/test_argument_json_recovery.py | 参数修复测试使用二期清单 |
-| widget_service/tests/test_generation_preflight.py | 生成前检查测试使用二期清单 |
-| widget_service/tests/test_compact_dsl_interface_retry.py | 接口重试测试元数据切到二期 |
-| widget_service/tests/test_compact_validation_repair_integration.py | 修复测试元数据切到二期 |
-| widget_service/tests/test_compact_validation_restoration_integration.py | 素材恢复测试元数据切到二期 |
-| widget_service/tests/test_asset_mapping_generation.py | 一期/二期历史结果连续编辑两轮，断言新版本与原文件不变；隔离主题阶段 |
-| widget_service/tests/test_capability_overview_descriptions.py | 旧 App 请求回退到二期素材描述 |
+| widget_service/test/test_phase_two_registry_defaults.py | 新增 111 个版本、回退、模板路径、历史素材恢复测试 |
+| widget_service/test/test_service_units.py | 能力选择、参数、过滤及校验测试迁到二期 |
+| widget_service/test/test_argument_json_recovery.py | 参数修复测试使用二期清单 |
+| widget_service/test/test_generation_preflight.py | 生成前检查测试使用二期清单 |
+| widget_service/test/test_compact_dsl_interface_retry.py | 接口重试测试元数据切到二期 |
+| widget_service/test/test_compact_validation_repair_integration.py | 修复测试元数据切到二期 |
+| widget_service/test/test_compact_validation_restoration_integration.py | 素材恢复测试元数据切到二期 |
+| widget_service/test/test_asset_mapping_generation.py | 一期/二期历史结果连续编辑两轮，断言新版本与原文件不变；隔离主题阶段 |
+| widget_service/test/test_capability_overview_descriptions.py | 旧 App 请求回退到二期素材描述 |
 | widget_service/README.md | 更新默认版本、版本区间和历史素材恢复说明 |
 | widget_service/docs/method_usage.md | 更新使用与部署迁移说明 |
 | widget_service/docs/latest_design_diff.md | 更新版本策略差异说明 |
