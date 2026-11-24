@@ -185,7 +185,7 @@ def _gregorian_target(target: str, today: date, repeat: _Repeat | None) -> _Targ
 
 def _lunar_months_from(anchor: LunarDate) -> Iterator[LunarDate]:
     for year in range(anchor.year, _LAST_LUNAR_YEAR + 1):
-        leap_month = LunarDate.leap_month_for_year(year)
+        leap_month = LunarDate.leapMonthForYear(year)
         first_month = anchor.month if year == anchor.year else 1
         for month in range(first_month, 13):
             yield LunarDate(year, month, anchor.day)
@@ -197,7 +197,7 @@ def _lunar_candidates(anchor: LunarDate, repeat: _Repeat) -> Iterator[LunarDate]
     if repeat.unit == "year":
         for year in range(anchor.year, _LAST_LUNAR_YEAR + 1, repeat.interval):
             yield LunarDate(year, anchor.month, anchor.day)
-            if LunarDate.leap_month_for_year(year) == anchor.month:
+            if LunarDate.leapMonthForYear(year) == anchor.month:
                 yield LunarDate(year, anchor.month, anchor.day, True)
         return
 
@@ -208,12 +208,12 @@ def _lunar_candidates(anchor: LunarDate, repeat: _Repeat) -> Iterator[LunarDate]
 
 def _lunar_to_solar(target: LunarDate, *, use_month_end: bool) -> date:
     try:
-        return target.to_solar_date()
+        return target.toSolarDate()
     except ValueError:
         if not use_month_end or target.day != 30 or not 1 <= target.month <= 12:
             raise
         # 农历小月的最后一天是廿九。
-        return LunarDate(target.year, target.month, 29, target.is_leap_month).to_solar_date()
+        return LunarDate(target.year, target.month, 29, target.isLeapMonth).toSolarDate()
 
 
 def _next_lunar_date(anchor: LunarDate, today: date, repeat: _Repeat) -> _TargetDates:

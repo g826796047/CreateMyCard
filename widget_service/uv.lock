@@ -432,11 +432,11 @@ wheels = [
 
 [[package]]
 name = "lunardate"
-version = "0.3.0"
+version = "0.2.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/4a/70/6d4d14313b5d9eab05e37c761164dd572d95386bd6238354b04b989e0eae/lunardate-0.3.0.tar.gz", hash = "sha256:ae1daa9140bb1078b2c8e2a5b1623e6f25cf0443eca9ef2d6df27a4644f25fef", size = 18571, upload-time = "2026-07-07T05:05:39.019Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/85/71/62fadf243502618cf2a7af5b81936a99684147c655729934f014758c3b39/lunardate-0.2.2.tar.gz", hash = "sha256:8ff8c01721bef7710f0712a302b1cb7d0b8b3ffc72a63a9a056cd01e58e5485a", size = 17686, upload-time = "2023-12-07T13:13:21.09Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/65/b0f833b26f932c865efd25790960bb83481098d66ed8b4ceac8a91859433/lunardate-0.3.0-py3-none-any.whl", hash = "sha256:68c1beaf7704c55c8a2c929d14be3ca98da55992d0ec3c0dd57eae2a5d4079fb", size = 18784, upload-time = "2026-07-07T05:05:38.029Z" },
+    { url = "https://files.pythonhosted.org/packages/a3/07/232401bb1c6bc699c5e641ad375e2582cdde90b19b18e6618ec51796b737/lunardate-0.2.2-py3-none-any.whl", hash = "sha256:cf1916337e50470a82df12d885ff47a456e89c91a3ad4e5fdf1575e063a7ed55", size = 18081, upload-time = "2023-12-07T13:13:19.333Z" },
 ]
 
 [[package]]
@@ -1042,7 +1042,7 @@ requires-dist = [
     { name = "json-repair", specifier = "==0.50.0" },
     { name = "jsonschema", specifier = ">=4.23.0" },
     { name = "loguru", specifier = ">=0.7.0" },
-    { name = "lunardate", specifier = "==0.3.0" },
+    { name = "lunardate", specifier = "==0.2.2" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.11.0" },
     { name = "openai", specifier = "==2.38.0" },
     { name = "orjson", specifier = ">=3.10.0" },
