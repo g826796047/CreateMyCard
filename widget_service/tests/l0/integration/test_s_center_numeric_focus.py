@@ -20,19 +20,27 @@ from services.compact.planning.compact_plan import (
 from services.generation.generation_pipeline import DesignCompactProcessor, DslProcessingContext
 
 
-def _source(props: dict[str, Any]) -> str:
+def _source(props: dict[str, Any], *, subtitle_sample: str | None = "左耳") -> str:
     rows = [
         ["root", "Layout", {"layout": "S-center"}, ["display"]],
         ["display", "DataDisplay", {"label": "耳机电量", "value": 85, **props}],
-        ["/data/subtitle", "左耳"],
+        ["/data/subtitle", subtitle_sample],
         ["/data/value", 85],
     ]
     return "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
 
 
-def _components(props: dict[str, Any]) -> dict[str, Any]:
-    converted = convert_compact_dsl_to_a2ui(_source(props), size="2x2")
-    messages = [json.loads(line) for line in converted.splitlines()]
+def _components(
+    props: dict[str, Any], *, subtitle_sample: str | None = "左耳",
+) -> dict[str, Any]:
+    converted = convert_compact_dsl_to_a2ui(
+        _source(props, subtitle_sample=subtitle_sample), size="2x2",
+    )
+    return _standard_components(converted)
+
+
+def _standard_components(standard_dsl: str) -> dict[str, Any]:
+    messages = [json.loads(line) for line in standard_dsl.splitlines()]
     assert len(messages) == 3
     update = messages[1].get("updateComponents")
     assert isinstance(update, dict)
@@ -84,24 +92,23 @@ def _plan() -> dict[str, Any]:
 def test_numeric_focus_title_geometry(subtitle: str | None) -> None:
     nodes = _components({"secondaryInfo": subtitle, "unit": "%"})
     assert _styles(nodes, "root").get("padding") == 12
-    assert _styles(nodes, "display_title_area").get("height") == 60
     assert _styles(nodes, "display").get("height") == "matchParent"
-    assert _styles(nodes, "display").get("justifyContent") == "start"
-    assert _node(nodes, "display").get("itemMargin") == 4
-    assert _styles(nodes, "display_value_row").get("height") == 46
+    assert _styles(nodes, "display").get("justifyContent") == "center"
+    assert _node(nodes, "display").get("itemMargin") == 0
+    assert _styles(nodes, "display_value_row").get("height") == 62
     assert _node(nodes, "display_value_row").get("itemMargin") == 2
-    assert _styles(nodes, "display_value").get("height") == 46
+    assert _styles(nodes, "display_value").get("height") == 58
     area = _styles(nodes, "display_numeric_area")
-    assert "height" not in area
-    assert area.get("layoutWeight") == 1
+    assert area.get("height") == "wrapContent"
+    assert not area.get("padding")
+    assert "layoutWeight" not in area
+    assert "constraintSize" not in area
     assert area.get("justifyContent") == "center"
-    assert area.get("constraintSize") == {"minHeight": 62}
-    assert _styles(nodes, "display_title_area").get("justifyContent") == "center"
     label = _styles(nodes, "display_label")
     assert "height" not in label
     assert label.get("constraintSize") == {"minHeight": 21, "maxHeight": 42}
     assert label.get("maxLines") == 2
-    assert label.get("lineHeight") == 1.3125
+    assert "lineHeight" not in label
     assert label.get("fontSize") == 16
     assert label.get("fontWeight") == 500
     assert _styles(nodes, "display_value").get("fontSize") == 46
@@ -109,23 +116,37 @@ def test_numeric_focus_title_geometry(subtitle: str | None) -> None:
     assert _styles(nodes, "display_unit").get("fontSize") == 16
     assert _styles(nodes, "display_value_row").get("alignItems") == "bottom"
     assert _styles(nodes, "display_value_row").get("justifyContent") == "center"
-    expected = ["display_label"]
+    expected = ["display_main_group"]
+    assert _node(nodes, "display_main_group").get("children") == [
+        "display_title_group", "display_numeric_area",
+    ]
+    assert _styles(nodes, "display_main_group").get("layoutWeight") == 1
+    assert _styles(nodes, "display_title_group").get("constraintSize") == {"minHeight": 32}
+    assert _styles(nodes, "display_title_group").get("padding") == {"bottom": 6}
+    assert _styles(nodes, "display_title_group").get("justifyContent") == "start"
     if subtitle == "左耳":
         expected.append("display_subtitle_group")
-        assert _styles(nodes, "display_subtitle_group").get("padding") == {"top": 2}
-        assert _styles(nodes, "display_subtitle_group").get("height") == 18
+        assert not _styles(nodes, "display_subtitle_group").get("padding")
+        assert _styles(nodes, "display_subtitle_group").get("height") == 16
         secondary = _styles(nodes, "display_secondary")
         assert secondary.get("height") == 16
         assert secondary.get("fontSize") == 12
         assert secondary.get("fontWeight") == 500
         assert secondary.get("maxLines") == 1
-    assert _node(nodes, "display_title_area").get("children") == expected
+    assert _node(nodes, "display").get("children") == expected
     assert all(node.get("component") != "DataDisplay" for node in nodes.values())
+    for node in nodes.values():
+        if node.get("component") == "Text":
+            styles = node.get("styles")
+            assert isinstance(styles, dict)
+            assert "lineHeight" not in styles
 
 
 @pytest.mark.parametrize("height", [150, 200, 260])
 @pytest.mark.parametrize("subtitle", [None, "左耳"])
-def test_numeric_area_receives_remaining_height(height: int, subtitle: str | None) -> None:
+def test_numeric_area_keeps_natural_height_in_centered_group(
+    height: int, subtitle: str | None,
+) -> None:
     nodes = _components({"secondaryInfo": subtitle, "unit": "%"})
     boxes = reference_region_boxes(
         list(nodes.values()), size="2x2",
@@ -136,28 +157,76 @@ def test_numeric_area_receives_remaining_height(height: int, subtitle: str | Non
     row = boxes.get("display_value_row")
     assert display is not None and area is not None and row is not None
     assert display.height == height - 24
-    assert area.height == height - 24 - 60 - 4
-    assert row.height == 46
+    assert area.height is None
+    assert row.height == 62
 
 
-@pytest.mark.parametrize("height,passes", [(150, True), (200, True), (147, False)])
-def test_numeric_focus_height_budget(height: int, passes: bool) -> None:
+@pytest.mark.parametrize("label,subtitle,required_height", [
+    ("耳机电量", None, 118),
+    ("耳机电量", "左耳", 134),
+    ("运动会\n倒计时", None, 134),
+    ("运动会\n倒计时", "目标日期", 150),
+])
+@pytest.mark.parametrize("height_delta,passes", [(0, True), (50, True), (-3, False)])
+def test_numeric_focus_height_budget(
+    label: str, subtitle: str | None, required_height: int, height_delta: int, passes: bool,
+) -> None:
+    height = required_height + height_delta
+    source = _source({"label": label, "secondaryInfo": subtitle, "unit": "%"})
     context = {
         "task_spec": _task(), "card_spec": {"suggestSize": "2x2"},
         "layout_scope": "S-center",
         "protocol_profile": {"sizes": {"2x2": {"width": 150, "height": height}}},
     }
     if passes:
-        validate_compact_dsl(_source({"unit": "%"}), **context)
+        validate_compact_dsl(source, **context)
     else:
         with pytest.raises(CompactDslValidationError, match="vertical layout"):
-            validate_compact_dsl(_source({"unit": "%"}), **context)
+            validate_compact_dsl(source, **context)
 
 
 def test_numeric_focus_without_unit_centers_value() -> None:
     nodes = _components({})
     assert _node(nodes, "display_value_row").get("children") == ["display_value"]
     assert "display_unit" not in nodes
+
+
+def test_fixed_numeric_geometry_survives_validation() -> None:
+    source = _source({"secondaryInfo": "左耳", "unit": "%"})
+    result = DesignCompactProcessor().process(
+        source,
+        DslProcessingContext(
+            size="2x2", task_spec=_task(), card_spec={"suggestSize": "2x2"},
+            protocol_profile={"version": "v0.9"}, layout_scope="S-center",
+        ),
+    )
+    assert not result.errors, result.errors
+    nodes = _standard_components(result.standard_dsl)
+    assert _styles(nodes, "display_value").get("height") == 58
+    assert _styles(nodes, "display_value_row").get("height") == 62
+    assert _styles(nodes, "display_numeric_area").get("height") == "wrapContent"
+    assert _styles(nodes, "display_unit").get("margin") == {"bottom": 10}
+    for identifier in ("display_value", "display_value_row", "display_numeric_area"):
+        styles = _styles(nodes, identifier)
+        assert "heightBudget" not in styles
+        assert "lineHeight" not in styles
+
+
+@pytest.mark.parametrize("height,passes", [(131, False), (134, True)])
+def test_dynamic_title_reserves_two_lines_without_freezing_sample(
+    height: int, passes: bool,
+) -> None:
+    source = _source({"label": {"path": "/data/subtitle"}, "unit": "%"})
+    context = {
+        "task_spec": _task(), "card_spec": {"suggestSize": "2x2"},
+        "layout_scope": "S-center",
+        "protocol_profile": {"sizes": {"2x2": {"width": 150, "height": height}}},
+    }
+    if passes:
+        validate_compact_dsl(source, **context)
+    else:
+        with pytest.raises(CompactDslValidationError, match="vertical layout"):
+            validate_compact_dsl(source, **context)
 
 
 @pytest.mark.parametrize("label", [
@@ -170,15 +239,24 @@ def test_dynamic_title_keeps_binding(label: str | dict[str, str]) -> None:
     assert _node(nodes, "display_label").get("content") == expected
 
 
-def test_dynamic_subtitle_keeps_binding_and_conditional_group() -> None:
-    nodes = _components({"secondaryInfo": {"path": "/data/subtitle"}, "unit": "%"})
+@pytest.mark.parametrize("subtitle_sample", ["左耳", "", None])
+@pytest.mark.parametrize("subtitle", [
+    {"path": "/data/subtitle"}, "{{ ${/data/subtitle} }}",
+])
+def test_dynamic_subtitle_keeps_binding_and_conditional_group(
+    subtitle_sample: str | None, subtitle: Any,
+) -> None:
+    nodes = _components(
+        {"secondaryInfo": subtitle, "unit": "%"},
+        subtitle_sample=subtitle_sample,
+    )
     assert _node(nodes, "display_secondary").get("content") == "{{ ${/data/subtitle} }}"
     visibility = _styles(nodes, "display_subtitle_group").get("visibility")
     assert isinstance(visibility, str)
     assert "${/data/subtitle}" in visibility
     assert "'visible' : 'none'" in visibility
-    assert _node(nodes, "display_title_area").get("children") == [
-        "display_label", "display_subtitle_group",
+    assert _node(nodes, "display").get("children") == [
+        "display_main_group", "display_subtitle_group",
     ]
 
 
@@ -247,11 +325,11 @@ def test_full_processor_accepts_generic_numeric_focus() -> None:
 
 
 @pytest.mark.parametrize("unit", ["天", "%", {"path": "/data/subtitle"}])
-def test_numeric_unit_keeps_fixed_box_without_legacy_offsets(unit: Any) -> None:
+def test_numeric_unit_keeps_fixed_box_and_bottom_compensation(unit: Any) -> None:
     nodes = _components({"unit": unit})
     styles = _styles(nodes, "display_unit")
     assert styles.get("height") == 21
-    assert styles.get("margin", {}).get("bottom", 0) == 0
+    assert styles.get("margin", {}).get("bottom") == 10
     assert styles.get("padding", {}).get("bottom", 0) == 0
 
 
@@ -272,11 +350,20 @@ def test_static_number_can_cover_accepted_fact() -> None:
 @pytest.mark.parametrize("label", ["运动会倒计时提醒", "运动会\n倒计时"])
 def test_numeric_title_accepts_two_lines(label: str) -> None:
     props = {"label": label, "secondaryInfo": "目标日期", "unit": "天"}
-    validate_compact_dsl(
-        _source(props), task_spec=_task(),
-        card_spec={"suggestSize": "2x2"}, layout_scope="S-center",
+    result = DesignCompactProcessor().process(
+        _source(props),
+        DslProcessingContext(
+            size="2x2", task_spec=_task(), card_spec={"suggestSize": "2x2"},
+            layout_scope="S-center",
+            protocol_profile={
+                "version": "v0.9", "sizes": {"2x2": {"width": 150, "height": 150}},
+            },
+        ),
     )
-    assert _node(_components(props), "display_label").get("content") == label
+    assert not result.errors, result.errors
+    nodes = _standard_components(result.standard_dsl)
+    assert _node(nodes, "display_label").get("content") == label
+    assert "height" not in _styles(nodes, "display_label")
 
 
 @pytest.mark.parametrize(("props", "message"), [
@@ -329,3 +416,24 @@ def test_standard_a2ui_protocol_accepts_numeric_focus(subtitle: Any) -> None:
         if diagnostic.severity == "error":
             errors.append(diagnostic)
     assert not errors, errors
+
+
+@pytest.mark.parametrize("subtitle_sample", ["左耳", ""])
+@pytest.mark.parametrize("height,passes", [(147, False), (150, True)])
+def test_dynamic_footer_reserves_visible_state_budget(
+    subtitle_sample: str | None, height: int, passes: bool,
+) -> None:
+    source = _source({
+        "label": {"path": "/data/subtitle"},
+        "secondaryInfo": {"path": "/data/subtitle"}, "unit": "%",
+    }, subtitle_sample=subtitle_sample)
+    context = {
+        "task_spec": _task(), "card_spec": {"suggestSize": "2x2"},
+        "layout_scope": "S-center",
+        "protocol_profile": {"sizes": {"2x2": {"width": 150, "height": height}}},
+    }
+    if passes:
+        validate_compact_dsl(source, **context)
+    else:
+        with pytest.raises(CompactDslValidationError, match="vertical layout"):
+            validate_compact_dsl(source, **context)

@@ -12,11 +12,49 @@ from services.card_validation.compact_validation.diagnostics import (
     CompactDslValidationError,
     emit_error,
 )
-from services.card_validation.compact_validation.text import _format_vp, _non_negative_number
+from services.card_validation.compact_validation.text import (
+    _format_vp,
+    _non_negative_number,
+    _uses_visual_recipe_part,
+)
 from services.compact.compact_dsl_a2ui_converter import ComponentRow
 from services.compact.components.compact_component_runtime import visual_recipe_part
 from services.compact.layout.compact_reference_canvas import reference_dimension
-from services.compact.layout.compact_region_layout import reference_region_boxes
+from services.compact.layout.compact_region_layout import RegionBox, reference_region_boxes
+from services.compact.planning.compact_composition_planner import _wrapped_lines
+
+
+def _reserve_numeric_title_height(
+    components_by_id: dict[str, ComponentRow], boxes: dict[str, RegionBox],
+) -> None:
+    """标题行数只在预算副本预占；数值区使用共享配方的固定高度与外边距。"""
+    _, title_styles = visual_recipe_part("DataDisplay", "mainTitle", variant="numericFocus")
+    constraints = title_styles.get("constraintSize")
+    if not isinstance(constraints, dict):
+        raise ValueError("DataDisplay.mainTitle requires height constraints")
+    single_height = _non_negative_number(constraints.get("minHeight"))
+    maximum_height = _non_negative_number(constraints.get("maxHeight"))
+    if single_height is None or maximum_height is None:
+        raise ValueError("DataDisplay.mainTitle requires numeric height constraints")
+    for identifier, component in components_by_id.items():
+        if not _uses_visual_recipe_part(component, "DataDisplay.mainTitle"):
+            continue
+        if "height" in component.props:
+            continue
+        reserved_height = maximum_height
+        content = component.props.get("content")
+        box = boxes.get(identifier)
+        font = _non_negative_number(component.props.get("fontSize"))
+        static_text = isinstance(content, str) and "{{" not in content
+        known_width = box is not None and box.width is not None and box.width > 0
+        if static_text and known_width and font is not None:
+            normalized = content.replace("\r\n", "\n").replace("\r", "\n")
+            lines = max(1, _wrapped_lines(normalized, font, box.width))
+            reserved_height = min(maximum_height, lines * single_height)
+        props = {**component.props, "height": reserved_height}
+        components_by_id[identifier] = ComponentRow(
+            identifier, component.component_type, props, component.children,
+        )
 
 
 def _height_budget_components(
@@ -71,6 +109,7 @@ def _collect_height_budget_errors(
         except ValueError as exc:
             errors.append(str(exc))
             return
+    _reserve_numeric_title_height(components_by_id, boxes)
     for component in components:
         if component.component_type != "Column":
             continue

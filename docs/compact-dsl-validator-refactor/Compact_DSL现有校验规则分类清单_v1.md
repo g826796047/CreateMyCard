@@ -1548,3 +1548,42 @@ S-center弹性数值区的高度属于语义／布局：44vp标题、8vp间距�
   数值承载区最小62vp，内部数字单位行46vp。沿用通用高度容差及诊断路径。
 - 回归见 `test_s_center_numeric_focus.py` 和 `s_center_glyph_alignment.mjs`，覆盖标题单双行、
   副标题显隐、不同参考高度及文字框对齐。
+
+### 2026-11-22 S-center 数值布局高度预算
+
+| 检查项 | 分类与实际文件 | 归属理由与边界 |
+| --- | --- | --- |
+| 新数值布局的静态主标题行高与整卡高度 | 语义／布局，`semantic/layout/geometry.py` | 固定标题区取消后，在预算副本中复用`compact_composition_planner._wrapped_lines`，仅对已知静态`DataDisplay.mainTitle`按一行或两行预占；动态标题保留两行容量，显式高度不覆盖。继续使用原高度错误码与容差，不改端侧排版或在入口重复实现 |
+
+数值行与底部副标题的11vp间距由共享Recipe和高阶组件展开提供，通用预算递归累计。
+副标题单行、主标题最多两行与同行数值宽度仍归`semantic/layout/text_width.py`，不新增并行判定。
+回归：`tests/l0/integration/test_s_center_numeric_focus.py`，覆盖四种静态标题/副标题高度组合、
+不足容量拒绝、动态标题预算及绑定保留；动态副标题重排由调试平台浏览器回归覆盖。
+
+S-center默认行高修订：数值模式四类文字不输出lineHeight。标题高度预算仍归semantic/layout/geometry.py，
+从共享Recipe的21/42vp文字框约束预占静态一行/两行、动态两行，不依赖lineHeight，
+不修改端侧默认行高或其他组件配方；回归见test_s_center_numeric_focus.py。
+
+S-center自然数值高度修订：数字文字框、数值行与承载区使用wrapContent，不下发数字固定高度或最小高度。
+语义／布局的semantic/layout/geometry.py继续负责参考高度预算：从共享Recipe读取数字heightBudget=56vp，
+仅在预算副本中替换自然数字高度并递归累计，保留标题21/42vp及原容差、错误码，不改变渲染样式。
+回归覆盖新高度边界、预算不泄露到产物、无裁切及副标题空值显隐；端侧自然字形仍待实测。
+
+自然数字高度预算配置要求为有限正数，零值或非有限数不能绕过容量预占；配置检查仍位于上述geometry.py共享预算读取处，
+不新增业务错误码；test_s_center_numeric_focus.py覆盖零、负值、缺失、非有限数、非法类型及两类动态副标题绑定。
+
+2026-11-23数值字底补偿修订（替代上述自然数字参考预算）：数字Text固定58vp、Row固定62vp，
+单位Text高21vp、margin.bottom为12vp；默认行高、字号及上下框间距11vp不变，外层承载区仍自然高度。
+容量归semantic/layout/geometry.py既有递归预算，直接累计固定高度及外边距，移除独立heightBudget读取；
+标题21/42vp预算继续保留，不新增错误码。test_s_center_numeric_focus.py覆盖新高度边界、单位补偿及显隐，
+s_center_glyph_alignment.mjs记录可见字底差并检查裁切。12vp暂定，端侧精确视觉对齐仍待实测。
+
+2026-11-23：S-center副标题独立贴底（文字框距卡片底边12vp），标题/数值主组占剩余高度居中。
+标题包装minHeight32vp、padding.bottom6vp，自然形成一行11vp/两行6vp间距；无副标题时主组占满内容区。
+容量仍归semantic.layout.geometry，复用通用最小高度和padding递归，无新增校验入口；
+内容预算无副标题94/110vp，有副标题110/126vp，另加上下24vp。覆盖此前整组居中及上下固定11vp规则。
+
+2026-11-23单位补偿最终修订：S-center数值单位margin.bottom由12vp调整为10vp，
+覆盖前述12vp暂定值；数字58vp、数值行62vp、单位21vp及默认行高不变。
+单位外高度21+10=31vp，仍小于数字58vp，总容量预算不变。标题一行11vp/两行6vp、
+日期框距卡片底边12vp及动态显隐合同不变；通用容量递归无需新增或修改判定。

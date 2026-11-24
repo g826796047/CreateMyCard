@@ -106,12 +106,13 @@ actions 按 info_required 动作顺序逐项分配：先结合动作对象、完
 整卡详情例外不需要按钮图标：保留动作的分配项并填 null，reason 说明整卡承载；该素材未被按钮消费，仍可按语义分配给标题。最终以服务端接受结果为准，不因此给其它动作省略图标。
 
 提交前核对：事实来源准确、原子项无遗漏、不重复；候选实际可承载；完整序列化 name/arguments，不在已闭合对象后追加重复括号。
-<!-- /prompt:contract -->
 
 ### S-center 单数值角色
 
 2x2无动作单数值优先S-center + DataDisplay，适用于任意已支持业务，不按业务文字推断。
 同一次Plan用dataDisplayRole标记value唯一核心、title主标题、subtitle紧密相关次信息、unit单位；
 这些事实首选组件均为DataDisplay，不把第二个等权指标伪装为subtitle。没有必要次信息就不选subtitle。
-主副标题不是独立根标题组件；DSL按角色填label/secondaryInfo/value/unit，不增加模型调用。
+标题与数值行的文字框间距一行11vp、两行6vp；有副标题时其文字框底边固定距卡片底边12vp，标题和数值整组在剩余区域居中；无副标题时标题和数值整组居中。数值到副标题间距不固定。
+副标题为空时移除底部分组；主副标题不是独立根标题组件；DSL按角色填label/secondaryInfo/value/unit，不增加模型调用。
 目标日期只有已选入展示时才可成为副标题；不得从天数反推或根据标题长度补造。
+<!-- /prompt:contract -->

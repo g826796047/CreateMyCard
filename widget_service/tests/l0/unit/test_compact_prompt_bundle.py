@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from config.config import get_settings
 from models.generation import TaskSpec
 from services.compact.layout.compact_layout_runtime import layout_ids_for_size
 from services.generation import prompt_builder
@@ -51,6 +52,61 @@ def test_assembled_prompts_are_model_facing() -> None:
     for content in prompts.values():
         assert "<!-- prompt:" not in content
         assert "维护源" not in content
+
+
+@pytest.mark.parametrize("phase", ["create", "plan", "repair"])
+def test_s_center_layout_rules_reach_model_facing_prompts(phase: str) -> None:
+    prompt = read_prompt(DEFAULT_SOURCE, phase, size="2x2")
+    assert "11vp" in prompt
+    assert "两行6vp" in prompt
+    assert "卡片底边12vp" in prompt
+    assert "数值到副标题间距不固定" in prompt
+    assert "副标题为空时" in prompt
+    assert "整组" in prompt
+    if phase == "plan":
+        assert "S-center 单数值角色" in prompt
+        assert "目标日期" in prompt
+    elif phase == "repair":
+        assert "可选副标题位于底部" in prompt
+        assert "主内容组layoutWeight:1居中" in prompt
+    else:
+        assert "标题包装自然高度" in prompt
+    if phase != "plan":
+        assert "数字文字框58vp、数值行62vp，单位底部外边距10vp" in prompt
+        assert "不输出lineHeight" in prompt
+        assert "固定数值行62vp" in prompt
+    for stale_rule in (
+        "标题区60vp", "标题区固定60vp", "最小高62vp", "单位底部外边距12vp",
+        "两处文字框间距均11vp", "121/142vp", "166vp参考高度",
+    ):
+        assert stale_rule not in prompt
+
+
+def test_s_center_layout_rules_reach_runtime_continuation(monkeypatch) -> None:
+    # 关闭示例，避免示例或历史源提示词中的相同文字掩盖运行时注入遗漏。
+    monkeypatch.setattr(get_settings(), "enable_design_compact_few_shots", False)
+    task = TaskSpec(size="2x2", userQuery="显示耳机电量", dataModelSchema={"data": {}})
+    plan = {"layoutHints": ["S-center"], "info_required": []}
+    conversation = [
+        {"role": "system", "content": "创建合同"},
+        {"role": "user", "content": "显示耳机电量"},
+        {"role": "user", "content": "提交计划"},
+        {"role": "assistant", "content": json.dumps(plan)},
+    ]
+    continued = PromptBuilder.build_compact_dsl_continuation(conversation, task, plan)
+    prompt = continued[-1].get("content", "")
+    assert continued[-1].get("role") == "user"
+    assert "<agent_stage>compact_dsl</agent_stage>" in prompt
+    for rule in (
+        "S-center数值DataDisplay", "主标题16fp/500、最多两行",
+        "底部副标题12fp/500、单行", "数值46fp及单位16fp",
+        "标题到数值行间距一行11vp、两行6vp", "副标题框底边距卡片底边12vp",
+        "标题和数值整组在剩余区域居中", "无副标题时占满内容区居中",
+        "数值到副标题间距不固定", "不提交字号或内部布局",
+    ):
+        assert rule in prompt
+    for stale_rule in ("标题区60vp", "标题区固定60vp", "两处文字框间距均11vp"):
+        assert stale_rule not in prompt
 
 
 def test_create_prompt_loads_each_source_as_one_complete_block() -> None:

@@ -9,7 +9,11 @@ from types import SimpleNamespace
 import pytest
 
 from config.config import get_settings
-from services.card_validation import ValidationOptions, validate_card, validate_compact_dsl
+from services.card_validation import (
+    ValidationOptions,
+    validate_card,
+    validate_compact_dsl,
+)
 from services.card_validation.contrast_validator import _composite, _contrast, _rgba
 from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
 from services.compact.components.compact_component_runtime import load_visual_recipe_contract
@@ -225,12 +229,14 @@ def test_few_shot_validates_and_converts(
             facts.append({"actionId": event["id"], "priority": "must", "requirement": "操作"})
         compact_plan = {"info_required": facts, "layoutHints": ["S-content-dual-action"]}
 
+    profile = None
     result = validate_compact_dsl(
         source,
         task_spec=task,
         card_spec={"suggestSize": size},
         enforce_model_component_types=True,
         compact_plan=compact_plan,
+        protocol_profile=profile,
     )
     assert not result.warnings, identifier
 

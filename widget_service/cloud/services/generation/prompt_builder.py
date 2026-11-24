@@ -2263,7 +2263,9 @@ class PromptBuilder:
         context_parts.append(
             "S-center数值DataDisplay保持唯一内容：label主标题，secondaryInfo可选紧密相关次信息，"
             "value唯一数值，unit可选单位。按已接受的展示事实填充，缺少相关次信息时省略secondaryInfo。"
-            "主标题16fp/500、最多两行，副标题12fp/500、单行，数值46fp及单位16fp；"
+            "主标题16fp/500、最多两行，底部副标题12fp/500、单行，数值46fp及单位16fp；"
+            "标题到数值行间距一行11vp、两行6vp；副标题框底边距卡片底边12vp；"
+            "标题和数值整组在剩余区域居中；无副标题时占满内容区居中，数值到副标题间距不固定；"
             "由程序展开，不提交字号或内部布局。"
             "新数值模式不输出supportingText；文本结论模式仍使用原supportingText合同。"
         )

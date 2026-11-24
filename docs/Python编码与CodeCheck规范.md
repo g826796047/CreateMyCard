@@ -20,6 +20,10 @@
 - 只使用 4 个空格缩进，禁止 Tab、混合缩进和无意义的额外缩进；调整缩进前先确认代码块层级，不能机械
   改写导致语义变化。
 - 模块级函数和类之间保留两个空行；类成员、嵌套函数和装饰器方法之间保留合理的一个空行。
+  `expected 2 blank lines, found 0` 表示定义之间缺少空行，只补齐分隔，不改变函数体或调用顺序。
+  合并冲突后须复核函数边界；`semantic/layout/geometry.py` 的标题高度预算辅助函数按此修复，
+  使用 Ruff 的 `--preview --select E302,E305` 专项检查，相关行为回归见
+  `tests/l0/integration/test_s_center_numeric_focus.py`。
 - 一行只写一条语句，函数体不得与 `def` 或 `async def` 写在同一行。
 - 单行代码不得超过 120 个字符；`widget_service/` 内 Python 代码还必须遵守 Ruff 的 100 字符行宽限制。
   长调用、长签名和长字符串应在保持内容等价的前提下主动换行。

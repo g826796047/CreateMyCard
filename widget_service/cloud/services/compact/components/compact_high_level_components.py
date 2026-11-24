@@ -3180,11 +3180,10 @@ def _data_display_optional_visibility(value: Any) -> str | None:
 
 
 def _expand_numeric_data_display(component: ComponentRow, size: str) -> list[ComponentRow]:
-    """通用单数值配方；副标题分组连同间距一起隐藏，不冻结动态样例。"""
+    """主内容占剩余区域居中，副标题独立贴底；不冻结动态样例。"""
     subtitle = _optional_data_display_text(component, "secondaryInfo")
     unit = _optional_data_display_text(component, "unit")
     identifier = component.component_id
-    title_area = f"{identifier}_title_area"
     label_id = f"{identifier}_label"
     subtitle_id = f"{identifier}_secondary"
     subtitle_group = f"{identifier}_subtitle_group"
@@ -3192,14 +3191,20 @@ def _expand_numeric_data_display(component: ComponentRow, size: str) -> list[Com
     value_row = f"{identifier}_value_row"
     value_id = f"{identifier}_value"
     unit_id = f"{identifier}_unit"
-    title_children = (label_id,) if subtitle is None else (label_id, subtitle_group)
+    main_group = f"{identifier}_main_group"
+    title_group = f"{identifier}_title_group"
+    display_children = (main_group,)
+    if subtitle is not None:
+        display_children += (subtitle_group,)
     value_children = (value_id,) if unit is None else (value_id, unit_id)
     color = component.props.get("fontColor")
     rows = [
         _visual_row(identifier, "DataDisplay", "root", size=size, variant="numericFocus",
-                    children=(title_area, numeric_area)),
-        _visual_row(title_area, "DataDisplay", "titleArea", size=size, variant="numericFocus",
-                    children=title_children),
+                    children=display_children),
+        _visual_row(main_group, "DataDisplay", "mainGroup", size=size, variant="numericFocus",
+                    children=(title_group, numeric_area)),
+        _visual_row(title_group, "DataDisplay", "titleGroup", size=size, variant="numericFocus",
+                    children=(label_id,)),
         _visual_row(label_id, "DataDisplay", "mainTitle", size=size, variant="numericFocus",
                     props={"content": component.props.get("label"), "fontColor": color}),
         _visual_row(numeric_area, "DataDisplay", "numericArea", size=size,
