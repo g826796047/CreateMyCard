@@ -17,26 +17,11 @@ The service follows `docs/AGENTS.md`:
 - 两份快照均要求 ROM `[6.0, 8.0)`。App `[11.7.9.300, 12.0.0.0)` 使用日期计数快照，
   App `[11.7.7.330, 11.7.9.300)` 及默认回退使用旧快照。
   编辑历史结果时，素材路径恢复使用历史版本对应的清单，业务能力按本轮选中的清单重新校验。
-- `generateWidgetCard` selects `mep` or the composite `openai` route through
-  `WIDGET_SERVICE_A2UI_FORM_MODEL_BACKEND`.
-  `generateWidgetCardCompactDsl` selects its backend through `WIDGET_SERVICE_DESIGN_COMPACT_MODEL_BACKEND`, loads
-  the configured Design profile under `data/protocol_profiles/`,
-  and converts Design Compact DSL with that profile's `protocol.json` before validation and
-  storage. Create requests first try the controlled Template route;
-  a Template mismatch can fall back to the ordinary Design Compact model route. The generation routes share one
-  policy-driven pipeline and the same model-failure, quality-repair, and validation switches. Tool callers cannot
-  select or override either backend.
-- `generateWidgetCardTerseDslNested2` is currently a strict Template-only create route. It uses the same Design
-  Compact public Processor after the Template module has compiled its internal TerseDSL-Nested-2/CardTpl result to
-  A2UI and adapted it to Design Compact source DSL. Template mismatch and edit requests fail without falling back to
-  the ordinary model route. See `cloud/services/template_generation/docs/README.md` for the current architecture and
-  module documentation.
+- `generateWidgetCardCompactDsl` 使用 `WIDGET_SERVICE_DESIGN_COMPACT_MODEL_BACKEND` 选择后端。
+  创建时可按开关先尝试模板，模板不适用时回退 Fusion；来源编辑走语义编辑流程。
 - `cloud/services/template_generation/config/template_controls.json` owns the Template Provider and individual
   Template denylists. Filtering happens before the first-layer prompt, and the same filtered set constrains
   second-layer Provider rules, layout candidates, and deterministic output validation.
-- Temporary route `generateWidgetCardCompactDslWithDirective` directly reuses the fourth route's generation service
-  and schema, but always emits widget directive command frames even when the global directive switch is disabled.
-  Its forced behavior is isolated in the router so the route can be removed without changing the generation pipeline.
 - `WIDGET_SERVICE_ENABLE_IDS_MOCK=true` by default. In this mode the service reads only `WIDGET_SERVICE_MOCK_IDS_RESPONSE_PATH`, whose default path is the service-internal `cloud/data/mock/ids_res.json`; a missing or invalid mock produces an empty IDS result and never falls back to remote IDS. When set to `false`, the service ignores the mock and queries only the real remote IDS; remote failure produces an empty result and never falls back to mock.
 - `WIDGET_SERVICE_ENABLE_VALIDATION_FAILURE_RETRY=false` by default. It controls targeted repair for both source
   DSL conversion errors and Validator errors. `WIDGET_SERVICE_VALIDATION_FAILURE_MAX_REPAIR_ATTEMPTS=1` limits
@@ -169,7 +154,7 @@ cd widget_service
 py -3.12 tests\test_running_ws_server.py
 ```
 
-该脚本会调用真实 `generateWidgetCard`，读取服务保存的 artifact，通过
+该脚本会调用真实 `generateWidgetCardCompactDsl`，读取服务保存的 artifact，通过
 `cloud/services/card_validation/` Python API 再校验一次并打印诊断。当前 mock 输出包含
 确定的校验问题，因此脚本还会断言接口依然成功返回 artifact，用于证明校验失败不会阻塞主流程。
 
@@ -247,9 +232,7 @@ python -m pytest tests -q -ra --junitxml=test-results/pytest.xml
 GET  /health
 WS   /api/v1/ws/tools/getWidgetCapabilityOverview
 WS   /api/v1/ws/tools/getDataCapabilitySchemas
-WS   /api/v1/ws/tools/generateWidgetCard
 WS   /api/v1/ws/tools/generateWidgetCardCompactDsl
-WS   /api/v1/ws/tools/generateWidgetCardTerseDslNested2
 ```
 
 Example request:
@@ -273,8 +256,6 @@ Schema files:
 
 - `docs/schemas/getWidgetCapabilityOverview.schema.json`
 - `docs/schemas/getDataCapabilitySchemas.schema.json`
-- `docs/schemas/generateWidgetCard.schema.json`
 - `docs/schemas/generateWidgetCardCompactDsl.schema.json`
-- `docs/schemas/generateWidgetCardTerseDslNested2.schema.json`
 
 See `docs/method_usage.md` for detailed method and API usage.

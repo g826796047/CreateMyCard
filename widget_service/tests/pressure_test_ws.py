@@ -319,10 +319,10 @@ async def _run_single_user_iteration(
                 if msg.get("errorCode") != "0":
                     raise RuntimeError(f"schema error: {msg.get('errorMessage', '')}")
 
-            # ---- Stage 3: generateWidgetCard ----
+            # ---- Stage 3: generateWidgetCardCompactDsl ----
             stage_start = _now_ms()
             async with websockets.connect(
-                f"{WS_BASE_URL}{WS_BASE_PATH}/generateWidgetCard",
+                f"{WS_BASE_URL}{WS_BASE_PATH}/generateWidgetCardCompactDsl",
                 open_timeout=5.0,
             ) as ws:
                 await ws.send(
@@ -373,7 +373,9 @@ async def _run_single_user_iteration(
                         ensure_ascii=False,
                     )
                 )
-                final_result = await _recv_until_final(ws, "generateWidgetCard", "generate")
+                final_result = await _recv_until_final(
+                    ws, "generateWidgetCardCompactDsl", "generate"
+                )
                 msg = final_result.message
                 result.generate_ms = final_result.elapsed_ms
                 result.first_token_ms = final_result.first_token_ms

@@ -144,7 +144,7 @@ def test_compact_route_recovers_reported_shapes_and_keeps_context(envelope):
 
 def test_other_routes_and_nested_business_fields_are_unchanged():
     arguments = _request(data=[DATA], arbitraryAlias=[DATA])
-    _, result = _normalize_payload({"arguments": arguments}, "generateWidgetCard")
+    _, result = _normalize_payload({"arguments": arguments}, "getDataCapabilitySchemas")
     assert result == arguments
     normalized = normalizer.normalize_candidate_arguments(arguments)
     assert normalized.get("arbitraryAlias") == [DATA]

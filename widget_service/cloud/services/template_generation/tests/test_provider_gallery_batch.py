@@ -92,7 +92,7 @@ class _GalleryService:
         self.template_sample_overrides: list[dict[str, object]] = []
         self.prd_versions: list[str] = []
 
-    async def generate_widget_card_terse_dsl_nested2(
+    async def generate_gallery_template(
         self,
         request: Any,
         *,
@@ -194,7 +194,7 @@ class _FailOnceGalleryService(_GalleryService):
         super().__init__()
         self.failed_once = False
 
-    async def generate_widget_card_terse_dsl_nested2(
+    async def generate_gallery_template(
         self,
         request: Any,
         *,
@@ -211,7 +211,7 @@ class _FailOnceGalleryService(_GalleryService):
                 suggestSize="2x2",
                 message="transient model failure",
             )
-        return await super().generate_widget_card_terse_dsl_nested2(
+        return await super().generate_gallery_template(
             request,
             trusted_template_candidate_ids=trusted_template_candidate_ids,
             trusted_template_action_ids=trusted_template_action_ids,

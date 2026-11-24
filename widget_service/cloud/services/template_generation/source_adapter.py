@@ -25,8 +25,6 @@ def prepare_template_source_dsl(
 ) -> str:
     """返回与 Processor 匹配的源格式，使公共转换和校验链保持不变。"""
     adapted_a2ui = _adapt_to_protocol_profile(template_a2ui, protocol_profile)
-    if processor_kind == DslProcessorKind.STANDARD_A2UI:
-        return adapted_a2ui
     if processor_kind != DslProcessorKind.DESIGN_COMPACT:
         raise TemplateSourceAdapterError(
             f"unsupported template processor kind: {processor_kind}"

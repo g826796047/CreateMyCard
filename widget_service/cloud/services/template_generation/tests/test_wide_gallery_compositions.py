@@ -162,7 +162,7 @@ async def test_runner_passes_all_businesses_and_checks_actual_skeleton(
     monkeypatch.setattr(facade, "generate_template_engine_a2ui", engine)
 
     class Service(_GalleryService):
-        async def generate_widget_card_terse_dsl_nested2(
+        async def generate_gallery_template(
             self,
             request,
             *,
@@ -174,7 +174,7 @@ async def test_runner_passes_all_businesses_and_checks_actual_skeleton(
                 case.compositionTemplateIds
             )
             await facade.generate_template_engine_a2ui()
-            return await super().generate_widget_card_terse_dsl_nested2(request, **kwargs)
+            return await super().generate_gallery_template(request, **kwargs)
 
     summary = await gallery.ProviderGalleryBatchRunner(Service()).run(tmp_path, tmp_path / "out")
     output = json.loads(summary.manifest_path.read_text(encoding="utf-8"))

@@ -8,7 +8,7 @@ subsystem a given validator belongs to.
 
 The online variant keeps the protocol and semantic stages as its core pipeline.
 The quality stage currently hosts deterministic contrast checks; broader design
-contract checks remain the responsibility of the ``generateWidgetCard`` service.
+contract checks remain the responsibility of the generation service.
 """
 
 from __future__ import annotations

@@ -16,9 +16,7 @@ from ws_response_parser import parse_legacy_stream_content
 OPERATIONS = [
     "getWidgetCapabilityOverview",
     "getDataCapabilitySchemas",
-    "generateWidgetCard",
     "generateWidgetCardCompactDsl",
-    "generateWidgetCardTerseDslNested2",
 ]
 
 

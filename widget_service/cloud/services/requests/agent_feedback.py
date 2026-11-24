@@ -12,9 +12,7 @@ from services.requests.agent_error_view import (
 )
 
 _GENERATION_OPERATIONS = (
-    "generateWidgetCard",
     "generateWidgetCardCompactDsl",
-    "generateWidgetCardTerseDslNested2",
 )
 _MISSING = object()
 _TRANSPORT_FIELDS = frozenset(

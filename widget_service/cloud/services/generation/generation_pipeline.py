@@ -70,7 +70,6 @@ IssueSeverity = Literal["error", "warning"]
 class DslProcessorKind(StrEnum):
     """标识生成路由使用的 DSL 处理器，避免业务分支散落字符串常量。"""
 
-    STANDARD_A2UI = "standard"
     DESIGN_COMPACT = "design-compact"
 
 
@@ -204,20 +203,6 @@ class DslProcessor(Protocol):
     ) -> DslProcessingResult:
         """把模型源 DSL 转换为标准 A2UI，失败时返回结构化问题。"""
         ...
-
-
-class StandardA2UIProcessor:
-    def process(
-        self,
-        source_dsl: str,
-        context: DslProcessingContext,
-    ) -> DslProcessingResult:
-        standard_dsl = repair_repeated_display_units(
-            source_dsl,
-            context.card_spec,
-            context.data_capabilities,
-        )
-        return DslProcessingResult(source_dsl=source_dsl, standard_dsl=standard_dsl)
 
 
 def _capture_processing_result(span: TraceSpan, result: DslProcessingResult) -> None:
@@ -909,7 +894,6 @@ def _elapsed_ms(started_at: float) -> float:
 
 
 _PROCESSORS: dict[DslProcessorKind, DslProcessor] = {
-    DslProcessorKind.STANDARD_A2UI: StandardA2UIProcessor(),
     DslProcessorKind.DESIGN_COMPACT: DesignCompactProcessor(),
 }
 

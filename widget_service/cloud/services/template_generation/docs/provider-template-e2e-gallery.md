@@ -3,7 +3,7 @@
 ## 用途
 
 该工具用于让开发者或 AI Agent 一次性生成全部业务 Provider 的 2×2 场景画廊，验证当前模板能否通过正式
-`generate_widget_card_terse_dsl_nested2` 服务入口完成能力裁决、模板路由、A2UI 转换和最终校验。每个场景
+`generate_gallery_template` 服务入口完成能力裁决、模板路由、A2UI 转换和最终校验。每个场景
 只生成一种高版本外观，请求中的 `deviceInfo.prdVer` 固定使用 `11.7.7.330`，`deviceInfo.romVersion` 为 `7.0`，经公共构建链写入
 `TaskSpec.appVersion`，模板生成器再使用该已有字段完成请求级裁决。
 
@@ -13,7 +13,7 @@
 
 该能力位于 `template_generation/test_support/`，只通过 `WidgetGenerationService` 的公开入口发起测试请求，
 不在 Template 模块内构造 TaskSpec、CardSpec 或最终 Artifact。批跑器调用
-`generate_widget_card_terse_dsl_nested2` 时，通过仅供 Python 服务调用的关键字参数携带目标模板、目标 Action
+`generate_gallery_template` 时，通过仅供 Python 服务调用的关键字参数携带目标模板、目标 Action
 和样例覆盖；该入口据此构造 `TemplateSourceGenerator`，它们不进入 `GenerateWidgetCardRequest`、工具请求
 JSON 或公开 Schema。Search 通过后，二层候选才会收窄到目标模板，外部工具请求不能设置这些开发测试约束。
 端到端画廊同时覆盖单业务路线和严格受控的 HeroTitle + HeroContent + 单 Action 双业务组合；后者从

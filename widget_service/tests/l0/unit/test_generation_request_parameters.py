@@ -29,7 +29,7 @@ def _generation_arguments():
 
 
 @pytest.mark.parametrize("operation", [
-    None, "generateWidgetCard", "generateWidgetCardCompactDsl", "generateWidgetCardTerseDslNested2",
+    None, "generateWidgetCardCompactDsl",
 ])
 @pytest.mark.parametrize("is_edit", [False, True])
 @pytest.mark.parametrize("name,replacement", [
@@ -111,7 +111,7 @@ def test_legal_static_and_dynamic_generation_requests_remain_valid(operation, ha
 
 
 @pytest.mark.parametrize("operation", [
-    None, "generateWidgetCard", "generateWidgetCardCompactDsl", "generateWidgetCardTerseDslNested2",
+    None, "generateWidgetCardCompactDsl",
 ])
 @pytest.mark.parametrize("value", ["generateWidgetCardCompactDsl", "otherRoute", None, []])
 @pytest.mark.parametrize("name", ["bundleName", "functionName", "skillName", "requestId"])

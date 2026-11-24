@@ -7,6 +7,7 @@ import hashlib
 import json
 import re
 import shutil
+from collections.abc import Awaitable, Callable
 from contextvars import ContextVar
 from copy import deepcopy
 from dataclasses import dataclass
@@ -21,14 +22,16 @@ from api.schemas import (
     GenerateWidgetCardResponse,
     ToolRequestEnvelope,
 )
+from config.config import get_settings
 from core.errors import ErrorCode, GenerationStatus
 from custom.model_runtime import ModelExecutionRuntime
 from models.artifact import WidgetArtifact
-from models.generation import ModelRequestContext
+from models.generation import ModelRequestContext, WidgetSize
 from models.service import ArtifactSaveResult
 from services.artifacts.artifact_store import ArtifactStore
+from services.generation.generation_pipeline import DslProcessorKind, GenerationRoutePolicy
 from services.generation.widget_generation_service import WidgetGenerationService
-from services.template_generation import facade
+from services.template_generation import TemplateSourceGenerator, facade
 from services.template_generation.controls import TemplateControls, load_template_controls
 from services.template_generation.test_support.gallery_background import check_gallery_background
 from services.template_generation.test_support.gallery_case_contracts import (
@@ -263,7 +266,7 @@ class GalleryInputManifest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     schemaVersion: str = INPUT_SCHEMA_VERSION
-    operation: str = "generate_widget_card_terse_dsl_nested2"
+    operation: str = "generate_gallery_template"
     cardSize: str = "2x2"
     providers: list[GalleryInputProvider] = Field(default_factory=list)
 
@@ -357,7 +360,7 @@ _GALLERY_APPEARANCES = (
 class GalleryGenerationService(Protocol):
     """批跑依赖的正式生成入口协议。"""
 
-    async def generate_widget_card_terse_dsl_nested2(
+    async def generate_gallery_template(
         self,
         request: GenerateWidgetCardRequest,
         *,
@@ -367,6 +370,44 @@ class GalleryGenerationService(Protocol):
         trusted_template_sample_overrides: dict[str, object] | None = None,
     ) -> GenerateWidgetCardResponse:
         ...
+
+
+class GalleryTemplateService(WidgetGenerationService):
+    """使用公共生成管线验证指定模板；图库必须报告模板自身的失败。"""
+
+    async def generate_gallery_template(
+        self,
+        request: GenerateWidgetCardRequest,
+        *,
+        before_model_call: Callable[[WidgetSize], Awaitable[None]] | None = None,
+        trusted_template_candidate_ids: tuple[str, ...] = (),
+        trusted_template_action_ids: tuple[str, ...] = (),
+        trusted_template_layout_ids: tuple[str, ...] = (),
+        trusted_template_sample_overrides: dict[str, object] | None = None,
+    ) -> GenerateWidgetCardResponse:
+        selection = self._compact_protocol_selection(request)
+        policy = GenerationRoutePolicy(
+            operation="template-gallery",
+            protocol_profile_id=selection.protocol_profile_id,
+            backend=get_settings().design_compact_model_backend,
+            processor_kind=DslProcessorKind.DESIGN_COMPACT,
+            source_format=selection.design_profile_id,
+            model_profile_id=selection.design_profile_id,
+            model_format="compact-dsl",
+            design_profile_id=selection.design_profile_id,
+            validation_failure_blocking=True,
+            stores_design_token=True,
+        )
+        generator = TemplateSourceGenerator(
+            trusted_template_candidate_ids=trusted_template_candidate_ids,
+            trusted_template_action_ids=trusted_template_action_ids,
+            trusted_template_layout_ids=trusted_template_layout_ids,
+            trusted_template_sample_overrides=dict(trusted_template_sample_overrides or {}),
+        )
+        return await self._generate_widget_card_with_policy(
+            request, policy, before_model_call=before_model_call,
+            template_source_generator=generator, need_fallback=False,
+        )
 
 
 class _ArtifactCapture:
@@ -1685,7 +1726,7 @@ class ProviderGalleryBatchRunner:
         )
         token = _CURRENT_CASE_ID.set(case.caseId)
         try:
-            response = await self.service.generate_widget_card_terse_dsl_nested2(
+            response = await self.service.generate_gallery_template(
                 request,
                 trusted_template_candidate_ids=trusted_template_candidate_ids,
                 trusted_template_action_ids=trusted_template_action_ids,
@@ -1854,7 +1895,7 @@ class ProviderGalleryBatchRunner:
         card_size = next(iter(card_sizes)) if len(card_sizes) == 1 else "mixed"
         return {
             "schemaVersion": OUTPUT_SCHEMA_VERSION,
-            "operation": "generate_widget_card_terse_dsl_nested2",
+            "operation": "generate_gallery_template",
             "cardSize": card_size if all_results else "2x2",
             "counts": {
                 "total": len(all_results),
@@ -1882,7 +1923,7 @@ async def generate_provider_gallery(
     """创建共享模型运行时并执行一次完整 Provider 画廊批跑。"""
     runtime = ModelExecutionRuntime()
     try:
-        service = WidgetGenerationService(model_runtime=runtime)
+        service = GalleryTemplateService(model_runtime=runtime)
         runner = ProviderGalleryBatchRunner(service)
         return await runner.run(
             input_root,

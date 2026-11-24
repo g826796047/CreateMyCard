@@ -31,8 +31,7 @@ pytestmark = pytest.mark.usefixtures("existing_generation_policy")
 @pytest.mark.parametrize("operation,template,expected", [
     ("generateWidgetCardCompactDsl", False, True),
     ("generateWidgetCardCompactDsl", True, False),
-    ("generateWidgetCardTerseDslNested2", False, False),
-    ("generateWidgetCard", False, False),
+    ("template-gallery", False, False),
 ])
 def test_only_actual_fusion_source_uses_theme(operation, template, expected):
     assert uses_post_layout_theme(operation, template_source=template) == expected
@@ -56,7 +55,7 @@ def test_processor_requires_explicit_fusion_context(monkeypatch, context_flag):
 
 
 @pytest.mark.parametrize("operation,filtered", [
-    ("generateWidgetCardCompactDsl", True), ("generateWidgetCardTerseDslNested2", False),
+    ("generateWidgetCardCompactDsl", True), ("template-gallery", False),
     ("template-generation", False), ("a2ui-model", False),
 ])
 def test_prompt_filter_does_not_touch_template_clients(monkeypatch, operation, filtered):

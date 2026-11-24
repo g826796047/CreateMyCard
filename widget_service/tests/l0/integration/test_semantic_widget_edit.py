@@ -429,8 +429,7 @@ async def test_intent_parse_failure_logs_reason_then_repairs(edit_run, edit_logs
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("entry", [
-    "generate_widget_card_compact_dsl", "generate_widget_card_a2ui_form",
-    "generate_widget_card_terse_dsl_nested2",
+    "generate_widget_card_compact_dsl",
 ])
 async def test_every_edit_entry_bypasses_creation_and_templates(edit_run, entry):
     original = edit_run.source.model_dump_json()
@@ -546,8 +545,7 @@ async def test_edit_master_switch_and_invalid_source_never_create(edit_run, monk
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("entry", [
-    "generate_widget_card_compact_dsl", "generate_widget_card_a2ui_form",
-    "generate_widget_card_terse_dsl_nested2",
+    "generate_widget_card_compact_dsl",
 ])
 async def test_disabled_semantic_edit_never_uses_retired_route(edit_run, monkeypatch, entry):
     monkeypatch.setattr(get_settings(), "enable_semantic_widget_edit", False)

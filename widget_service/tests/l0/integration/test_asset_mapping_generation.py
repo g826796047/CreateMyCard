@@ -3,6 +3,7 @@
 import asyncio
 import json
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 from widget_service.tests.l0.unit.test_asset_url_mapper import SRC, URL, components
@@ -13,7 +14,6 @@ from core.errors import GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient
 from services.artifacts.source_artifact_repository import SourceArtifactRepository
 from services.card_validation.validator import ArtifactValidator
-from services.compact.compact_dsl_a2ui_converter import convert_compact_dsl_to_a2ui
 from services.editing.widget_edit_utils import source_digest
 from services.generation.widget_generation_service import WidgetGenerationService
 from services.template_generation import TemplateSourceGenerator
@@ -120,27 +120,18 @@ def storage(tmp_path, monkeypatch, isolated_theme_stage):
     return tmp_path / "mock_obs"
 
 
-@pytest.mark.parametrize(
-    "kind,backend",
-    [
-        ("compact_dsl", "model"),
-        ("a2ui_form", "model"),
-        ("compact_dsl", "template"),
-    ],
-)
+@pytest.mark.parametrize("backend", ["model", "template"])
 @pytest.mark.parametrize("validation_enabled", [True, False])
 @pytest.mark.asyncio
 async def test_generation_maps_before_validation_and_saves_separate_sources(
     storage,
     monkeypatch,
-    kind,
     backend,
     validation_enabled,
 ):
     settings = get_settings()
     monkeypatch.setattr(settings, "enable_artifact_validation", validation_enabled)
     token = design_source()
-    standard = convert_compact_dsl_to_a2ui(token, size="2x4")
     inputs = []
     validated = []
     phases = []
@@ -153,7 +144,7 @@ async def test_generation_maps_before_validation_and_saves_separate_sources(
         if phase == "plan":
             assert profile.get("id") == "compact-info-plan"
             return plan_output()
-        return token if kind == "compact_dsl" else standard
+        return token
 
     async def template(_generator, task, *_args):
         inputs.append(task.model_dump_json())
@@ -173,10 +164,10 @@ async def test_generation_maps_before_validation_and_saves_separate_sources(
         staticmethod(lambda: backend == "template"),
     )
 
-    result = await getattr(WidgetGenerationService(), f"generate_widget_card_{kind}")(request())
+    result = await WidgetGenerationService().generate_widget_card_compact_dsl(request())
     assert result.status == GenerationStatus.SUCCESS
     if backend == "model":
-        assert phases == (["plan", "initial"] if kind == "compact_dsl" else ["initial"])
+        assert phases == ["plan", "initial"]
     else:
         assert not phases
     source = await asyncio.to_thread(SourceArtifactRepository().load, result.artifactUrl)
@@ -195,10 +186,9 @@ async def test_generation_maps_before_validation_and_saves_separate_sources(
         assert json_rows(validated[0]) == json_rows(source.artifact.genui)
     else:
         assert not validated
-    if kind == "compact_dsl":
-        assert source.design_token is not None
-        assert SRC in source.design_token
-        assert URL not in source.design_token
+    assert source.design_token is not None
+    assert SRC in source.design_token
+    assert URL not in source.design_token
     task = source.artifact.taskSpec
     assert URL not in json.dumps(task)
     md = (storage / result.artifactUrl.rsplit("/", 1)[-1]).read_text(encoding="utf-8")
@@ -338,27 +328,31 @@ async def test_repair_uses_original_paths_and_remaps_final_output(storage, monke
 
 
 @pytest.mark.asyncio
-async def test_semantic_edit_preserves_source_paths_without_remapping(storage, monkeypatch):
+@pytest.mark.parametrize(("fixture_name", "artifact_id"), [
+    ("legacy_standard_asset.md", "91c3f19f-55bd-422f-b1d8-8daa37e2098a"),
+    ("legacy_template_asset.md", "1ecf607b-854b-4acd-af8c-e7e3b2cea939"),
+])
+async def test_semantic_edit_preserves_source_paths_without_remapping(
+    storage, monkeypatch, fixture_name, artifact_id,
+):
     monkeypatch.setattr(get_settings(), "enable_artifact_validation", False)
+    sample = Path(__file__).with_name("fixtures") / fixture_name
+    source_name = f"artifact_{artifact_id}.md"
+    storage.mkdir(parents=True, exist_ok=True)
+    (storage / source_name).write_bytes(sample.read_bytes())
     prompts = []
-    standard = convert_compact_dsl_to_a2ui(design_source(), size="2x4")
 
-    def generate(_client, prompt, _profile, *, phase="initial", **_kwargs):
+    def generate(_client, prompt, _profile, *, phase, **_kwargs):
         prompts.append(json.dumps(prompt, ensure_ascii=False))
-        if phase in {"edit_intent", "edit_execute"}:
-            return semantic_edit_response(prompt, phase)
-        return standard
+        return semantic_edit_response(prompt, phase)
 
     monkeypatch.setattr(A2UIModelClient, "generate", generate)
-    service = WidgetGenerationService()
-    created = await service.generate_widget_card_a2ui_form(request())
-    assert created.status == GenerationStatus.SUCCESS
-    edited = await service.generate_widget_card_a2ui_form(request(
-        sourceArtifactUrl=created.artifactUrl, userQuery="仅增加根容器圆角",
+    edited = await WidgetGenerationService().generate_widget_card_compact_dsl(request(
+        sourceArtifactUrl=f"https://artifact.test/{source_name}", userQuery="仅增加根容器圆角",
     ))
     assert edited.status == GenerationStatus.SUCCESS
-    assert len(prompts) == 3
-    assert "previousGenui" in prompts[1]
-    assert URL in prompts[1]
+    assert len(prompts) == 2
+    assert "previousGenui" in prompts[0]
+    assert URL in prompts[0]
     source = await asyncio.to_thread(SourceArtifactRepository().load, edited.artifactUrl)
     assert URL in source.artifact.genui

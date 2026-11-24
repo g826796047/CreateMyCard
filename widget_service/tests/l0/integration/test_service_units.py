@@ -149,7 +149,7 @@ def test_websocket_handler_runs_sync_service_in_threadpool():
     [
         (
             WidgetWebSocketResultMessage(
-                operation="generateWidgetCard",
+                operation="generateWidgetCardCompactDsl",
                 requestId="request-1",
                 data={"status": "success"},
             ),
@@ -157,7 +157,7 @@ def test_websocket_handler_runs_sync_service_in_threadpool():
         ),
         (
             WidgetWebSocketErrorMessage(
-                operation="generateWidgetCard",
+                operation="generateWidgetCardCompactDsl",
                 requestId="request-1",
                 errorCode="FAILED",
                 error={"message": "failed"},
@@ -219,7 +219,6 @@ def test_plugin_error_explanation_distinguishes_business_failures(
 def test_anyio_thread_pool_uses_configured_capacity(monkeypatch):
     assert Settings(_env_file=None).anyio_thread_pool_tokens == 80
     assert Settings(_env_file=None).enable_sensitive_log_fields is True
-    assert Settings(_env_file=None).a2ui_form_model_backend == "mep"
     assert Settings(_env_file=None).design_compact_model_backend == "openai"
     assert Settings(_env_file=None).openai_master_client == "llmclient"
     assert Settings(_env_file=None).openai_fallback_client == "llmclient"
@@ -1478,7 +1477,6 @@ def test_public_tool_schemas_do_not_expose_version_overrides():
     schema_names = [
         "getWidgetCapabilityOverview.schema.json",
         "getDataCapabilitySchemas.schema.json",
-        "generateWidgetCard.schema.json",
         "generateWidgetCardCompactDsl.schema.json",
     ]
 
@@ -1494,7 +1492,6 @@ def test_public_tool_schemas_do_not_expose_version_overrides():
 def test_generation_tool_schemas_default_to_2x2():
     schema_root = PROJECT_ROOT / "docs" / "schemas"
     schema_names = [
-        "generateWidgetCard.schema.json",
         "generateWidgetCardCompactDsl.schema.json",
     ]
 
@@ -3662,7 +3659,6 @@ def _model_failure_request() -> GenerateWidgetCardRequest:
 @pytest.mark.parametrize(
     ("generation_method", "setting_name", "backend"),
     [
-        ("generate_widget_card_a2ui_form", "a2ui_form_model_backend", "openai"),
         ("generate_widget_card_compact_dsl", "design_compact_model_backend", "mep"),
     ],
 )
@@ -3699,7 +3695,7 @@ async def test_generation_routes_accept_each_configured_model_backend(
 
 @pytest.mark.parametrize(
     "generation_method",
-    ["generate_widget_card_a2ui_form", "generate_widget_card_compact_dsl"],
+    ["generate_widget_card_compact_dsl"],
 )
 @pytest.mark.parametrize("failure_kind", ["empty", "exception"])
 @pytest.mark.asyncio
@@ -3734,86 +3730,6 @@ async def test_model_failure_skips_validator_and_artifact_store(
     assert response.artifactUrl == ""
     assert response.artifactDigest == ""
     assert response.message == "卡片创建过程遇到问题了，请稍后再试。"
-
-
-@pytest.mark.asyncio
-async def test_repair_model_failure_does_not_validate_or_save_second_result(monkeypatch):
-    settings = get_settings()
-    model_calls: list[int] = []
-    validation_calls: list[str] = []
-
-    def generate_then_fail(_client, _prompt, _profile=None, **_kwargs):
-        model_calls.append(len(model_calls) + 1)
-        if len(model_calls) == 1:
-            return "invalid-but-nonempty-dsl"
-        return ""
-
-    def validate_once(_validator, artifact, _profile):
-        validation_calls.append(artifact.genui)
-        return ["DSL_REQUIRED_FIELD [genui:1 /createSurface]"]
-
-    def unexpected_save(*_args, **_kwargs):
-        pytest.fail("repair model failure must not save an artifact")
-
-    monkeypatch.setattr(settings, "enable_artifact_validation", True)
-    monkeypatch.setattr(settings, "enable_model_failure_retry", False)
-    monkeypatch.setattr(settings, "enable_validation_failure_retry", True)
-    monkeypatch.setattr(A2UIModelClient, "generate", generate_then_fail)
-    monkeypatch.setattr(ArtifactValidator, "validate", validate_once)
-    monkeypatch.setattr(ArtifactStore, "save", unexpected_save)
-
-    response = await WidgetGenerationService().generate_widget_card_a2ui_form(
-        _model_failure_request()
-    )
-
-    assert model_calls == [1, 2]
-    assert validation_calls == ["invalid-but-nonempty-dsl"]
-    assert response.status == GenerationStatus.FAILED
-    assert response.errorCode == ErrorCode.A2UI_GENERATION_FAILED.value
-
-
-@pytest.mark.asyncio
-async def test_validation_repair_stops_early_after_second_configured_repair(monkeypatch):
-    settings = get_settings()
-    monkeypatch.setattr(settings, "enable_static_content_generation_policy", False)
-    standard_outputs = [_standard_text_dsl(label) for label in ("first", "second", "third")]
-    generated_values = iter(standard_outputs)
-    model_calls = 0
-    validation_calls: list[str] = []
-
-    def generate_next(_client, _prompt, _profile=None, **_kwargs):
-        nonlocal model_calls
-        model_calls += 1
-        return next(generated_values)
-
-    def validate_until_third(_validator, artifact, _profile):
-        validation_calls.append(artifact.genui)
-        if artifact.genui == standard_outputs[-1]:
-            return []
-        return [f"invalid {artifact.genui}"]
-
-    monkeypatch.setattr(settings, "enable_artifact_validation", True)
-    monkeypatch.setattr(settings, "enable_model_failure_retry", True)
-    monkeypatch.setattr(settings, "enable_validation_failure_retry", True)
-    monkeypatch.setattr(settings, "validation_failure_max_repair_attempts", 2)
-    monkeypatch.setattr(A2UIModelClient, "generate", generate_next)
-    monkeypatch.setattr(ArtifactValidator, "validate", validate_until_third)
-    monkeypatch.setattr(
-        ArtifactStore,
-        "save",
-        lambda _store, _artifact: ArtifactSaveResult(
-            artifactUrl="https://artifact.test/third-validation-result",
-            artifactDigest="sha256:third-validation-result",
-        ),
-    )
-
-    response = await WidgetGenerationService().generate_widget_card_a2ui_form(
-        _model_failure_request()
-    )
-
-    assert model_calls == 3
-    assert validation_calls == standard_outputs
-    assert response.status == GenerationStatus.SUCCESS
 
 
 @pytest.mark.asyncio

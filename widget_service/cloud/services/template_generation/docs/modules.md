@@ -7,7 +7,7 @@
 ```text
 cloud/api/routes.py
   -> WidgetGenerationService.generate_widget_card_compact_dsl()
-     或 generate_widget_card_terse_dsl_nested2()
+     或测试侧 generate_gallery_template()
   -> WidgetGenerationService._generate_widget_card_with_policy()
   -> WidgetGenerationService.generate_widget_card()
   -> generate_source_dsl()

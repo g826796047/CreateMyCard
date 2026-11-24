@@ -40,23 +40,8 @@ template_generation -X-> ArtifactValidator / ArtifactStore / ResponsePlanner
 
 ## 2. 入口路由差异
 
-Compact 和 Tersel 入口分别构造 `TemplateSourceGenerator` 对象，并设置各自的模板候选、Action、样例覆盖等
-差异属性。`WidgetGenerationService._generate_widget_card_with_policy()` 只负责向对象绑定当前 Processor、
-Form Profile、模型运行时和请求上下文，再将其注入公共生成链。回退策略在公共 `generate_source_dsl()` 中
-执行，不进入模板模块。
-
-| 场景 | Compact | Tersel |
-| --- | --- | --- |
-| create | 先尝试 Template | 只允许 Template |
-| edit | 跳过 Template，进入原 Compact edit | 入口直接 `failed` |
-| Template 不匹配或模块异常 | 同一次 `generate_source_dsl` 从 Fusion Info Plan 重新生成 | 不回退，转为生成失败 |
-| Template 已返回，Processor/Validator 失败 | 首次失败即从 Fusion Info Plan 重新生成 | 直接失败；公共模型 prompt 未加载，不调用通用 repair |
-| repair 最终失败 | `VALIDATION_FAILED`，不保存 | 同左 |
-| ArtifactStore 失败 | 不回退 Template 或模型 | 同左 |
-
-两个入口当前都构造 `DslProcessorKind.DESIGN_COMPACT` 策略。
-`generateWidgetCardTerseDslNested2` 的名称表达模板内部编排语义；生产路线不把 Tersel
-字符串交给公共 Processor，旧 TerseDSL 公共 Processor 已删除。
+Compact 创建可启用模板，模板未匹配或公共处理失败时回退 Fusion。编辑请求直接进入语义编辑。
+图库使用测试侧入口指定模板并验证生成结果，模板失败时记录该样例失败。
 
 ## 3. Template 内部主流程
 

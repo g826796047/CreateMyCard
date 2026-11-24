@@ -117,7 +117,6 @@ from services.observability.generation_trace_recorder import (
 )
 from services.observability.operational_logging import exception_summary
 from services.protocols.protocol_registry import (
-    A2UI_FORM_PROTOCOL_PROFILE_ID,
     A2UIProtocolRegistry,
     ProtocolProfileSelection,
 )
@@ -176,25 +175,17 @@ class WidgetGenerationService:
                 DataCapabilitySchemasRequest(**request.model_dump(exclude={"operation"}))
             )
 
-        if request.operation in {
-            "generateWidgetCard",
-            "generateWidgetCardCompactDsl",
-            "generateWidgetCardTerseDslNested2",
-        }:
+        if request.operation == "generateWidgetCardCompactDsl":
             # 生成阶段必须带原始用户需求，模型 prompt、TaskSpec 和用户话术都依赖它。
             if not request.userQuery:
-                raise ValueError("userQuery is required for generateWidgetCard.")
+                raise ValueError("userQuery is required for generateWidgetCardCompactDsl.")
             # dataCapabilityIds 只属于 schema 加载接口，生成请求下沉时需要剔除。
             payload = request.model_dump(
                 exclude={"operation", "dataCapabilityIds"},
                 exclude_unset=True,
             )
             generation_request = GenerateWidgetCardRequest(**payload)
-            if request.operation == "generateWidgetCardCompactDsl":
-                return await self.generate_widget_card_compact_dsl(generation_request)
-            if request.operation == "generateWidgetCardTerseDslNested2":
-                return await self.generate_widget_card_terse_dsl_nested2(generation_request)
-            return await self.generate_widget_card_a2ui_form(generation_request)
+            return await self.generate_widget_card_compact_dsl(generation_request)
 
         raise ValueError(f"Unknown operation: {request.operation}")
 
@@ -2502,44 +2493,6 @@ class WidgetGenerationService:
             f"source_artifact_digest={source_artifact_digest}"
         )
 
-    async def generate_widget_card_a2ui_form(
-        self,
-        request: GenerateWidgetCardRequest,
-        *,
-        before_model_call: Callable[[WidgetSize], Awaitable[None]] | None = None,
-    ) -> GenerateWidgetCardResponse:
-        """使用标准 A2UI Form profile 和配置选择的模型后端生成卡片。"""
-        settings = get_settings()
-        policy = GenerationRoutePolicy(
-            operation="generateWidgetCard",
-            protocol_profile_id=A2UI_FORM_PROTOCOL_PROFILE_ID,
-            backend=settings.a2ui_form_model_backend,
-            processor_kind=DslProcessorKind.STANDARD_A2UI,
-            source_format="a2ui-form",
-            model_profile_id=A2UI_FORM_PROTOCOL_PROFILE_ID,
-            model_format="a2ui-form",
-        )
-        if "sourceArtifactUrl" in request.model_fields_set:
-            return await self._generate_widget_card_with_policy(
-                request, policy, before_model_call=before_model_call,
-            )
-        try_template = self._enable_card_template()
-        template_source_generator = TemplateSourceGenerator() if try_template else None
-        if before_model_call is None:
-            return await self._generate_widget_card_with_policy(
-                request,
-                policy,
-                template_source_generator=template_source_generator,
-                need_fallback=True,
-            )
-        return await self._generate_widget_card_with_policy(
-            request,
-            policy,
-            before_model_call=before_model_call,
-            template_source_generator=template_source_generator,
-            need_fallback=True,
-        )
-
     async def generate_widget_card_compact_dsl(
         self,
         request: GenerateWidgetCardRequest,
@@ -2649,61 +2602,6 @@ class WidgetGenerationService:
                 artifact_digest=response.artifactDigest,
             )
         return response
-
-    async def generate_widget_card_terse_dsl_nested2(
-        self,
-        request: GenerateWidgetCardRequest,
-        *,
-        before_model_call: Callable[[WidgetSize], Awaitable[None]] | None = None,
-        trusted_template_candidate_ids: tuple[str, ...] = (),
-        trusted_template_action_ids: tuple[str, ...] = (),
-        trusted_template_layout_ids: tuple[str, ...] = (),
-        trusted_template_sample_overrides: dict[str, object] | None = None,
-    ) -> GenerateWidgetCardResponse:
-        """复用 Design Compact 原始生成链处理 Terse 模板入口。"""
-        try:
-            selection = self._compact_protocol_selection(request)
-        except ValueError as exc:
-            logger.error(
-                f"{_MODULE} terse_nested2_protocol_selection_failed "
-                f"error_code={ErrorCode.APP_VERSION_UNSUPPORTED.value} error={exc}"
-            )
-            return GenerateWidgetCardResponse(
-                status=GenerationStatus.UNSUPPORTED,
-                suggestSize=request.size or DEFAULT_WIDGET_SIZE,
-                message="当前 App/ROM 版本暂无可用的卡片协议，暂时不能生成卡片。",
-                errorCode=ErrorCode.APP_VERSION_UNSUPPORTED.value,
-            )
-        policy = GenerationRoutePolicy(
-            operation="generateWidgetCardTerseDslNested2",
-            protocol_profile_id=selection.protocol_profile_id,
-            backend=get_settings().design_compact_model_backend,
-            processor_kind=DslProcessorKind.DESIGN_COMPACT,
-            source_format=selection.design_profile_id,
-            model_profile_id=selection.design_profile_id,
-            model_format="compact-dsl",
-            design_profile_id=selection.design_profile_id,
-            supports_dynamic_capabilities=True,
-            validation_failure_blocking=True,
-            stores_design_token=True,
-        )
-        if "sourceArtifactUrl" in request.model_fields_set:
-            return await self._generate_widget_card_with_policy(
-                request, policy, before_model_call=before_model_call,
-            )
-        template_source_generator = TemplateSourceGenerator(
-            trusted_template_candidate_ids=trusted_template_candidate_ids,
-            trusted_template_action_ids=trusted_template_action_ids,
-            trusted_template_layout_ids=trusted_template_layout_ids,
-            trusted_template_sample_overrides=dict(trusted_template_sample_overrides or {}),
-        )
-        return await self._generate_widget_card_with_policy(
-            request,
-            policy,
-            before_model_call=before_model_call,
-            template_source_generator=template_source_generator,
-            need_fallback=False,
-        )
 
     async def _generate_widget_card_with_policy(
         self,

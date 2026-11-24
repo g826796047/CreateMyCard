@@ -131,7 +131,7 @@ def static_policy():
         {"effective_data": True},
         {"requested_events": True},
         {"effective_events": True},
-        {"operation": "generateWidgetCard"},
+        {"operation": "template-gallery"},
     ],
 )
 def test_policy_only_enables_eligible_create(change: dict) -> None:

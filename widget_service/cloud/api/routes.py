@@ -79,17 +79,13 @@ _MODULE = "[WS Router]"
 INTERFACE_TYPE = {
     "getWidgetCapabilityOverview": "getWidgetCapabilityOverviewInterfaceTime",
     "getDataCapabilitySchemas": "getDataCapabilitySchemasInterfaceTime",
-    "generateWidgetCard": "generateWidgetCardInterfaceTime",
     "generateWidgetCardCompactDsl": "generateWidgetCardCompactDslInterfaceTime",
-    "generateWidgetCardTerseDslNested2": "generateWidgetCardTerseDslNested2InterfaceTime",
 }
 
 INTERFACE_PARAMETER_ERROR_TYPE = {
     "getWidgetCapabilityOverview": "getWidgetCapabilityOverviewInterfaceParamError",
     "getDataCapabilitySchemas": "getDataCapabilitySchemasInterfaceParamError",
-    "generateWidgetCard": "generateWidgetCardInterfaceParamError",
     "generateWidgetCardCompactDsl": "generateWidgetCardCompactDslInterfaceParamError",
-    "generateWidgetCardTerseDslNested2": "generateWidgetCardTerseDslNested2InterfaceParamError",
 }
 
 router = APIRouter(prefix="/api/v1")
@@ -110,9 +106,7 @@ COMPACT_DSL_TRANSPORT_CONTENT_KEYS = frozenset(
 )
 GENERATION_OPERATIONS = frozenset(
     {
-        "generateWidgetCard",
         COMPACT_DSL_OPERATION,
-        "generateWidgetCardTerseDslNested2",
     }
 )
 ERROR_EXPLANATIONS = {
@@ -1528,28 +1522,6 @@ async def get_data_capability_schemas_ws(websocket: WebSocket):
     )
 
 
-@router.websocket("/ws/tools/generateWidgetCard")
-async def generate_widget_card_ws(websocket: WebSocket):
-    """卡片生成 WebSocket 入口。
-
-    入参：
-    - websocket：客户端 WebSocket 连接，消息体需符合 GenerateWidgetCardRequest。
-    出参：无；服务端通过 WebSocket 返回 result 或 error 消息。
-    """
-    await _serve_operation_websocket(
-        websocket,
-        "generateWidgetCard",
-        GenerateWidgetCardRequest,
-        lambda service, request, before_model_call: service.generate_widget_card_a2ui_form(
-            request,
-            before_model_call=before_model_call,
-        ),
-        heartbeat=True,
-        heartbeat_interval=6.0,
-        handler_in_threadpool=False,
-    )
-
-
 @router.websocket("/ws/tools/generateWidgetCardCompactDsl")
 async def generate_widget_card_compact_dsl_ws(websocket: WebSocket):
     """Compact DSL 卡片生成 WebSocket 入口。"""
@@ -1558,23 +1530,6 @@ async def generate_widget_card_compact_dsl_ws(websocket: WebSocket):
         "generateWidgetCardCompactDsl",
         GenerateWidgetCardRequest,
         lambda service, request, before_model_call: service.generate_widget_card_compact_dsl(
-            request,
-            before_model_call=before_model_call,
-        ),
-        heartbeat=True,
-        heartbeat_interval=6.0,
-        handler_in_threadpool=False,
-    )
-
-
-@router.websocket("/ws/tools/generateWidgetCardTerseDslNested2")
-async def generate_widget_card_terse_dsl_nested2_ws(websocket: WebSocket):
-    """TerseDSL-Nested-2 卡片生成 WebSocket 入口。"""
-    await _serve_operation_websocket(
-        websocket,
-        "generateWidgetCardTerseDslNested2",
-        GenerateWidgetCardRequest,
-        lambda service, request, before_model_call: service.generate_widget_card_terse_dsl_nested2(
             request,
             before_model_call=before_model_call,
         ),

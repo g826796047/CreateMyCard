@@ -1,8 +1,7 @@
 # Tersel 协议
 
 本文定义 `template_generation` 模块使用的受限 Tersel 组件树协议。历史文档和代码中的
-`Tersel-Nest2`、`TerseDSL-Nested-2`、`Nested-2` 统一归为 **Tersel**。现有 WebSocket operation
-仍保留旧名称，但 Python 模块、函数和内部输出字段不再提供旧名称兼容层。
+`Tersel-Nest2`、`TerseDSL-Nested-2`、`Nested-2` 统一归为 **Tersel**。Python 模块、函数和内部输出字段不再提供旧名称兼容层。
 
 ## 1. 文档结构
 
@@ -137,7 +136,7 @@ CardTpl 和可信展开后的 Tersel 内联样式还可使用受限 `$theme('<pa
 以下名称因对外接口稳定性保留：
 
 - Profile ID：`terse-dsl-nested-2`。
-- WebSocket operation：`generateWidgetCardTerseDslNested2`。
+- WebSocket operation：`generateWidgetCardCompactDsl`。
 
 模板内部只使用 `tersel_converter.py`、`parse_tersel()`、`convert_tersel_to_a2ui()` 和 `tersel` 输出字段，
 不维护第二套 Parser 或旧 Python 别名。

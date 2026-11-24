@@ -15,7 +15,7 @@ from ws_response_parser import parse_legacy_stream_content
 SERVER_HOST = os.getenv("WIDGET_SERVICE_TEST_HOST", socket.gethostbyname("localhost"))
 SERVER_PORT = int(os.getenv("WIDGET_SERVICE_TEST_PORT", "8855"))
 WS_BASE_PATH = os.getenv("WIDGET_SERVICE_TEST_WS_BASE_PATH", "/api/v1/ws/tools")
-WS_URI = f"ws://{SERVER_HOST}:{SERVER_PORT}{WS_BASE_PATH}/generateWidgetCard"
+WS_URI = f"ws://{SERVER_HOST}:{SERVER_PORT}{WS_BASE_PATH}/generateWidgetCardCompactDsl"
 APP_VERSION = ".".join(("11", "7", "5", "205"))
 ROM_VERSION = "CLS-AL30 " + ".".join(("6", "0", "0", "328"))
 
@@ -52,7 +52,7 @@ def _tool_payload(content: dict, interaction_id: str) -> dict:
 
 
 async def _generate(content: dict, interaction_id: str) -> dict:
-    """调用真实 generateWidgetCard，并返回业务 data。"""
+    """调用真实 generateWidgetCardCompactDsl，并返回业务 data。"""
     expected_request_id = f"{SESSION_ID}&{interaction_id}"
     try:
         async with websockets.connect(WS_URI, open_timeout=3.0) as websocket:
@@ -77,11 +77,11 @@ async def _generate(content: dict, interaction_id: str) -> dict:
                     stream_info["streamContent"]
                 )
                 assert result_item["type"] == "result"
-                assert result_item["operation"] == "generateWidgetCard"
+                assert result_item["operation"] == "generateWidgetCardCompactDsl"
                 assert result_item["requestId"] == expected_request_id
                 data = result_item["data"]
                 print(
-                    f"\n[{interaction_id}] generateWidgetCard response:\n"
+                    f"\n[{interaction_id}] generateWidgetCardCompactDsl response:\n"
                     + json.dumps(data, ensure_ascii=False, indent=2)
                 )
                 return data

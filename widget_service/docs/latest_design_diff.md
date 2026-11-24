@@ -14,7 +14,7 @@
 - 当前保留三个正式业务 WebSocket 入口：
   `WS /api/v1/ws/tools/getWidgetCapabilityOverview`、
   `WS /api/v1/ws/tools/getDataCapabilitySchemas`、
-  `WS /api/v1/ws/tools/generateWidgetCard`。
+  `WS /api/v1/ws/tools/generateWidgetCardCompactDsl`。
 - 旧 HTTP 接口已移除。
 
 ## 2. 生成入参

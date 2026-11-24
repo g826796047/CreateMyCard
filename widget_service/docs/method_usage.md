@@ -60,7 +60,7 @@ App 使用完整数字版本，ROM 使用主次版本。两个区间均为左闭
 `WIDGET_SERVICE_ENABLE_DEFAULT_CAPABILITY_REGISTRY_FALLBACK=true` 时，统一回退到默认的
 `app-11.7.7.300_rom-7.0` 能力清单。arguments 参数修复也使用同一默认配置。
 旧清单使用 `GetCountdownDays`，日期计数清单使用 `GetDateCounter`。
-关闭开关时，第一、第二接口返回空清单/缺失能力，三个生成接口返回版本不支持。
+关闭开关时，第一、第二接口返回空清单/缺失能力，生成接口返回版本不支持。
 
 第一接口的 IDS 安装过滤范围由
 `WIDGET_SERVICE_IDS_INSTALLATION_FILTER_PACKAGE_NAMES` 配置，值为 JSON 字符串数组。默认包含
@@ -110,12 +110,10 @@ IDS 查询继续使用固定兜底值。用户和设备上下文通常由工具�
 ```text
 WS /api/v1/ws/tools/getWidgetCapabilityOverview
 WS /api/v1/ws/tools/getDataCapabilitySchemas
-WS /api/v1/ws/tools/generateWidgetCard
 WS /api/v1/ws/tools/generateWidgetCardCompactDsl
-WS /api/v1/ws/tools/generateWidgetCardTerseDslNested2
 ```
 
-第四接口的 `AIWidgetStart/AIWidgetEnd` 指令由全局开关控制。每个生成请求会创建一个 UUID 格式的
+Compact 接口的 `AIWidgetStart/AIWidgetEnd` 指令由全局开关控制。每个生成请求会创建一个 UUID 格式的
 `cardId`，放在指令的
 `payload.executeParam.cardId`；同一请求的开始、成功和失败指令共用该值，不同请求使用不同值。指令的
 `payload.executeParam.size` 优先使用 `content.size`；首次生成未传时为 `2x2`，编辑未传时继承来源
@@ -132,14 +130,13 @@ WebSocket 发送完成（不代表端侧已执行），`widget_directive_send_fa
 仅在日志副本中将 `content` JSON 字符串展开为对象，便于查看 `directives`、`executeParam`
 和 `session`；递归移除 `uid/userId/callingUid/odid` 等用户标识，实际下发内容保持不变。
 
-`generateWidgetCard` 固定使用标准 A2UI Form profile，后端由
-`WIDGET_SERVICE_A2UI_FORM_MODEL_BACKEND` 选择；`generateWidgetCardCompactDsl` 根据 App/ROM 区间选择
+`generateWidgetCardCompactDsl` 根据 App/ROM 区间选择
 Design profile，后端由 `WIDGET_SERVICE_DESIGN_COMPACT_MODEL_BACKEND` 选择并生成
 Design Compact DSL，再由服务内转换器读取该 Design profile 下的 `protocol.json`，生成标准三段 A2UI DSL。
-第三至第五入口共享同一策略驱动生成管线、校验和 repair 语义，
+生成入口共享同一策略驱动生成管线、校验和 repair 语义，
 调用方不需要传 `protocolProfileId`，旧值也不能覆盖路由选择结果。
 
-主 Agent 调用第四接口时不感知 WebSocket 的 `content` 字段，只使用标准工具调用格式：`arguments`、
+主 Agent 调用Compact 接口时不感知 WebSocket 的 `content` 字段，只使用标准工具调用格式：`arguments`、
 `functionName`、`skillName` 位于同层。`arguments` 必须直接传 JSON 对象，并包含 `bundleName`、
 `userQuery`、`title`、`description` 等工具字段；若误传为 JSON 字符串，服务会在模型调用前返回
 `/arguments` 错误，要求将字符串反序列化为对象后重新调用。可通过
@@ -166,16 +163,7 @@ retryable 为 false，明确要求主 Agent 停止本轮自动调用，提示用
 恢复成功替换请求 `content` 后，仍需通过正常生成、校验和存储流程；
 任意一次不再携带字符串化 `arguments` 的请求会清除该 `requestId` 的连续计数。
 
-`generateWidgetCardTerseDslNested2` 从
-`cloud/data/protocol_profiles/terse-dsl-nested-2/PROMPT.md` 读取本地 Prompt。模型输出只进入
-`cloud/services/terse_dsl_nested2_converter.py` 的受限 Parser，不作为 Python 或 JavaScript 执行；
-Parser 只接受单根组件调用、字面量、白名单组件和安全对象键，再复用标准 A2UI 转换与 artifact 校验。
-该接口支持静态 create/edit；动态数据绑定和点击事件返回 `PROTOCOL_CAPABILITY_UNSUPPORTED`。edit 与
-第四接口共用 `enable_widget_edit` 和 artifact 的 `designcompactdsl` 块，但会按 TerseDSL-Nested-2
-语法验证其中的上一轮模型原始输出。第五接口沿用 Design Compact 后端配置；两项后端配置都可取
-`mep` 或 `openai`。其它配置值会在启动配置校验阶段直接报错，不做自动迁移。
-
-第四接口的协议区间索引位于 `cloud/data/protocol_profiles/registry_ranges.json`，其中 App
+Compact 接口的协议区间索引位于 `cloud/data/protocol_profiles/registry_ranges.json`，其中 App
 `[11.7.5.205, 11.7.7.330)` 且 ROM `[7.0, 7.2)`，以及 App
 `[11.7.7.330, 12.0.0.0)` 且 ROM `[7.0, 8.0)`。当前两段都映射到同一套 A2UI Form Profile 和
 `design-compact-dsl`；未命中时，只有 `WIDGET_SERVICE_ENABLE_DEFAULT_PROTOCOL_PROFILE_FALLBACK=true`
@@ -220,9 +208,7 @@ Parser 只接受单根组件调用、字面量、白名单组件和安全对象�
 ```text
 docs/schemas/getWidgetCapabilityOverview.schema.json
 docs/schemas/getDataCapabilitySchemas.schema.json
-docs/schemas/generateWidgetCard.schema.json
 docs/schemas/generateWidgetCardCompactDsl.schema.json
-docs/schemas/generateWidgetCardTerseDslNested2.schema.json
 ```
 
 ### 3.1 GET /health
@@ -382,9 +368,9 @@ curl http://127.0.0.1:8855/health
 
 `missingCapabilityIds` 用来告诉主 Agent 哪些能力 ID 没有注册。`defaultWriteResultTo` 是可选建议字段：缺少该字段不代表能力缺失或不可用，也不得阻断能力清单加载；第三接口实际使用请求中的 `candidateDataBindings[].writeResultTo`。
 
-### 3.4 WS /api/v1/ws/tools/generateWidgetCard
+### 3.4 WS /api/v1/ws/tools/generateWidgetCardCompactDsl
 
-对应工具能力：`generateWidgetCard`
+对应工具能力：`generateWidgetCardCompactDsl`
 
 用途：首次生成或基于上一版 artifact 继续编辑卡片。接收主 Agent 从能力概述中规划的候选并生成 artifact；不再查询 IDS 或重复执行 `dependencies` 过滤。请求版本目录不存在时，使用统一的默认注册表回退配置。
 
@@ -478,8 +464,8 @@ Design Compact 两个生成入口都受同一个编辑开关控制，并沿用�
 ```json
 {
   "type": "result",
-  "tool": "generateWidgetCard",
-  "operation": "generateWidgetCard",
+  "tool": "generateWidgetCardCompactDsl",
+  "operation": "generateWidgetCardCompactDsl",
   "requestId": "generate-1",
   "data": {
     "status": "success",
@@ -619,7 +605,7 @@ async generate_widget_card(
 ) -> GenerateWidgetCardResponse
 ```
 
-用途：第三至第五接口的共用异步生成编排方法，只消费主 Agent 从第一接口可用清单中规划的能力。
+用途：生成接口的共用异步生成编排方法，只消费主 Agent 从第一接口可用清单中规划的能力。
 公开包装方法只负责选择一次 `GenerationRoutePolicy`，其中集中定义协议/Profile、模型后端、源 DSL
 格式、Processor、编辑/动态能力支持范围和 Validator error 是否阻断。
 
@@ -646,7 +632,7 @@ async generate_widget_card(
 from api.schemas import GenerateWidgetCardRequest
 from models.generation import CandidateDataBinding
 
-response = await service.generate_widget_card_a2ui_form(
+response = await service.generate_widget_card_compact_dsl(
     GenerateWidgetCardRequest(
         userQuery="帮我做一个只显示今天上海天气的桌面卡片",
         size="2x4",
@@ -978,7 +964,7 @@ build(
 
 用途：根据过滤后的有效能力生成最终 CardSpec。
 
-其中 `title` 和 `description` 来自第三个接口 `generateWidgetCard` 的入参，
+其中 `title` 和 `description` 来自第三个接口 `generateWidgetCardCompactDsl` 的入参，
 由 `GenerationPreflight` 传给 `CardSpecBuilder`，最终随 CardSpec 写入 artifact。
 
 规则：
@@ -1130,7 +1116,7 @@ async generate(
 生成接口的服务端路由配置选择，调用方不能通过请求参数切换。
 
 - 开关为 `true`：直接读取并返回与客户端同目录的 `mock.dat` 原始内容，不做字段替换或结构调整。
-- 第三接口读取 `WIDGET_SERVICE_A2UI_FORM_MODEL_BACKEND`；第四、第五接口读取
+- 生成接口读取
   `WIDGET_SERVICE_DESIGN_COMPACT_MODEL_BACKEND`。两项均可配置 `mep` 或 `openai`。
 - `A2UIModelClient` 通过 `UnifiedModelClient` 调用物理模型。`mep` 路由直接使用 MEP；`openai` 路由通过
   `WIDGET_SERVICE_OPENAI_MASTER_CLIENT` 选择 `deepseek_platform`、`llmclient` 或独立的
@@ -1176,7 +1162,7 @@ cloud/services/card_validation/validator.py
 validate(artifact: WidgetArtifact, protocol_profile: dict) -> list[str]
 ```
 
-用途：校验完整 artifact，而不是只校验 DSL。标准 A2UI 直接调用 `cloud/services/card_validation/` 暴露的 Python API；不会执行 Skill 校验脚本或启动子进程。静态规则从 `cloud/data/validator_rules/` 加载，动态能力白名单从 artifact 和其能力版本目录加载；第四接口校验转换后的标准 A2UI，不保存转换前的 Design Token。
+用途：校验完整 artifact，而不是只校验 DSL。标准 A2UI 直接调用 `cloud/services/card_validation/` 暴露的 Python API；不会执行 Skill 校验脚本或启动子进程。静态规则从 `cloud/data/validator_rules/` 加载，动态能力白名单从 artifact 和其能力版本目录加载；Compact 接口校验转换后的标准 A2UI，不保存转换前的 Design Token。
 
 当前校验项：
 
@@ -1194,7 +1180,7 @@ CardSpec 必填字段、suggestSize、dataBindings 和 writeResultTo 合法
 
 返回空列表表示没有 error；warning 只记录日志，不触发修复。Processor 的转换问题和 Validator 问题
 统一携带 `stage`、`code`、`message`。`enable_validation_failure_retry=true` 时才会携带当前最新源 DSL、
-源格式和错误位置执行有限次数定向 repair。第四、第五接口转换失败始终阻断保存；Validator error 的
+源格式和错误位置执行有限次数定向 repair。生成接口转换失败始终阻断保存；Validator error 的
 最终阻断策略由接口路由策略决定。
 
 ### 8.5 RetryController.run
@@ -1335,7 +1321,6 @@ WIDGET_SERVICE_DEFAULT_DEVICE_ROM_VERSION
 WIDGET_SERVICE_DEFAULT_PRD_VERSION
 WIDGET_SERVICE_MOCK_IDS_RESPONSE_PATH
 WIDGET_SERVICE_IDS_QUERY_URL
-WIDGET_SERVICE_A2UI_FORM_MODEL_BACKEND
 WIDGET_SERVICE_DESIGN_COMPACT_MODEL_BACKEND
 WIDGET_SERVICE_OPENAI_MASTER_CLIENT
 WIDGET_SERVICE_OPENAI_FALLBACK_CLIENT
@@ -1402,7 +1387,7 @@ WIDGET_SERVICE_ANYIO_THREAD_POOL_TOKENS
 ```
 
 `WIDGET_SERVICE_ANYIO_THREAD_POOL_TOKENS` 默认值为 `80`，在应用启动时写入 AnyIO
-默认线程限制器，仅控制第一、第二接口和短时同步 IO/校验任务的并发容量。第三至第五接口直接等待
+默认线程限制器，仅控制第一、第二接口和短时同步 IO/校验任务的并发容量。生成接口直接等待
 异步生成 Service，不让完整模型链路占用该线程池。
 
 `WIDGET_SERVICE_ENABLE_MODEL_FAILURE_RETRY` 默认值为 `false`。关闭时每个模型阶段只调用 master 一次，
@@ -1424,7 +1409,7 @@ N 个字符、system prompt 总字符数和消息数量，不记录完整 system
 提示词正文。repair 请求继续保持完整载荷不落日志。
 
 `WIDGET_SERVICE_MODEL_MAX_CONCURRENCY` 默认 `20`，由应用生命周期唯一模型 Runtime 的共享 Semaphore
-执行。MEP、DeepSeek Platform、llmclient、DeepSeek 官方 HTTP、三个生成接口、create/edit、模型失败重试和 repair 的每一次
+执行。MEP、DeepSeek Platform、llmclient、DeepSeek 官方 HTTP、生成接口、create/edit、模型失败重试和 repair 的每一次
 真实模型调用都要单独获取令牌；mock 不占令牌。排队和执行分别由
 `WIDGET_SERVICE_MODEL_QUEUE_TIMEOUT_SECONDS` 与 `WIDGET_SERVICE_MODEL_REQUEST_TIMEOUT_SECONDS` 控制，
 默认均为 120 秒。llmclient 超时后令牌保留到同步后台调用真正结束，避免物理并发超限。
@@ -1497,7 +1482,7 @@ from app.logger import json_for_log, logger
 
 logger.info(
     "flow_started "
-    f"operation=generateWidgetCard candidates={json_for_log(['ViewWeather'])}"
+    f"operation=generateWidgetCardCompactDsl candidates={json_for_log(['ViewWeather'])}"
 )
 ```
 

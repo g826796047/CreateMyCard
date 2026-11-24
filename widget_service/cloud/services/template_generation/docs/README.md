@@ -1,11 +1,11 @@
 # Template Generation 文档中心
 
 本目录维护 `template_generation` 模块的实现说明。模块为
-`generateWidgetCardCompactDsl` 和 `generateWidgetCardTerseDslNested2` 的 create 请求提供受控
+`generateWidgetCardCompactDsl` 的 create 请求提供受控
 Template source DSL，但不负责能力裁决、CardSpec/TaskSpec 构造、最终校验、artifact 保存或业务响应。
 
 > 本目录统一使用协议名 `Tersel`。`Tersel-Nest2`、`TerseDSL-Nested-2`、`Nested-2` 和 `Terse`
-> 只作为历史名称或现有 WebSocket operation 的组成部分保留。
+> 只作为历史名称保留。
 
 ## 文档层级
 
@@ -17,7 +17,7 @@ Template source DSL，但不负责能力裁决、CardSpec/TaskSpec 构造、最�
 | [modules.md](modules.md) | 目录、类、函数和代码责任索引 | 否，实现说明 |
 | [tersel-protocol.md](tersel-protocol.md) | Tersel 语法、DesignToken、内联样式和安全边界 | 否，模块内协议说明 |
 | [compact-dsl-data-flow.md](compact-dsl-data-flow.md) | Compact 入口的数据流和回退策略 | 否，接口实现说明 |
-| [tersel-data-flow.md](tersel-data-flow.md) | Tersel 入口的数据流和严格失败策略 | 否，接口实现说明 |
+| [tersel-data-flow.md](tersel-data-flow.md) | Compact 模板数据流和图库失败策略 | 否，接口实现说明 |
 | [provider-template-contract.md](provider-template-contract.md) | Provider Bundle、CardTpl、Layout 与 Action 接入规则 | 否，模块内契约 |
 | [template-search-planner-contract.md](template-search-planner-contract.md) | 第一层、Search、Planner、第二层及验证器的职责与输入输出 | 否，模块内契约 |
 | [support-template-action-policy.md](support-template-action-policy.md) | Support 内嵌事件白名单、业务对象归属和确定性校验 | 否，模块内契约 |
@@ -88,7 +88,7 @@ Tersel 生产路线都使用 `DESIGN_COMPACT` Processor，因此模块最终返�
 - 不生成 CardSpec、TaskSpec、artifact 或 `GenerateWidgetCardResponse`。
 - 不调用 `ArtifactValidator`、`ArtifactStore` 或 `ResponsePlanner`。
 - 生产路径不持有 `WidgetGenerationService` 实例，不反向调用原协议生成链。
-- 不决定 Compact 和 Tersel 入口的回退、edit 和业务响应策略。
+- 不决定 Compact 入口的回退、edit 和业务响应策略。
 
 ## 开发入口
 

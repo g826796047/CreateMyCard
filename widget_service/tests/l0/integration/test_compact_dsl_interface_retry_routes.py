@@ -4,6 +4,8 @@ import json
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
+from starlette.websockets import WebSocketDisconnect
 from test_compact_dsl_interface_retry import make_response
 from test_tool_dispatch_routes import (
     _command_content,
@@ -15,6 +17,7 @@ from test_tool_dispatch_routes import (
 )
 
 from api import routes
+from api.schemas import WidgetCardServiceRequest
 from config.config import get_settings
 from core.errors import ErrorCode, GenerationStatus
 from custom.a2ui_model_client import A2UIModelClient, A2UIModelGenerationError
@@ -259,33 +262,6 @@ def test_route_disabled_or_zero_retry_preserves_single_attempt(monkeypatch, enab
     assert_single_directive_pair(frames, succeeded=False)
 
 
-@pytest.mark.parametrize(
-    ("operation", "method"),
-    [
-        ("generateWidgetCard", "generate_widget_card_a2ui_form"),
-        ("generateWidgetCardTerseDslNested2", "generate_widget_card_terse_dsl_nested2"),
-    ],
-)
-def test_other_generation_routes_do_not_use_interface_retry(monkeypatch, operation, method):
-    calls = []
-
-    async def unexpected_retry(*_args, **_kwargs):
-        pytest.fail("other routes must not enter Compact DSL interface retry")
-
-    async def generate(_service, request, *, before_model_call):
-        calls.append(request)
-        await before_model_call("2x2")
-        return make_response(GenerationStatus.FAILED, ErrorCode.A2UI_GENERATION_FAILED)
-
-    monkeypatch.setattr(routes, "run_compact_dsl_with_retry", unexpected_retry)
-    monkeypatch.setattr(WidgetGenerationService, method, generate)
-    with TestClient(app).websocket_connect(f"/api/v1/ws/tools/{operation}") as websocket:
-        websocket.send_json(_tool_payload(_CONTENT, "other-route"))
-        frames = _receive_frames_until_final(websocket, _request_id("other-route"))
-    assert len(calls) == 1
-    assert_single_directive_pair(frames, succeeded=False)
-
-
 @pytest.mark.parametrize("failure_kind", ["model", "validation", "upload"])
 def test_real_generation_pipeline_retries_to_valid_artifact(monkeypatch, tmp_path, failure_kind):
     settings = get_settings()
@@ -398,3 +374,13 @@ def test_final_delivery_failure_does_not_repeat_successful_generation(monkeypatc
         frames = _receive_frames_until_final(websocket, _request_id("final-failure"))
     assert len(calls) == 1
     assert_single_directive_pair(frames, succeeded=True)
+
+
+@pytest.mark.parametrize("operation", ["generateWidgetCard", "generateWidgetCardTerseDslNested2"])
+def test_retired_generation_tools_reject_websocket_and_service_requests(operation):
+    with TestClient(app) as client, pytest.raises(WebSocketDisconnect):
+        with client.websocket_connect(f"/api/v1/ws/tools/{operation}"):
+            pytest.fail("retired WebSocket accepted")
+    with pytest.raises(ValidationError) as rejected:
+        WidgetCardServiceRequest.model_validate({"operation": operation})
+    assert any(error.get("loc") == ("operation",) for error in rejected.value.errors())

@@ -35,9 +35,7 @@ from models.generation import (
 WidgetCardOperation = Literal[
     "getWidgetCapabilityOverview",
     "getDataCapabilitySchemas",
-    "generateWidgetCard",
     "generateWidgetCardCompactDsl",
-    "generateWidgetCardTerseDslNested2",
 ]
 
 
@@ -144,7 +142,7 @@ class ToolRequestEnvelope(BaseModel):
     - deviceInfo：端侧设备信息；content 未提供 romVersion 时作为回退来源。
     - session：会话信息，服务会用 sessionId + '&' + interactionId 生成 requestId。
     - userAuth：用户鉴权信息；content 未提供 uid 时从 user.userId 回退提取。
-    - utterance：用户原始表达；generateWidgetCard 未传 userQuery 时可兜底使用 original。
+    - utterance：用户原始表达；生成接口未传 userQuery 时可兜底使用 original。
     - pagination：分页信息，当前接口暂不消费。
     - version：外部包络协议版本。
     - bundleName：宿主业务包名。
@@ -349,11 +347,7 @@ class WidgetCardServiceRequest(VersionedToolRequest):
         """按操作区分字段，保留数据定义查询的合法 ID 列表。"""
         if isinstance(value, dict):
             operation = value.get("operation")
-            if operation in (
-                "generateWidgetCard",
-                "generateWidgetCardCompactDsl",
-                "generateWidgetCardTerseDslNested2",
-            ):
+            if operation == "generateWidgetCardCompactDsl":
                 _reject_generation_capability_ids(value)
             value = _without_tool_metadata(value)
         return value

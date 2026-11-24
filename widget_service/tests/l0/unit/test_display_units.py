@@ -10,11 +10,7 @@ from services.card_validation import validate_card
 from services.card_validation.diagnostics import Diagnostic
 from services.card_validation.display_unit_rules import repair_repeated_display_units
 from services.card_validation.validator import ArtifactValidator
-from services.generation.generation_pipeline import (
-    DslProcessingContext,
-    QualityIssue,
-    StandardA2UIProcessor,
-)
+from services.generation.generation_pipeline import QualityIssue
 from services.generation.task_spec_builder import TaskSpecBuilder
 
 
@@ -125,23 +121,6 @@ def test_task_spec_builder_does_not_project_display_unit_metadata():
         "description": "测试电量字段",
         "sampleValue": 68,
     }
-
-
-def test_standard_processor_repairs_repeated_inline_unit():
-    source = _dsl("{{ ${/data/battery/level} + '%' }}")
-    context = DslProcessingContext(
-        size="2x2",
-        card_spec=_card_spec(),
-        task_spec={"dataModelSchema": {}},
-        protocol_profile={},
-        data_capabilities=[_capability(unit_included=True)],
-    )
-
-    result = StandardA2UIProcessor().process(source, context)
-
-    assert result.source_dsl == source
-    assert "{{ ${/data/battery/level} }}" in result.standard_dsl
-    assert "+ '%'" not in result.standard_dsl
 
 
 def test_repair_collapses_repeated_unit_and_keeps_one_for_raw_number():

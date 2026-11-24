@@ -35,7 +35,6 @@ DEVICE_INFO = {
 REPORT_TIMESTAMPS = {
     "getWidgetCapabilityOverview": "2026-07-10T02:03:51.676293+00:00",
     "getDataCapabilitySchemas": "2026-07-10T02:03:51.678293+00:00",
-    "generateWidgetCard": "2026-07-10T02:03:51.679293+00:00",
 }
 
 if str(CLOUD_ROOT) not in sys.path:
@@ -95,7 +94,7 @@ def _tool_payload(
     入参：
     - content：业务入参，对应旧协议 arguments。
     - interaction_id：当前交互 ID，会和 sessionId 拼接成 requestId。
-    - original：用户原始表达，generateWidgetCard 未传 userQuery 时可兜底使用。
+    - original：用户原始表达，generateWidgetCardCompactDsl 未传 userQuery 时可兜底使用。
     - device_info：可选设备信息；不传时使用正常版本设备。
     出参：完整 WebSocket 请求字典。
     """
@@ -830,7 +829,7 @@ def test_generation_model_error_sends_start_and_failure_commands(monkeypatch):
         interaction_id,
     )
 
-    with client.websocket_connect("/api/v1/ws/tools/generateWidgetCard") as websocket:
+    with client.websocket_connect("/api/v1/ws/tools/generateWidgetCardCompactDsl") as websocket:
         websocket.send_json(request)
         frames = _receive_frames_until_final(websocket, request_id)
 

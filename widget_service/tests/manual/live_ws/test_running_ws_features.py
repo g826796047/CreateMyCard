@@ -181,29 +181,6 @@ def test_live_missing_data_capability_schema():
     assert legacy_message["data"]["missingCapabilityIds"] == [missing_id]
 
 
-def test_live_generate_widget_card():
-    """单独验证原 A2UI Form 模型生成和 artifact 保存链路。"""
-    _, legacy_message = _run_ws(
-        "generateWidgetCard",
-        {
-            "userQuery": "生成一张简洁的欢迎卡片",
-            "size": "2x2",
-            "title": "欢迎",
-            "description": "本地单功能测试",
-            "candidateDataBindings": [],
-            "candidateEventCandidates": [],
-            "candidateAssetIds": [],
-        },
-        "generate-a2ui",
-    )
-    data = legacy_message["data"]
-
-    assert legacy_message["type"] == "result"
-    assert data["status"] in {"success", "degraded"}
-    assert data["artifactUrl"]
-    assert data["artifactDigest"].startswith("sha256:")
-
-
 def test_live_generate_widget_card_compact_dsl():
     """单独验证 Compact DSL 模型生成和 artifact 保存链路。"""
     _, legacy_message = _run_ws(
@@ -230,7 +207,7 @@ def test_live_generate_widget_card_compact_dsl():
 def test_live_invalid_arguments_plugin_contract():
     """单独验证参数异常仍保持插件顶层成功，并在 streamContent 中携带详情。"""
     response, legacy_message = _run_ws(
-        "generateWidgetCard",
+        "generateWidgetCardCompactDsl",
         {
             "userQuery": "故意缺少创建模式的 title 和 description",
             "candidateDataBindings": [],

@@ -121,6 +121,7 @@ from services.template_generation.engine.tersel_converter import (
     convert_tersel_to_a2ui,
 )
 from services.template_generation.profile import read_tersel_protocol_profile
+from services.template_generation.test_support.provider_gallery import GalleryTemplateService
 from services.template_generation.tests.photo_assertions import capture_template_photos
 from services.themes.fusion_ball_expander import (
     FUSION_BALL_MIN_PRD_VERSION_CONFIG,
@@ -7408,9 +7409,9 @@ def _policy() -> GenerationRoutePolicy:
     )
 
 
-def _terse_policy() -> GenerationRoutePolicy:
+def _gallery_policy() -> GenerationRoutePolicy:
     return GenerationRoutePolicy(
-        operation="generateWidgetCardTerseDslNested2",
+        operation="template-gallery",
         protocol_profile_id=A2UI_FORM_PROTOCOL_PROFILE_ID,
         backend="openai",
         processor_kind=DslProcessorKind.DESIGN_COMPACT,
@@ -7904,9 +7905,9 @@ async def test_terse_entry_uses_compact_template_source_with_fusion_ball_theme(m
         )
 
     monkeypatch.setattr(ArtifactStore, "save", save)
-    response = await WidgetGenerationService(
+    response = await GalleryTemplateService(
         model_runtime=object(),
-    ).generate_widget_card_terse_dsl_nested2(
+    ).generate_gallery_template(
         _weather_request().model_copy(update={"prdVer": "11.7.5.206"}),
     )
 
@@ -8702,7 +8703,7 @@ async def test_compact_edit_rejection_uses_original_flow(monkeypatch):
     ("entry_name", "template_failure_is_terminal"),
     [
         ("generate_widget_card_compact_dsl", False),
-        ("generate_widget_card_terse_dsl_nested2", True),
+        ("generate_gallery_template", True),
     ],
 )
 @pytest.mark.parametrize(
@@ -8798,7 +8799,7 @@ async def test_template_exception_obeys_route_failure_policy(
         lambda: settings,
     )
 
-    service = WidgetGenerationService()
+    service = GalleryTemplateService()
     entry = getattr(service, entry_name)
     response = await entry(
         _weather_request(),
@@ -8822,7 +8823,7 @@ async def test_template_exception_obeys_route_failure_policy(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("policy_factory", [_policy, _terse_policy], ids=["compact", "terse"])
+@pytest.mark.parametrize("policy_factory", [_policy, _gallery_policy], ids=["compact", "terse"])
 async def test_template_quality_failure_obeys_entry_fallback_policy(
     monkeypatch,
     policy_factory,
@@ -8965,7 +8966,7 @@ async def test_template_quality_failure_obeys_entry_fallback_policy(
 
 
 @pytest.mark.asyncio
-async def test_terse_edit_is_rejected_when_semantic_edit_is_disabled(monkeypatch):
+async def test_compact_edit_is_rejected_when_semantic_edit_is_disabled(monkeypatch):
     settings = get_settings()
     monkeypatch.setattr(settings, "enable_semantic_widget_edit", False)
     request = _weather_request().model_copy(
@@ -8975,7 +8976,7 @@ async def test_terse_edit_is_rejected_when_semantic_edit_is_disabled(monkeypatch
     template_called = False
 
     async def original_generation(*_args: Any, **_kwargs: Any) -> Any:
-        pytest.fail("Terse edit must not enter the original flow")
+        pytest.fail("Compact edit must not enter the original flow")
 
     async def rejected_template(*_args: Any, **_kwargs: Any) -> Any:
         nonlocal template_called
@@ -8989,7 +8990,7 @@ async def test_terse_edit_is_rejected_when_semantic_edit_is_disabled(monkeypatch
         rejected_template,
     )
     monkeypatch.setattr(service, "generate_widget_card", original_generation)
-    response = await service.generate_widget_card_terse_dsl_nested2(request)
+    response = await service.generate_widget_card_compact_dsl(request)
 
     assert response.status == GenerationStatus.UNSUPPORTED
     assert response.errorCode == "WIDGET_EDIT_DISABLED"
@@ -9009,9 +9010,9 @@ async def test_terse_entry_forwards_gallery_template_overrides(monkeypatch):
         observed.update(options)
         return expected
 
-    service = WidgetGenerationService()
+    service = GalleryTemplateService()
     monkeypatch.setattr(service, "_generate_widget_card_with_policy", capture_generation)
-    response = await service.generate_widget_card_terse_dsl_nested2(
+    response = await service.generate_gallery_template(
         _weather_request(),
         trusted_template_candidate_ids=("WeatherOverviewCompact@1",),
         trusted_template_action_ids=("event.open.weather",),
@@ -9051,7 +9052,7 @@ async def test_policy_layer_configures_template_source_generator(monkeypatch):
     )
     response = await service._generate_widget_card_with_policy(
         _weather_request(),
-        _terse_policy(),
+        _gallery_policy(),
         template_source_generator=generator,
         need_fallback=False,
     )

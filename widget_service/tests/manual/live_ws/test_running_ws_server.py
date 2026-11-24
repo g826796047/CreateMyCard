@@ -242,7 +242,7 @@ def test_live_four_websocket_paths_complete_flow():
             "candidateAssetIds": ["asset.drop_1"],
         }
         generate_message = await _call_ws(
-            "generateWidgetCard",
+            "generateWidgetCardCompactDsl",
             _tool_payload(
                 {
                     "bundleName": "com.omega_w_0823.hmservice",
@@ -265,17 +265,11 @@ def test_live_four_websocket_paths_complete_flow():
         assert generated["suggestSize"] == "2x4"
         assert generated["effectiveCapabilities"]["data"] == ["ViewWeather"]
 
-        # 当前 mock.dat 故意保留可被最新校验器识别的问题，用于真实验证：即使校验失败，
-        # 主流程仍会返回成功产物并继续保存，而不是阻塞 WebSocket 请求。
         validation_report = await asyncio.to_thread(
             _validate_saved_artifact,
             generated["artifactUrl"],
         )
-        assert validation_report.error_count > 0
-        print(
-            "校验发现问题，但 generateWidgetCard 仍成功返回 artifact，非阻塞链路验证通过。",
-            flush=True,
-        )
+        assert validation_report.error_count == 0
 
     asyncio.run(scenario())
 

@@ -124,7 +124,6 @@ class Settings(BaseSettings):
     model_flow_id: str = CONFIG.get("model_flow_id")
     model_temperature: float = 0.4
     model_top_k: int = 1
-    a2ui_form_model_backend: str = CONFIG.get("a2ui_form_model_backend")
     design_compact_model_backend: str = CONFIG.get("design_compact_model_backend")
     validation_failure_max_repair_attempts: int = CONFIG.get(
         "validation_failure_max_repair_attempts"

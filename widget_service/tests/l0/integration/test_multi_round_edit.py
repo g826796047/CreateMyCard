@@ -133,7 +133,7 @@ async def test_source_artifact_remote_mode_uses_shared_download_utility(
 ):
     """验证关闭 mock 后由公共 URL 下载方法读取来源 artifact。"""
     settings = get_settings()
-    created = await WidgetGenerationService().generate_widget_card_a2ui_form(_base_request())
+    created = await WidgetGenerationService().generate_widget_card_compact_dsl(_base_request())
     source_file = editable_artifact_storage / created.artifactUrl.rsplit("/", 1)[-1]
     source_content = source_file.read_bytes()
     requested: dict = {}
@@ -169,7 +169,7 @@ async def test_source_artifact_remote_mode_uses_shared_download_utility(
 async def test_source_artifact_load_does_not_validate_url_storage(
     editable_artifact_storage,
 ):
-    created = await WidgetGenerationService().generate_widget_card_a2ui_form(_base_request())
+    created = await WidgetGenerationService().generate_widget_card_compact_dsl(_base_request())
     source_name = created.artifactUrl.rsplit("/", 1)[-1]
     loaded = await asyncio.to_thread(
         SourceArtifactRepository().load,
@@ -199,7 +199,6 @@ def test_v1_artifact_is_reported_as_unsupported():
 @pytest.mark.parametrize(
     "generation_method",
     [
-        "generate_widget_card_a2ui_form",
         "generate_widget_card_compact_dsl",
     ],
 )

@@ -82,7 +82,6 @@ model_url: ""
 model_bid: ""
 model_flow_id: ""
 
-a2ui_form_model_backend: mep
 design_compact_model_backend: openai
 validation_failure_max_repair_attempts: 5
 model_max_concurrency: 20
