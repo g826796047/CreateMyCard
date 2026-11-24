@@ -30,11 +30,11 @@ def trace_counts(directory: Path) -> dict:
     return result
 
 
-def prepare_preview(run: Path, meta: dict) -> None:
+def prepare_preview(run_dir: Path, meta: dict) -> None:
     index = meta["index"]
-    preview = run / "preview"
-    directory = run / meta["traceDirectory"] / "artifacts"
-    artifact_file = run / "md" / f"q{index}_artifact.md"
+    preview = run_dir / "preview"
+    directory = run_dir / meta["traceDirectory"] / "artifacts"
+    artifact_file = run_dir / "md" / f"q{index}_artifact.md"
     artifact = artifact_file.read_text(encoding="utf-8") if artifact_file.exists() else ""
     for label, suffix in (("request", "raw_request"), ("taskspec", "task_spec_attempt-1")):
         if f"```{label}" in artifact:
@@ -113,8 +113,10 @@ async def run(args: argparse.Namespace) -> None:
             print(f"[Progress] {len(results)}/{len(files)}", flush=True)
     finally:
         if os.name == "nt" and proc.poll() is None:
-            subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"],
-                           capture_output=True, check=False)
+            taskkill = Path(os.environ["SystemRoot"]) / "System32" / "taskkill.exe"
+            subprocess.run(
+                [taskkill, "/PID", str(proc.pid), "/T", "/F"], capture_output=True, check=False
+            )
         else:
             runner.stop_server(proc)
 

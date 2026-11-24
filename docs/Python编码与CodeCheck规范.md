@@ -75,6 +75,7 @@
   2026-11-22 图案创建回归的嵌套保存回调参数改为 `saved_artifact`，避免遮蔽外层产物变量；
   参数改名须保持回调传参与对象身份不变。`test/level0/unit/test_compact_codecheck_regressions.py`
   覆盖图案编译模块及创建回调的词法作用域，区分真实外层绑定与类成员作用域。
+- Windows 批跑脚本清理进程树时，使用系统目录中 `taskkill.exe` 的完整路径，保持 PID、子进程清理参数及退出码处理语义。回归见 `test_run_compact_semantic_batch.py`。
 - 遵守 `G.ERR.09`。同一个 `except` 元组不得同时捕获父异常和子异常；例如已捕获 `OSError` 时，不再
   重复列出其子类 `TimeoutError`。
 - 遵守 `G.ERR.07`。不得使用 `except` 后直接 `pass`；可选流程发生异常时也要记录异常类型和原因，
